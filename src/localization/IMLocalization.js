@@ -12,9 +12,9 @@ export const IMLocalized = memoize(
     i18n.t(key, config).includes('missing') ? key : i18n.t(key, config),
   (key, config) => (config ? key + JSON.stringify(config) : key),
 );
-export const init = () => {
+export const init = (language) => {
     
-  let localeLanguageTag = Localization.locale;
+  let localeLanguageTag = language;
   let isRTL = Localization.isRTL;
   IMLocalized.cache.clear();
   // update layout direction

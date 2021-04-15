@@ -35,8 +35,17 @@ import PrivacyScreen from "../screens/Privacy";
 import AboutScreen from "../screens/About";
 import LanguageScreen from "../screens/Language";
 import AgreementScreen from "../screens/Agreement";
-
+import UserSelectScreen from "../screens/UserSelect";
+import PatientInfoScreen from "../screens/PatientInfo";
+import DoctorDetailScreen from "../screens/DoctorDetail";
+import EditProfileScreen from "../screens/EditProfile";
+import NotificationScreen from "../screens/Notification";
+import CaseHistoryScreen from "../screens/CaseHistory";
+import PatientViewScreen from "../screens/PatientView";
+import PrimaryCareDoctorViewScreen from "../screens/PrimaryCareDoctorView";
+import BookDoctorScreen from "../screens/BookDoctor";
 import CustomDrawerContent from "./Menu";
+
 import { tabs } from "../constants/";
 
 const { width } = Dimensions.get("screen");
@@ -47,22 +56,21 @@ const Drawer = createDrawerNavigator();
 const profile = {
   avatar: Images.Profile,
   name: "Rachel Brown",
-  type: "Seller",
-  plan: "Pro",
-  rating: 4.8
+  type: "Agent",
+  plan: "Workforce",  
 };
 
 const ProfileStack = (props) => {
   return (
     <Stack.Navigator initialRouteName="Profile" mode="card" headerMode="screen">
       <Stack.Screen
-        name="Profile"
+        name="Agency Info"
         component={ProfileScreen}
         options={{
           header: ({ navigation, scene }) => (
             <Header
               transparent
-              title="Profile"
+              title="Agency Info"
               scene={scene}
               navigation={navigation}
             />
@@ -828,11 +836,9 @@ const HomeStack = (props) => {
         options={{
           header: ({ navigation, scene }) => (
             <Header
-              search
-              options
-              title="Home"
-              navigation={navigation}
-              scene={scene}
+              back 
+              title="Title" 
+              navigation={props.navigation}
             />
           )
         }}
@@ -988,15 +994,15 @@ const AppStack = (props) => {
           overflow: "hidden"
         },
         labelStyle: {
-          fontSize: 18,
+          fontSize: 48,
           fontWeight: "normal"
         }
       }}
       initialRouteName="Home"
     >
       <Drawer.Screen
-        name="Home"
-        component={HomeStack}
+        name="Agent Info"
+        component={ProfileStack}
         options={{
           drawerIcon: ({ focused }) => (
             <Icon
@@ -1009,8 +1015,8 @@ const AppStack = (props) => {
         }}
       />
       <Drawer.Screen
-        name="Woman"
-        component={WomanStack}
+        name="Dashboard"
+        component={HomeStack}
         options={{
           drawerIcon: ({ focused }) => (
             <Icon
@@ -1038,7 +1044,7 @@ const AppStack = (props) => {
         }}
       />
       <Drawer.Screen
-        name="Kids"
+        name="Case View"
         component={KidsStack}
         options={{
           drawerIcon: ({ focused }) => (
@@ -1052,7 +1058,7 @@ const AppStack = (props) => {
         }}
       />
       <Drawer.Screen
-        name="New Collection"
+        name="Primary Care Doctor View"
         component={NewCollectionStack}
         options={{
           drawerIcon: ({ focused }) => (
@@ -1066,7 +1072,7 @@ const AppStack = (props) => {
         }}
       />
       <Drawer.Screen
-        name="Profile"
+        name="Schedule View"
         component={ProfileStack}
         options={{
           drawerIcon: ({ focused }) => (
@@ -1110,6 +1116,81 @@ const AppStack = (props) => {
         }}
       />
       <Drawer.Screen
+        name="Patient Info"
+        component={PatientInfoStack}
+        options={{
+          drawerIcon: ({ focused }) => (
+            <Icon
+              size={16}
+              name="md-woman"
+              family="ionicon"
+              color={focused ? "white" : materialTheme.COLORS.MUTED}
+              style={{ marginLeft: 4, marginRight: 4 }}
+            />
+          )
+        }}
+      />
+      <Drawer.Screen
+        name="Doctor Detail"
+        component={DoctorDetailStack}
+        options={{
+          drawerIcon: ({ focused }) => (
+            <Icon
+              size={16}
+              name="md-woman"
+              family="ionicon"
+              color={focused ? "white" : materialTheme.COLORS.MUTED}
+              style={{ marginLeft: 4, marginRight: 4 }}
+            />
+          )
+        }}
+      />
+      <Drawer.Screen
+        name="Edit Profile"
+        component={EditProfileStack}
+        options={{
+          drawerIcon: ({ focused }) => (
+            <Icon
+              size={16}
+              name="md-woman"
+              family="ionicon"
+              color={focused ? "white" : materialTheme.COLORS.MUTED}
+              style={{ marginLeft: 4, marginRight: 4 }}
+            />
+          )
+        }}
+      />
+      <Drawer.Screen
+        name="Notification"
+        component={NotificationStack}
+        options={{
+          drawerIcon: ({ focused }) => (
+            <Icon
+              size={16}
+              name="md-woman"
+              family="ionicon"
+              color={focused ? "white" : materialTheme.COLORS.MUTED}
+              style={{ marginLeft: 4, marginRight: 4 }}
+            />
+          )
+        }}
+      />
+      <Drawer.Screen
+        name="CaseHistory"
+        component={NotificationStack}
+        options={{
+          drawerIcon: ({ focused }) => (
+            <Icon
+              size={16}
+              name="md-woman"
+              family="ionicon"
+              color={focused ? "white" : materialTheme.COLORS.MUTED}
+              style={{ marginLeft: 4, marginRight: 4 }}
+            />
+          )
+        }}
+      />
+      <Drawer.Screen
         name="Sign In"
         component={SignInScreen}
         options={{
@@ -1137,8 +1218,182 @@ const AppStack = (props) => {
           )
         }}
       />
+      <Drawer.Screen
+        name="Patient View"
+        component={PatientViewScreen}
+        options={{
+          drawerIcon: ({ focused }) => (
+            <Icon
+              size={16}
+              name="md-person-add"
+              family="ionicon"
+              color={focused ? "white" : materialTheme.COLORS.MUTED}
+            />
+          )
+        }}
+      />
     </Drawer.Navigator>
   );
 }
 
-export default OnboardingStack;
+const UserSelectStack = (props) => {
+  return (
+    <Stack.Navigator mode="card" headerMode="none">
+      <Stack.Screen
+        name="UserSelectStack"
+        component={UserSelectScreen}
+        option={{
+          headerTransparent: true
+        }}
+      />
+      <Stack.Screen name="App" component={AppStack} />
+    </Stack.Navigator>
+  );
+}
+
+const PatientInfoStack = (props) => {
+  return (
+    <Stack.Navigator mode="card" headerMode="screen">
+      <Stack.Screen
+        name="Patient Info"
+        component={PatientInfoScreen}
+        options={{
+          header: ({ navigation, scene }) => (
+            <Header
+              back 
+              title="Patient Information" 
+              navigation={props.navigation}
+            />
+          )
+        }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+const PatientViewStack = (props) => {
+  return (
+    <Stack.Navigator mode="card" headerMode="none">
+      <Stack.Screen
+        name="Patient View"
+        component={PatientViewScreen}
+        option={{
+          headerTransparent: true
+        }}
+      />
+      <Stack.Screen name="App" component={AppStack} />
+    </Stack.Navigator>
+  );
+}
+
+const DoctorDetailStack = (props) => {
+  return (
+    <Stack.Navigator mode="card" headerMode="screen">
+      <Stack.Screen
+        name="Doctor Detail"
+        component={DoctorDetailScreen}
+        options={{
+          header: ({ navigation, scene }) => (
+            <Header
+              back 
+              title="Doctor Detail" 
+              navigation={props.navigation}
+            />
+          )
+        }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+const PrimaryCareDoctorViewStack = (props) => {
+  return (
+    <Stack.Navigator mode="card" headerMode="none">
+      <Stack.Screen
+        name="PrimaryCareDoctorViewStack"
+        component={PrimaryCareDoctorViewScreen}
+        option={{
+          headerTransparent: true
+        }}
+      />
+      <Stack.Screen name="App" component={AppStack} />
+    </Stack.Navigator>
+  );
+}
+
+const EditProfileStack = (props) => {
+  return (
+    <Stack.Navigator mode="card" headerMode="screen">
+      <Stack.Screen
+        name="Edit Profile"
+        component={EditProfileScreen}
+        options={{
+          header: ({ navigation, scene }) => (
+            <Header
+              back 
+              title="Edit Profile" 
+              navigation={props.navigation}
+            />
+          )
+        }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+const BookDoctorStack = (props) => {
+  return (
+    <Stack.Navigator mode="card" headerMode="none">
+      <Stack.Screen
+        name="BookDoctorStack"
+        component={BookDoctorScreen}
+        option={{
+          headerTransparent: true
+        }}
+      />
+      <Stack.Screen name="App" component={AppStack} />
+    </Stack.Navigator>
+  );
+}
+
+const NotificationStack = (props) => {
+  return (
+    <Stack.Navigator mode="card" headerMode="screen">
+      <Stack.Screen
+        name="Notification"
+        component={NotificationScreen}
+        options={{
+          header: ({ navigation, scene }) => (
+            <Header
+              back               
+              title="Notification" 
+              navigation={props.navigation}
+            />
+          )
+        }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+const CaseHistoryStack = (props) => {
+  return (
+    <Stack.Navigator mode="card" headerMode="screen">
+      <Stack.Screen
+        name="CaseHistory"
+        component={CaseHistoryScreen}
+        options={{
+          header: ({ navigation, scene }) => (
+            <Header
+              back               
+              title="CaseHistory" 
+              navigation={props.navigation}
+            />
+          )
+        }}
+      />
+    </Stack.Navigator>
+  );
+}
+
+export default UserSelectStack;

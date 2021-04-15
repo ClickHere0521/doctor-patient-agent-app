@@ -6,6 +6,8 @@ import { I18nManager } from 'react-native';
 import materialTheme from '../constants/Theme';
 import { IMLocalized, init } from '../src/localization/IMLocalization';
   
+export const LocalizationContext = React.createContext();
+
 const listData = [
     {
         id: '1',
@@ -38,13 +40,13 @@ const Language = () => {
         switch(selectedId)
         {
           case '1':
-            console.log(selectedId);
+            init('en-US');
             break;
           case '2':
-            console.log(selectedId);
+            init('fr-FR');
             break;
           case '3':
-            console.log(selectedId);
+            init('fr-FR');
             break;
         }
       };
@@ -59,7 +61,7 @@ const Language = () => {
                 extraData={selectedId}
             />
             <Text>
-                {Localization.locale}
+                {IMLocalized('Home')}
             </Text>
         </ScrollView>
       </Block>

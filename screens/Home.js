@@ -66,8 +66,6 @@ const Home = (props) => {
   return (
     <Block flex center style={styles.home}>
       {
-        renderSearch(),
-        renderTabs(),
         renderProducts()
       }
     </Block>

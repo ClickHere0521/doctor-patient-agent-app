@@ -6,6 +6,7 @@ import { Block, Button, Input, Text, theme } from 'galio-framework';
 import { LinearGradient } from 'expo-linear-gradient';
 import { materialTheme } from '../constants/';
 import { HeaderHeight } from "../constants/utils";
+import {IMLocalized, init} from '../src/localization/IMLocalization';
 
 const { height, width } = Dimensions.get('window');
 
@@ -40,60 +41,15 @@ const SignUp = (props) => {
       start={{ x: 0, y: 0 }}
       end={{ x: 0.25, y: 1.1 }}
       locations={[0.2, 1]}
-      colors={['#6C24AA', '#15002B']}
+      colors={['#4E54C8', '#8F94FB']}
       style={[styles.signup, { flex: 1, paddingTop: theme.SIZES.BASE * 4 }]}>
       <Block flex middle>
         <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "position"} enabled keyboardVerticalOffset={0}> 
-          <Block style={{ marginBottom: height * 0.05 }}>
-            <Block row center space="between" style={{ marginVertical: theme.SIZES.BASE * 1.875 }}>
-              <Block flex middle right>
-                <Button
-                  round
-                  onlyIcon
-                  iconSize={theme.SIZES.BASE * 1.625}
-                  icon="facebook"
-                  iconFamily="font-awesome"
-                  onPress={() => Alert.alert('Not implemented')}
-                  color={theme.COLORS.FACEBOOK}
-                  shadowless
-                  iconColor={theme.COLORS.WHITE}
-                  style={styles.social}
-                />
-              </Block>
-              <Block flex middle center>
-                <Button
-                  round
-                  onlyIcon
-                  iconSize={theme.SIZES.BASE * 1.625}
-                  icon="twitter"
-                  iconFamily="font-awesome"
-                  onPress={() => Alert.alert('Not implemented')}
-                  color={theme.COLORS.TWITTER}
-                  shadowless
-                  iconColor={theme.COLORS.WHITE}
-                  style={styles.social}
-                />
-              </Block>
-              <Block flex middle left>
-                <Button
-                  round
-                  onlyIcon
-                  iconSize={theme.SIZES.BASE * 1.625}
-                  icon="dribbble"
-                  iconFamily="font-awesome"
-                  onPress={() => Alert.alert('Not implemented')}
-                  color={theme.COLORS.DRIBBBLE}
-                  shadowless
-                  iconColor={theme.COLORS.WHITE}
-                  style={styles.social}
-                />
-              </Block>
-            </Block>
-            <Text color='#fff' center size={theme.SIZES.FONT * 0.875}>
-              or be classical
+          <Block middle style={{ paddingTop: theme.SIZES.BASE * 5, paddingHorizontal: width * 0.1 }}>
+            <Text color="white" size={34} style={{alignSelf: 'flex-start', fontWeight: 'bold'}}>
+              {IMLocalized('Welcome')}
             </Text>
           </Block>
-
           <Block flex={1} center space="between">
             <Block center>
               <Input
@@ -136,7 +92,7 @@ const SignUp = (props) => {
                 onFocus={() => toggleActive('password')}
               />
             </Block>
-            <Block flex center style={{ marginTop: 20 }}>
+            <Block flex center style={{ marginTop: 20, width: width * 0.8 }}>
               <Button
               size="large"
                 shadowless
@@ -176,7 +132,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 1
   },
   input: {
-    width: width * 0.9,
+    width: width * 0.8,
     borderRadius: 0,
     borderBottomWidth: 1,
     borderBottomColor: materialTheme.COLORS.PLACEHOLDER,

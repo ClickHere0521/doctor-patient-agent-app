@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="55" height="55" viewBox="0 0 55 55">
+  <g id="border" fill="none" stroke="#3b3e51" stroke-width="1">
+    <rect width="55" height="55" rx="16" stroke="none"/>
+    <rect x="0.5" y="0.5" width="54" height="54" rx="15.5" fill="none"/>
+  </g>
+</svg>

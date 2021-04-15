@@ -3,10 +3,10 @@ import { withNavigation } from '@react-navigation/compat';
 import { StyleSheet, Dimensions, Image, TouchableWithoutFeedback } from 'react-native';
 import { Block, Text, theme } from 'galio-framework';
 
-const { width } = Dimensions.get('screen');
+const { width, height } = Dimensions.get('screen');
 
 const Product = props => {
-  const { navigation, product, horizontal, full, style, priceColor, imageStyle } = props;
+  const { navigation, product, horizontal, full, style, priceColor, imageStyle, time, unReaden } = props;
   const imageStyles = [styles.image, full ? styles.fullImage : styles.horizontalImage, imageStyle];
 
   return (
@@ -14,6 +14,7 @@ const Product = props => {
       <TouchableWithoutFeedback onPress={() => navigation.navigate('Product', { product: product })}>
         <Block flex style={[styles.imageContainer, styles.shadow]}>
           <Image source={{ uri: product.image }} style={imageStyles} />
+          <Text>Admin</Text>
         </Block>
       </TouchableWithoutFeedback>
       <TouchableWithoutFeedback onPress={() => navigation.navigate('Product', { product: product })}>

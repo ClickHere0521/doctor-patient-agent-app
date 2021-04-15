@@ -443,7 +443,7 @@ const Components = (props) => {
         {renderInputs()}
         {renderSwitches()}
         {renderTableCell()}
-        {/* {renderNavigation()} */}
+        {renderNavigation()}
         {renderSocial()}  
         {renderCards()}
         {renderAlbum()}

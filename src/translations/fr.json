@@ -1,6 +1,10 @@
 {
     "welcome": "Bienvenue",
     "English": "English",
-    "Fully coded React Native components.": "Composants React Native entièrement codés.",
-    "hello": "Hello World!"
+    "Home": "Domicile",
+    "Settings": "Paramètres",
+    "Profile": "Profil",
+    "Sign Up": "S'inscrire",
+    "Sign In": "S'identifier",
+    "Fully coded React Native components.": "Composants React Native entièrement codés."
 }

@@ -1,6 +1,6 @@
 import React from 'react';
 import { StyleSheet, Dimensions, ScrollView, Image, ImageBackground, Platform } from 'react-native';
-import { Block, Text, theme } from 'galio-framework';
+import { Button, Block, Text, theme } from 'galio-framework';
 import { LinearGradient } from 'expo-linear-gradient';
 
 import { Icon } from '../components';
@@ -23,12 +23,9 @@ const Profile = (props) => {
             <Block row space="between">
               <Block row>
                 <Block middle style={styles.pro}>
-                  <Text size={16} color="white">Pro</Text>
+                  <Text size={16} color="white">Workforce</Text>
                 </Block>
-                <Text color="white" size={16} muted style={styles.seller}>Seller</Text>
-                <Text size={16} color={materialTheme.COLORS.WARNING}>
-                  4.8 <Icon name="shape-star" family="GalioExtra" size={14} />
-                </Text>
+                <Text color="white" size={16} muted style={styles.seller}>Agency</Text>
               </Block>
               <Block>
                 <Text color={theme.COLORS.MUTED} size={16}>
@@ -46,31 +43,21 @@ const Profile = (props) => {
           <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
             <Block row space="between" style={{ padding: theme.SIZES.BASE, }}>
               <Block middle>
-                <Text bold size={12} style={{marginBottom: 8}}>36</Text>
-                <Text muted size={12}>Orders</Text>
+                <Text bold size={12} style={{marginBottom: 8}}>Doctors</Text>
+                <Text muted size={12}>50</Text>
               </Block>
               <Block middle>
-                <Text bold size={12} style={{marginBottom: 8}}>5</Text>
-                <Text muted size={12}>Bids & Offers</Text>
+                <Text bold size={12} style={{marginBottom: 8}}>Tel</Text>
+                <Text muted size={12}>098-90-9088</Text>
               </Block>
               <Block middle>
-                <Text bold size={12} style={{marginBottom: 8}}>2</Text>
-                <Text muted size={12}>Messages</Text>
+                <Text bold size={12} style={{marginBottom: 8}}>Email</Text>
+                <Text muted size={12}>Anth.gmail@com</Text>
               </Block>
             </Block>
             <Block row space="between" style={{ paddingVertical: 16, alignItems: 'baseline' }}>
-              <Text size={16}>Recently viewed</Text>
-              <Text size={12} color={theme.COLORS.PRIMARY} onPress={() => props.navigation.navigate('Home')}>View All</Text>
-            </Block>
-            <Block row space="between" style={{ flexWrap: 'wrap' }} >
-              {Images.Viewed.map((img, imgIndex) => (
-                <Image
-                  source={{ uri: img }}
-                  key={`viewed-${img}`}  
-                  resizeMode="cover"
-                  style={styles.thumb}
-                />
-              ))}
+              <Text size={16}>Role</Text>
+              <Text size={14} color={theme.COLORS.PRIMARY} onPress={() => props.navigation.navigate('Home')}>Edit</Text>
             </Block>
           </ScrollView>
         </Block>
@@ -108,7 +95,7 @@ const styles = StyleSheet.create({
     marginRight: theme.SIZES.BASE / 2,
     borderRadius: 4,
     height: 19,
-    width: 38,
+    width: 90,
   },
   seller: {
     marginRight: theme.SIZES.BASE / 2,

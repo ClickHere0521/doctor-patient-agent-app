@@ -4,13 +4,15 @@ import { Block, Text, theme } from "galio-framework";
 
 import Icon from "./Icon";
 import materialTheme from "../constants/Theme";
+import {IMLocalized, init} from '../src/localization/IMLocalization';
+
 
 const DrawerItem = props => {
   const renderIcon = () => {
     const { title, focused } = props;
 
     switch (title) {
-      case "Home":
+      case "Agent Info":
         return (
           <Icon
             size={14}
@@ -19,7 +21,7 @@ const DrawerItem = props => {
             color={focused ? "white" : materialTheme.COLORS.MUTED}
           />
         );
-      case "Woman":
+      case "Dashboard":
         return (
           <Icon
             size={16}
@@ -28,7 +30,7 @@ const DrawerItem = props => {
             color={focused ? "white" : materialTheme.COLORS.MUTED}
           />
         );
-      case "Man":
+      case "Patient View":
         return (
           <Icon
             size={15}
@@ -37,7 +39,7 @@ const DrawerItem = props => {
             color={focused ? "white" : materialTheme.COLORS.MUTED}
           />
         );
-      case "Kids":
+      case "Case View":
         return (
           <Icon
             size={15}
@@ -46,7 +48,7 @@ const DrawerItem = props => {
             color={focused ? "white" : materialTheme.COLORS.MUTED}
           />
         );
-      case "New Collection":
+      case "Primary Care Doctor View":
         return (
           <Icon
             size={15}
@@ -55,7 +57,7 @@ const DrawerItem = props => {
             color={focused ? "white" : materialTheme.COLORS.MUTED}
           />
         );
-      case "Profile":
+      case "Schedule View":
         return (
           <Icon
             size={15}
@@ -74,6 +76,15 @@ const DrawerItem = props => {
           />
         );
       case "Components":
+        return (
+          <Icon
+            size={17}
+            name="md-triangle"
+            family="ionicon"
+            color={focused ? "white" : materialTheme.COLORS.MUTED}
+          />
+        );
+      case "Patient Info":
         return (
           <Icon
             size={17}
@@ -123,7 +134,7 @@ const DrawerItem = props => {
         </Block>
         <Block flex={0.9}>
           <Text size={15} color={focused ? "white" : "black"}>
-            {title}
+            {IMLocalized(title)}
           </Text>
         </Block>
       </Block>

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { ImageBackground, Image, StyleSheet, StatusBar, Dimensions } from 'react-native';
 import { Block, Button, Text, theme } from 'galio-framework';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -11,6 +11,11 @@ import {IMLocalized, init} from '../src/localization/IMLocalization';
 
 const Onboarding = (props) => {
   const { navigation } = props;
+
+  useEffect(() => {
+    // Update the document title using the browser API
+    init('en-US');
+  }, []);
 
   return (
     <Block flex style={styles.container}>
@@ -39,7 +44,7 @@ const Onboarding = (props) => {
           </Block>
           <Block style={{ paddingHorizontal: theme.SIZES.BASE * 2,  zIndex: 3 }}>
             <Text size={16} color='rgba(255,255,255,0.6)'>
-            {IMLocalized('Fully coded React Native components.')}
+            {IMLocalized('welcome')}
             </Text>
           </Block>
         </Block>

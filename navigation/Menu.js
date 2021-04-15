@@ -14,14 +14,13 @@ import { useSafeArea } from "react-native-safe-area-context";
 import { Icon, Drawer as DrawerCustomItem } from "../components/";
 import { Images, materialTheme } from "../constants/";
 
-const { width } = Dimensions.get("screen");
+const { width, height } = Dimensions.get("screen");
 
 const profile = {
   avatar: Images.Profile,
   name: "Rachel Brown",
-  type: "Seller",
-  plan: "Pro",
-  rating: 4.8
+  type: "Agnecy",
+  plan: "Workforce",  
 };
 
 const CustomDrawerContent = ({
@@ -34,14 +33,22 @@ const CustomDrawerContent = ({
 }) => {
   const insets = useSafeArea();
   const screens = [
-    "Home",
-    "Woman",
-    "Man",
-    "Kids",
-    "New Collection",
-    "Profile",
+    "Agent Info",
+    "Dashboard",
+    "Patient View",
+    "Case View",
+    "Primary Care Doctor View",
+    "Schedule View",
     "Settings",
-    "Components"
+    "Components",
+    "Patient Info",
+    "Doctor Detail",
+    "Edit Profile",
+    "Notification",
+    "CaseHistory",
+    "Sign In",
+    "Sign Up",
+    "Patient View"
   ];
   return (
     <Block
@@ -52,8 +59,7 @@ const CustomDrawerContent = ({
         <TouchableWithoutFeedback
           onPress={() => navigation.navigate("Profile")}
         >
-          <Block style={styles.profile}>
-            <Image source={{ uri: profile.avatar }} style={styles.avatar} />
+          <Block style={styles.profile}>            
             <Text h5 color={"white"}>
               {profile.name}
             </Text>
@@ -65,12 +71,8 @@ const CustomDrawerContent = ({
               {profile.plan}
             </Text>
           </Block>
-          <Text size={16} muted style={styles.seller}>
+          <Text size={16} muted color="white" style={styles.seller}>
             {profile.type}
-          </Text>
-          <Text size={16} color={materialTheme.COLORS.WARNING}>
-            {profile.rating}{" "}
-            <Icon name="shape-star" family="GalioExtra" size={14} />
           </Text>
         </Block>
       </Block>
@@ -97,7 +99,13 @@ const CustomDrawerContent = ({
           })}
         </ScrollView>
       </Block>
-      <Block flex={0.25} style={{ paddingLeft: 7, paddingRight: 14 }}>
+      {/* <Block flex={0.25} style={{ paddingLeft: width * 0.1, paddingTop: height * 0.1 }}>
+        <Text>
+          © 2021-2022  AMGAPP.          
+        </Text>
+        <Text>
+          All Rights Reserved  
+        </Text>
         <DrawerCustomItem
           title="Sign In"
           navigation={navigation}
@@ -108,7 +116,7 @@ const CustomDrawerContent = ({
           navigation={navigation}
           focused={state.index === 9 ? true : false}
         />
-      </Block>
+      </Block> */}
     </Block>
   );
 }
@@ -118,7 +126,7 @@ const styles = StyleSheet.create({
     flex: 1
   },
   header: {
-    backgroundColor: "#4B1958",
+    backgroundColor: "#6E78F7",
     paddingHorizontal: 28,
     paddingBottom: theme.SIZES.BASE,
     paddingTop: theme.SIZES.BASE * 2,
@@ -143,7 +151,7 @@ const styles = StyleSheet.create({
     marginRight: 8,
     borderRadius: 4,
     height: 19,
-    width: 38
+    width: 90
   },
   seller: {
     marginRight: 16

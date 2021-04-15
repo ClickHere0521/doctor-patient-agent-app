@@ -4,6 +4,7 @@ import AppLoading from 'expo-app-loading';
 import { Asset } from 'expo-asset';
 import { Block, GalioProvider } from 'galio-framework';
 import { NavigationContainer } from '@react-navigation/native';
+import { useFonts } from 'expo-font';
 
 // Configure redux
 import { Provider } from 'react-redux';
@@ -62,29 +63,32 @@ const App = props => {
     setIsLoadingComplete(true);
   };
 
-  return (
-    <>
-      {(!isLoadingComplete) ? (
-        <AppLoading
-          startAsync={_loadResourcesAsync}
-          onError={_handleLoadingError}
-          onFinish={_handleFinishLoading}
-        />
-      ) : (
-        <Provider store={store}>
-          <NavigationContainer>
-            <GalioProvider theme={materialTheme}>
-              <Block flex>
-                {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-                <Screens />
-              </Block>
-            </GalioProvider>
-          </NavigationContainer>
-        </Provider>
-        )
-      }
-    </>
-  )
+  
+    return (
+      <>
+        {
+        (!isLoadingComplete) ? (
+          <AppLoading
+            startAsync={_loadResourcesAsync}
+            onError={_handleLoadingError}
+            onFinish={_handleFinishLoading}
+          />
+        ) : (
+          <Provider store={store}>
+            <NavigationContainer>
+              <GalioProvider theme={materialTheme}>
+                <Block flex>
+                  {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
+                  <Screens />
+                </Block>
+              </GalioProvider>
+            </NavigationContainer>
+          </Provider>
+          )
+        }
+      </>
+    )
+  
 }
 
 export default App;

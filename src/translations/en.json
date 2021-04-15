@@ -1,6 +1,12 @@
 {
     "welcome": "welcome",
     "English": "English",
+    "Workforce": "Workforce",
+    "Agent": "Agent",
+    "Workforce Agent": "Workforce Agent",
+    "Patient": "Patient",
+    "AgreeTerm": "By continuing, you agree to Terms & Conditions",
+    "Primary Care Doctor": "Primary Care Doctor",
     "Fully coded React Native components.": "Fully coded React Native components.",
     "Send texts, photos, videos, and audio messages to your close friends.": "Send texts, photos, videos, and audio messages to your close friends.",
     "Log In": "Log In",

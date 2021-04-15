@@ -6,6 +6,7 @@ import { Button, Block, NavBar, Input, Text, theme } from 'galio-framework';
 import Icon from './Icon';
 import materialTheme from '../constants/Theme';
 import Tabs from './Tabs';
+import {IMLocalized, init} from '../src/localization/IMLocalization';
 
 const { height, width } = Dimensions.get('window');
 const iPhoneX = () => Platform.OS === 'ios' && (height === 812 || width === 812 || height === 896 || width === 896);
@@ -179,7 +180,7 @@ const Header = (props) => {
     <Block style={headerStyles}>
       <NavBar
         back={back}
-        title={title}
+        title={IMLocalized(title)}
         style={styles.navbar}
         transparent={transparent}
         right={renderRight()}
