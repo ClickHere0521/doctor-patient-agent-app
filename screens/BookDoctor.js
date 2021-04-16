@@ -103,7 +103,7 @@ const Components = (props) => {
                     </ImageBackground>
                 </Block>
             </ScrollView>
-            <Text color={'#3F4079'} bold size={17} style={{marginTop: theme.SIZES.BASE}}>Doctors near by you</Text>
+            <Text color={'#3F4079'} bold size={17} style={{marginVertical: theme.SIZES.BASE}}>Doctors near by you</Text>
             <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                 <Block flex row>
                         <HorizontalListItem product={products[1]} style={{ marginRight: theme.SIZES.BASE }} />

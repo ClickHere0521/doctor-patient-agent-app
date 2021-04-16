@@ -124,7 +124,7 @@ const Chat = (props) => {
     handleScroll();
   }
 
-  const messageForm = () => {
+const messageForm = () => {
     const { navigation } = props;
     
     return (

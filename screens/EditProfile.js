@@ -34,22 +34,20 @@ const EditProfile = (props) => {
           <Block middle>
             <Image source={require('../assets/images/avatar.png')} />
           </Block>
-          <Block middle style={styles.uploadPicture}>
-            <Block row>
-              <Block middle>
-                <TouchableOpacity>
-                  <Text style={{marginRight: 20}}>
-                    Upload 
-                  </Text>
-                </TouchableOpacity>                                            
-              </Block>
-              <Block middle>
-                <TouchableOpacity>
-                  <Text>
-                    Remove 
-                  </Text>
-                </TouchableOpacity>
-              </Block>
+          <Block row>
+            <Block middle>
+              <TouchableOpacity style={{borderWidth: 1, borderRadius: 20, paddingVertical: 5, paddingLeft: 8, paddingRight: 30, marginRight:-26}}>
+                <Text>
+                  Upload 
+                </Text>
+              </TouchableOpacity>                                            
+            </Block>
+            <Block middle>
+              <TouchableOpacity style={{borderWidth: 1, backgroundColor: '#3B3E51',borderRadius: 20, paddingVertical: 5, paddingHorizontal: 8}}>
+                <Text color="white">
+                  Remove 
+                </Text>
+              </TouchableOpacity>
             </Block>
           </Block>
         </Block>      
@@ -117,16 +115,28 @@ const EditProfile = (props) => {
           style={[styles.input, vals.email ? styles.inputActive : null]}
           
         />
-        <Button
-          center
-          shadowless
-          color={materialTheme.COLORS.PRIMARY}
-          textStyle={styles.optionsButtonText}
-          style={styles.optionsButton}
-          onPress={() => handleDelete(item.id)}
-        >
-          SAVE
-        </Button>        
+        <Block row style={{alignSelf: 'flex-end'}}>
+          <Button
+            center
+            shadowless
+            color='#6E78F7'
+            textStyle={styles.optionsButtonText}
+            style={styles.optionsButton}
+            onPress={() => handleDelete(item.id)}
+          >
+            EDIT
+          </Button>  
+          <Button
+            center
+            shadowless
+            color='#6E78F7'
+            textStyle={styles.optionsButtonText}
+            style={styles.optionsButton}
+            onPress={() => handleDelete(item.id)}
+          >
+            SAVE
+          </Button>
+        </Block>      
       </Block>
       </ScrollView>
     </Block>
@@ -156,17 +166,18 @@ const styles = StyleSheet.create({
     shadowOpacity: 1,
   },
   uploadPicture: {
-    paddingHorizontal: width * 0.03,
-    height: height * 0.06,
-    marginTop: height * 0.04,
+    paddingHorizontal: 14,
+    paddingVertical: 1,
+    marginTop: height * 0.01,
     marginHorizontal: width * 0.01,    
-    borderRadius: 13,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'grey',
     backgroundColor: theme.COLORS.WHITE,
     shadowColor: 'black',
     shadowOffset: { width: 0, height: 0 },
     shadowRadius: 8,
-    shadowOpacity: 0.2,
-    elevation: 3,
+    shadowOpacity: 0.2,    
     zIndex: 2,
   },
   userInfo: {

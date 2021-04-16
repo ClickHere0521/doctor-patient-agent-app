@@ -16,8 +16,8 @@ const DrawerItem = props => {
         return (
           <Icon
             size={14}
-            name="shop"
-            family="GalioExtra"
+            name="address-book"
+            family="font-awesome"
             color={focused ? "white" : materialTheme.COLORS.MUTED}
           />
         );
@@ -25,8 +25,8 @@ const DrawerItem = props => {
         return (
           <Icon
             size={16}
-            name="md-woman"
-            family="ionicon"
+            name="home"
+            family="font-awesome"
             color={focused ? "white" : materialTheme.COLORS.MUTED}
           />
         );
@@ -34,8 +34,8 @@ const DrawerItem = props => {
         return (
           <Icon
             size={15}
-            name="man"
-            family="entypo"
+            name="user"
+            family="font-awesome"
             color={focused ? "white" : materialTheme.COLORS.MUTED}
           />
         );
@@ -43,8 +43,8 @@ const DrawerItem = props => {
         return (
           <Icon
             size={15}
-            name="baby"
-            family="GalioExtra"
+            name="id-badge"
+            family="font-awesome"
             color={focused ? "white" : materialTheme.COLORS.MUTED}
           />
         );
@@ -52,8 +52,8 @@ const DrawerItem = props => {
         return (
           <Icon
             size={15}
-            name="grid-on"
-            family="material"
+            name="stethoscope"
+            family="font-awesome"
             color={focused ? "white" : materialTheme.COLORS.MUTED}
           />
         );
@@ -61,8 +61,8 @@ const DrawerItem = props => {
         return (
           <Icon
             size={15}
-            name="circle-10"
-            family="GalioExtra"
+            name="calendar"
+            family="font-awesome"
             color={focused ? "white" : materialTheme.COLORS.MUTED}
           />
         );

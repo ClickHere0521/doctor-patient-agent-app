@@ -37,14 +37,17 @@ import LanguageScreen from "../screens/Language";
 import AgreementScreen from "../screens/Agreement";
 import UserSelectScreen from "../screens/UserSelect";
 import PatientInfoScreen from "../screens/PatientInfo";
-import DoctorDetailScreen from "../screens/DoctorDetail";
+import DoctorScheduleDetailScreen from "../screens/DoctorScheduleDetail";
 import EditProfileScreen from "../screens/EditProfile";
 import NotificationScreen from "../screens/Notification";
 import CaseHistoryScreen from "../screens/CaseHistory";
 import PatientViewScreen from "../screens/PatientView";
 import PrimaryCareDoctorViewScreen from "../screens/PrimaryCareDoctorView";
 import BookDoctorScreen from "../screens/BookDoctor";
+import CaseViewScreen from "../screens/CaseView";
 import CustomDrawerContent from "./Menu";
+import TimeSlotScreen from "../screens/TimeSlot";
+import DoctorDetailScreen from "../screens/DoctorDetail";
 
 import { tabs } from "../constants/";
 
@@ -55,7 +58,7 @@ const Drawer = createDrawerNavigator();
 
 const profile = {
   avatar: Images.Profile,
-  name: "Rachel Brown",
+  name: "Workforce Agent",
   type: "Agent",
   plan: "Workforce",  
 };
@@ -835,132 +838,10 @@ const HomeStack = (props) => {
         component={HomeScreen}
         options={{
           header: ({ navigation, scene }) => (
-            <Header
-              back 
-              title="Title" 
+            <Header               
+              title="Dashboard" 
               navigation={props.navigation}
             />
-          )
-        }}
-      />
-      <Stack.Screen
-        name="Deals"
-        component={DealsScreen}
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header
-              back
-              tabs={tabs.deals}
-              title="Best Deals"
-              navigation={navigation}
-              scene={scene}
-            />
-          )
-        }}
-      />
-      <Stack.Screen
-        name="Categories"
-        component={CategoriesScreen}
-        options={{
-          header: ({ navigation, scene, route }) => (
-            <Header
-              back
-              tabs={tabs.categories}
-              tabIndex={tabs.categories[1].id}
-              title="Categories"
-              navigation={navigation}
-              route={route}
-              scene={scene}
-            />
-          )
-        }}
-      />
-      <Stack.Screen
-        name="Category"
-        component={CategoryScreen}
-        options={{
-          header: ({ navigation, scene }) => {
-            const { params } = scene.descriptor;
-            const title = (params && params.headerTitle) || "Category";
-            return (
-              <Header
-                back
-                title={title}
-                navigation={navigation}
-                scene={scene}
-              />
-            );
-          }
-        }}
-      />
-      <Stack.Screen
-        name="Product"
-        component={ProductScreen}
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header
-              back
-              white
-              transparent
-              title=""
-              navigation={navigation}
-              scene={scene}
-            />
-          ),
-          headerTransparent: true
-        }}
-      />
-      <Stack.Screen
-        name="Gallery"
-        component={GalleryScreen}
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header
-              back
-              white
-              transparent
-              title=""
-              navigation={navigation}
-              scene={scene}
-            />
-          ),
-          headerTransparent: true
-        }}
-      />
-      <Stack.Screen
-        name="Chat"
-        component={ChatScreen}
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header
-              back
-              title="Rachel Brown"
-              navigation={navigation}
-              scene={scene}
-            />
-          )
-        }}
-      />
-      <Stack.Screen
-        name="Cart"
-        component={CartScreen}
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header
-              back
-              title="Shopping Cart"
-              navigation={navigation}
-              scene={scene}
-            />
-          )
-        }}
-      />
-      <Stack.Screen
-        name="Search"
-        component={SearchScreen}
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header back title="Search" navigation={navigation} scene={scene} />
           )
         }}
       />
@@ -1001,20 +882,6 @@ const AppStack = (props) => {
       initialRouteName="Home"
     >
       <Drawer.Screen
-        name="Agent Info"
-        component={ProfileStack}
-        options={{
-          drawerIcon: ({ focused }) => (
-            <Icon
-              size={16}
-              name="shop"
-              family="GalioExtra"
-              color={focused ? "white" : materialTheme.COLORS.MUTED}
-            />
-          )
-        }}
-      />
-      <Drawer.Screen
         name="Dashboard"
         component={HomeStack}
         options={{
@@ -1030,27 +897,13 @@ const AppStack = (props) => {
         }}
       />
       <Drawer.Screen
-        name="Man"
-        component={ManStack}
+        name="Agent Info"
+        component={ProfileStack}
         options={{
           drawerIcon: ({ focused }) => (
             <Icon
               size={16}
-              name="man"
-              family="entypo"
-              color={focused ? "white" : materialTheme.COLORS.MUTED}
-            />
-          )
-        }}
-      />
-      <Drawer.Screen
-        name="Case View"
-        component={KidsStack}
-        options={{
-          drawerIcon: ({ focused }) => (
-            <Icon
-              size={16}
-              name="baby"
+              name="shop"
               family="GalioExtra"
               color={focused ? "white" : materialTheme.COLORS.MUTED}
             />
@@ -1058,14 +911,42 @@ const AppStack = (props) => {
         }}
       />
       <Drawer.Screen
-        name="Primary Care Doctor View"
-        component={NewCollectionStack}
+        name="Patient View"
+        component={PatientViewStack}
         options={{
           drawerIcon: ({ focused }) => (
             <Icon
               size={16}
-              name="grid-on"
-              family="material"
+              name="user"
+              family="font-awesome"
+              color={focused ? "white" : materialTheme.COLORS.MUTED}
+            />
+          )
+        }}
+      />
+      <Drawer.Screen
+        name="Case View"
+        component={CaseViewStack}
+        options={{
+          drawerIcon: ({ focused }) => (
+            <Icon
+              size={16}
+              name="id-badge"
+              family="font-awesome"
+              color={focused ? "white" : materialTheme.COLORS.MUTED}
+            />
+          )
+        }}
+      />
+      <Drawer.Screen
+        name="Primary Care Doctor View"
+        component={PrimaryCareDoctorViewStack}
+        options={{
+          drawerIcon: ({ focused }) => (
+            <Icon
+              size={16}
+              name="briefcase-medical"
+              family="font-awesome"
               color={focused ? "white" : materialTheme.COLORS.MUTED}
             />
           )
@@ -1078,8 +959,8 @@ const AppStack = (props) => {
           drawerIcon: ({ focused }) => (
             <Icon
               size={16}
-              name="circle-10"
-              family="GalioExtra"
+              name="calender"
+              family="font-awesome"
               color={focused ? "white" : materialTheme.COLORS.MUTED}
             />
           )
@@ -1131,8 +1012,8 @@ const AppStack = (props) => {
         }}
       />
       <Drawer.Screen
-        name="Doctor Detail"
-        component={DoctorDetailStack}
+        name="Doctor Schedule Detail"
+        component={DoctorScheduleDetailStack}
         options={{
           drawerIcon: ({ focused }) => (
             <Icon
@@ -1177,7 +1058,7 @@ const AppStack = (props) => {
       />
       <Drawer.Screen
         name="CaseHistory"
-        component={NotificationStack}
+        component={CaseHistoryStack}
         options={{
           drawerIcon: ({ focused }) => (
             <Icon
@@ -1186,6 +1067,48 @@ const AppStack = (props) => {
               family="ionicon"
               color={focused ? "white" : materialTheme.COLORS.MUTED}
               style={{ marginLeft: 4, marginRight: 4 }}
+            />
+          )
+        }}
+      />
+      <Drawer.Screen
+        name="BookDoctor"
+        component={BookDoctorScreen}
+        options={{
+          drawerIcon: ({ focused }) => (
+            <Icon
+              size={16}
+              name="md-person-add"
+              family="ionicon"
+              color={focused ? "white" : materialTheme.COLORS.MUTED}
+            />
+          )
+        }}
+      />
+      <Drawer.Screen
+        name="Time Slot"
+        component={TimeSlotStack}
+        options={{
+          drawerIcon: ({ focused }) => (
+            <Icon
+              size={16}
+              name="briefcase-medical"
+              family="font-awesome"
+              color={focused ? "white" : materialTheme.COLORS.MUTED}
+            />
+          )
+        }}
+      />
+      <Drawer.Screen
+        name="Doctor Detail"
+        component={DoctorDetailStack}
+        options={{
+          drawerIcon: ({ focused }) => (
+            <Icon
+              size={16}
+              name="briefcase-medical"
+              family="font-awesome"
+              color={focused ? "white" : materialTheme.COLORS.MUTED}
             />
           )
         }}
@@ -1207,20 +1130,6 @@ const AppStack = (props) => {
       <Drawer.Screen
         name="Sign Up"
         component={SignUpScreen}
-        options={{
-          drawerIcon: ({ focused }) => (
-            <Icon
-              size={16}
-              name="md-person-add"
-              family="ionicon"
-              color={focused ? "white" : materialTheme.COLORS.MUTED}
-            />
-          )
-        }}
-      />
-      <Drawer.Screen
-        name="Patient View"
-        component={PatientViewScreen}
         options={{
           drawerIcon: ({ focused }) => (
             <Icon
@@ -1278,7 +1187,13 @@ const PatientViewStack = (props) => {
         name="Patient View"
         component={PatientViewScreen}
         option={{
-          headerTransparent: true
+          header: ({ navigation, scene }) => (
+            <Header
+              back 
+              title="Patient View" 
+              navigation={props.navigation}
+            />
+          )
         }}
       />
       <Stack.Screen name="App" component={AppStack} />
@@ -1286,17 +1201,17 @@ const PatientViewStack = (props) => {
   );
 }
 
-const DoctorDetailStack = (props) => {
+const DoctorScheduleDetailStack = (props) => {
   return (
     <Stack.Navigator mode="card" headerMode="screen">
       <Stack.Screen
         name="Doctor Detail"
-        component={DoctorDetailScreen}
+        component={DoctorScheduleDetailScreen}
         options={{
           header: ({ navigation, scene }) => (
             <Header
               back 
-              title="Doctor Detail" 
+              title="Doctor Schedule Detail" 
               navigation={props.navigation}
             />
           )
@@ -1310,7 +1225,7 @@ const PrimaryCareDoctorViewStack = (props) => {
   return (
     <Stack.Navigator mode="card" headerMode="none">
       <Stack.Screen
-        name="PrimaryCareDoctorViewStack"
+        name="Primary Care Doctor View"
         component={PrimaryCareDoctorViewScreen}
         option={{
           headerTransparent: true
@@ -1345,7 +1260,7 @@ const BookDoctorStack = (props) => {
   return (
     <Stack.Navigator mode="card" headerMode="none">
       <Stack.Screen
-        name="BookDoctorStack"
+        name="BookDoctor"
         component={BookDoctorScreen}
         option={{
           headerTransparent: true
@@ -1358,20 +1273,14 @@ const BookDoctorStack = (props) => {
 
 const NotificationStack = (props) => {
   return (
-    <Stack.Navigator mode="card" headerMode="screen">
+    <Stack.Navigator mode="card" headerMode="none">
       <Stack.Screen
         name="Notification"
         component={NotificationScreen}
         options={{
-          header: ({ navigation, scene }) => (
-            <Header
-              back               
-              title="Notification" 
-              navigation={props.navigation}
-            />
-          )
+          headerTransparent: true          
         }}
-      />
+      />      
     </Stack.Navigator>
   );
 }
@@ -1392,6 +1301,51 @@ const CaseHistoryStack = (props) => {
           )
         }}
       />
+    </Stack.Navigator>
+  );
+}
+
+const CaseViewStack = (props) => {
+  return (
+    <Stack.Navigator mode="card" headerMode="none">
+      <Stack.Screen
+        name="Case View"
+        component={CaseViewScreen}
+        option={{
+          headerTransparent: true
+        }}
+      />
+      <Stack.Screen name="App" component={AppStack} />
+    </Stack.Navigator>
+  );
+}
+
+const TimeSlotStack = (props) => {
+  return (
+    <Stack.Navigator mode="card" headerMode="none">
+      <Stack.Screen
+        name="TimeSlot"
+        component={TimeSlotScreen}
+        option={{
+          headerTransparent: true
+        }}
+      />
+      <Stack.Screen name="App" component={AppStack} />
+    </Stack.Navigator>
+  );
+}
+
+const DoctorDetailStack = (props) => {
+  return (
+    <Stack.Navigator mode="card" headerMode="none">
+      <Stack.Screen
+        name="Doctor Detail"
+        component={DoctorDetailScreen}
+        option={{
+          headerTransparent: true
+        }}
+      />
+      <Stack.Screen name="App" component={AppStack} />
     </Stack.Navigator>
   );
 }

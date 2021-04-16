@@ -6,6 +6,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { materialTheme } from '../constants/';
 import { HeaderHeight } from "../constants/utils";
 import {IMLocalized, init} from '../src/localization/IMLocalization';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 const { width, height } = Dimensions.get('window');
 
@@ -42,7 +43,7 @@ const SignIn = (props) => {
       style={[styles.signin, {flex: 1, paddingTop: theme.SIZES.BASE * 4}]}>
       <Block flex middle>
         <KeyboardAvoidingView behavior="padding" enabled>
-          <Block middle style={{ paddingTop: theme.SIZES.BASE * 5, paddingHorizontal: width * 0.1 }}>
+          <Block middle style={{ paddingTop: theme.SIZES.BASE * 7, paddingHorizontal: width * 0.1 }}>
             <Text color="white" size={34} style={{alignSelf: 'flex-start', fontWeight: 'bold'}}>
               {IMLocalized('Workforce')}
             </Text>
@@ -82,7 +83,7 @@ const SignIn = (props) => {
               />
 
             </Block>
-            <Block center flex style={{ marginTop: height * 0.1 }}>
+            <Block center flex style={{ marginTop: height * 0.05 }}>
               <Button size="large" color="transparent" shadowless onPress={() => navigation.navigate('Sign Up')}>
                 <Text
                   center
@@ -92,15 +93,15 @@ const SignIn = (props) => {
                 >
                   {"Don't have an account? Sign Up"}
                 </Text>
-              </Button>
-              <Button
-                size="large"
-                color={materialTheme.COLORS.BUTTON_COLOR}               
-                style={{ height: 48, width: width * 0.8 }}
+              </Button>              
+              <TouchableOpacity
+                style={{ borderWidth: 2, borderRadius: 1, borderColor: 'white', height: 40, width: width * 0.8 }}
                 onPress={() => Alert.alert('Sign in action',`Email: ${vals.email} Password: ${password}`,)}
               >
-                SIGN IN
-              </Button>
+                <Text size={18} color={theme.COLORS.WHITE} style={{alignSelf: 'center', paddingTop: 7}}>
+                  SIGN IN
+                </Text>                
+              </TouchableOpacity>
             </Block>
           </Block>
         </KeyboardAvoidingView>

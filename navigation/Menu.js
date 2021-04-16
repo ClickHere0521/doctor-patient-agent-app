@@ -18,7 +18,7 @@ const { width, height } = Dimensions.get("screen");
 
 const profile = {
   avatar: Images.Profile,
-  name: "Rachel Brown",
+  name: "Workforce Agent",
   type: "Agnecy",
   plan: "Workforce",  
 };
@@ -33,8 +33,8 @@ const CustomDrawerContent = ({
 }) => {
   const insets = useSafeArea();
   const screens = [
-    "Agent Info",
     "Dashboard",
+    "Agent Info",
     "Patient View",
     "Case View",
     "Primary Care Doctor View",
@@ -42,13 +42,15 @@ const CustomDrawerContent = ({
     "Settings",
     "Components",
     "Patient Info",
-    "Doctor Detail",
+    "Doctor Schedule Detail",
     "Edit Profile",
     "Notification",
     "CaseHistory",
+    "BookDoctor",
+    "Time Slot",
+    "Doctor Detail",
     "Sign In",
-    "Sign Up",
-    "Patient View"
+    "Sign Up"
   ];
   return (
     <Block
@@ -57,24 +59,17 @@ const CustomDrawerContent = ({
     >
       <Block flex={0.23} style={styles.header}>
         <TouchableWithoutFeedback
-          onPress={() => navigation.navigate("Profile")}
+          onPress={() => navigation.navigate("Agent Info")}
         >
-          <Block style={styles.profile}>            
-            <Text h5 color={"white"}>
-              {profile.name}
-            </Text>
+          <Block row style={{marginLeft: -20, marginTop: height * 0.05}}>
+            <Image source={require('../assets/images/avatar.png')} alt="" />
+            <Block middle style={styles.profile}>            
+              <Text h5 color={"white"}>
+                {profile.name}
+              </Text>
+            </Block>
           </Block>
         </TouchableWithoutFeedback>
-        <Block row>
-          <Block middle style={styles.pro}>
-            <Text size={16} color="white">
-              {profile.plan}
-            </Text>
-          </Block>
-          <Text size={16} muted color="white" style={styles.seller}>
-            {profile.type}
-          </Text>
-        </Block>
       </Block>
       <Block flex style={{ paddingLeft: 7, paddingRight: 14 }}>
         <ScrollView

@@ -3,6 +3,7 @@ import { withNavigation } from '@react-navigation/compat';
 import { StyleSheet, Dimensions, Image, TouchableWithoutFeedback } from 'react-native';
 import { Block, Text, theme } from 'galio-framework';
 import { Icon } from '../components/';
+import { LinearGradient } from 'expo-linear-gradient';
 
 const { width } = Dimensions.get('screen');
 
@@ -11,45 +12,47 @@ const ListItem = props => {
   const imageStyles = [styles.image, full ? styles.fullImage : styles.horizontalImage, imageStyle];
 
   return (
-    <Block row={horizontal} card flex style={[styles.product, styles.shadow, style]}>
-      <TouchableWithoutFeedback onPress={() => navigation.navigate('Product', { product: product })}>
-        <Block style={[styles.imageContainer, styles.shadow]}>
-          <Image source={{ uri: product.image }} style={imageStyles}/>
-        </Block>
-      </TouchableWithoutFeedback>
-      <TouchableWithoutFeedback onPress={() => navigation.navigate('Product', { product: product })}>
-        <Block flex={3}>
-          <Text size={16} style={styles.userName}>{product.title}</Text>
-          <Block flexDirection={'row'}>
-            <Icon name="photo" family="font-awesome" color={theme.COLORS.MUTED} size={theme.SIZES.BASE} style={styles.icons}> </Icon>  
-            <Icon name="check" family="font-awesome" color={theme.COLORS.MUTED} size={theme.SIZES.BASE} style={styles.icons}> </Icon>  
-            <Text size={16} muted={!priceColor} color={priceColor}>${product.price}</Text>
-          </Block>
-        </Block>
-      </TouchableWithoutFeedback>
-      <TouchableWithoutFeedback onPress={() => navigation.navigate('Product', { product: product })}>
-        <Block flex={1}>
-          <>
-            {(product.time) ? (
-              <Text size={12} style={styles.times} color={"#06D81E"}>{product.time}</Text>
-            ) : (
-              <Text size={12} style={styles.times} color={"#000"}>{product.weekday}</Text>
-            )}
-          </>
-          
-          <Block style={{borderRadius: 100, backgroundColor: "#06D81E", width: theme.SIZES.BASE * 1.2, height: theme.SIZES.BASE * 1.2, position: "absolute", right: theme.SIZES.BASE, bottom: theme.SIZES.BASE}}>
-            <Text size={12} center style={{justifyContent: 'center', alignItems: 'center'}} color={"#FFF"} fontWeight={"semiBold"}>{product.unReaden}</Text>
-          </Block>
-        </Block>
-      </TouchableWithoutFeedback>
-    </Block>
+        
+      <Block row={horizontal} card flex style={[styles.product, styles.shadow, style]}>
+          <TouchableWithoutFeedback onPress={() => navigation.navigate('Product', { product: product })}>
+            <Block style={[styles.imageContainer, styles.shadow]}>
+              <Image source={{ uri: product.image }} style={imageStyles}/>
+            </Block>
+          </TouchableWithoutFeedback>
+          <TouchableWithoutFeedback onPress={() => navigation.navigate('Product', { product: product })}>
+            <Block flex={3}>
+              <Text size={16} style={styles.userName}>{product.title}</Text>
+              <Block flexDirection={'row'}>
+                <Icon name="photo" family="font-awesome" color={theme.COLORS.MUTED} size={theme.SIZES.BASE} style={styles.icons}> </Icon>  
+                <Icon name="check" family="font-awesome" color={theme.COLORS.MUTED} size={theme.SIZES.BASE} style={styles.icons}> </Icon>  
+                <Text size={16} muted={!priceColor} color={priceColor}>${product.price}</Text>
+              </Block>
+            </Block>
+          </TouchableWithoutFeedback>
+          <TouchableWithoutFeedback onPress={() => navigation.navigate('Product', { product: product })}>
+            <Block flex={1}>
+              <>
+                {(product.time) ? (
+                  <Text size={12} style={styles.times} color={"#06D81E"}>{product.time}</Text>
+                ) : (
+                  <Text size={12} style={styles.times} color={"#000"}>{product.weekday}</Text>
+                )}
+              </>
+              
+              <Block style={{borderRadius: 100, backgroundColor: "#06D81E", width: theme.SIZES.BASE * 1.2, height: theme.SIZES.BASE * 1.2, position: "absolute", right: theme.SIZES.BASE, bottom: theme.SIZES.BASE}}>
+                <Text size={12} center style={{justifyContent: 'center', alignItems: 'center'}} color={"#FFF"} fontWeight={"semiBold"}>{product.unReaden}</Text>
+              </Block>
+            </Block>
+          </TouchableWithoutFeedback>
+      </Block>
   );
 }
 
 const styles = StyleSheet.create({
   product: {
     backgroundColor: "#EFEFEF",
-    marginVertical: theme.SIZES.BASE,
+    marginVertical: theme.SIZES.BASE / 2,
+    marginHorizontal: theme.SIZES.BASE / 4,
     borderWidth: 2,
     borderColor: theme.COLORS.WHITE,
     minHeight: theme.SIZES.BASE * 2,

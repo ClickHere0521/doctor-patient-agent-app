@@ -75,8 +75,6 @@ const Onboarding = (props) => {
           </Block>
         </Block>
         <View style={styles.circle}/>
-        <Image source={require('../assets/icons/backArrow.png')} style={styles.backIcon}/>
-        {/* <Icon size={16} name="arrow-back-circle-sharp" family="Ionicons" color={theme.COLORS.MUTED} style={styles.backIcon}/> */}
       </Block>
     );
   }
