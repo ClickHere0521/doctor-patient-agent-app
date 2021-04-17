@@ -6,9 +6,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { materialTheme } from '../constants';
 import { HeaderHeight } from "../constants/utils";
 
-const { width } = Dimensions.get('screen');
+const { width, height } = Dimensions.get('screen');
 
-const Home = (props) => {
+const ProfileInfo = (props) => {
 
   const renderEvents = (events) => {
 
@@ -40,12 +40,10 @@ const Home = (props) => {
   return (
     <Block flex style={styles.profile}>
       <ImageBackground
-        source={ require('../assets/images/dashboard.png')}
+        source={ require('../assets/images/doctor2.png')}
         style={styles.profileContainer}
         imageStyle={styles.profileImage}>
         <Block flex style={styles.profileDetails}>
-          <Block style={styles.profileTexts}>            
-          </Block>
           <LinearGradient 
             colors={['rgba(110,120,247,0.2)', 'rgba(110,120,247,0.3)']} 
             style={styles.gradient} 
@@ -56,18 +54,31 @@ const Home = (props) => {
           />
         </Block>
       </ImageBackground>
-      <Block flex={0.7}>        
+      <Block flex={0.7} style={styles.body}>
+        <Block style={styles.profileTexts}>    
+          <Text bold size={24}>
+            Rachel Brown
+          </Text>
+          <Block row>
+            <Text bold size={18} color="white" style={styles.workforce}>
+              Workforce
+            </Text>    
+            <Text bold size={17} color="white" style={styles.doctor}>
+              Doctor
+            </Text> 
+          </Block>
+        </Block>
         {renderEvents({
-          eventHeading: 'Total active case', 
-          eventContent: 3000
+          eventHeading: 'Full Name', 
+          eventContent: 'Rachel Brown'
         })}
         {renderEvents({
-          eventHeading: 'This year', 
-          eventContent: 700
+          eventHeading: 'Address', 
+          eventContent: 'Los Angeles,CA'
         })}
         {renderEvents({
-          eventHeading: 'Case resolved this year', 
-          eventContent: 605
+          eventHeading: 'Phone number', 
+          eventContent: '+92 314 1254789'
         })}
         {renderEvents({
           eventHeading: 'Ongoing case', 
@@ -83,12 +94,13 @@ const styles = StyleSheet.create({
     marginTop: Platform.OS === 'android' ? -HeaderHeight : 0,
   },
   profileImage: {
-    width: width * 1.1,
+    width: width,
     height: 'auto',
+    top: height * 0.1
   },
   profileContainer: {
     width: width,
-    height: 'auto',
+    height: height,
     flex: 1,
   },
   profileDetails: {
@@ -97,9 +109,14 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   profileTexts: {
-    paddingHorizontal: theme.SIZES.BASE * 2,
-    paddingVertical: theme.SIZES.BASE * 2,
-    zIndex: 2
+    position: 'relative',
+    paddingHorizontal: theme.SIZES.BASE,
+    paddingVertical: theme.SIZES.BASE,
+    marginHorizontal: theme.SIZES.BASE,
+    marginTop: -theme.SIZES.BASE *10,
+    marginBottom: theme.SIZES.BASE * 4,
+    borderRadius: 30,    
+    zIndex: 2,
   },
   pro: {
     backgroundColor: materialTheme.COLORS.LABEL,
@@ -144,6 +161,18 @@ const styles = StyleSheet.create({
     height: '100%',
     position: 'absolute',
   },
+  body: {
+    backgroundColor: '#6E78F7'
+  },
+  workforce: {
+    backgroundColor: "#FE2472",
+    borderRadius: 10,
+    paddingVertical: 1,
+    paddingHorizontal: 10
+  },
+  doctor: {
+    padding: 2
+  }
 });
 
-export default Home;
+export default ProfileInfo;

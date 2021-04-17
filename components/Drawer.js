@@ -30,6 +30,15 @@ const DrawerItem = props => {
             color={focused ? "white" : materialTheme.COLORS.MUTED}
           />
         );
+      case "Profile Info":
+        return (
+          <Icon
+            size={16}
+            name="address-book"
+            family="font-awesome"
+            color={focused ? "white" : materialTheme.COLORS.MUTED}
+          />
+        );
       case "Patient View":
         return (
           <Icon

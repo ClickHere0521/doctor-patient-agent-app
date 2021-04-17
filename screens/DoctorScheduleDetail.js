@@ -1,52 +1,71 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, Dimensions, ScrollView, Image, ImageBackground, Platform, TouchableOpacity } from 'react-native';
-import { Button, Block, Text, theme } from 'galio-framework';
-import { LinearGradient } from 'expo-linear-gradient';
-
-import { Icon } from '../components';
-import { Images, materialTheme } from '../constants';
-import { HeaderHeight } from "../constants/utils";
+import { Block, Text, theme } from 'galio-framework';
+import { materialTheme } from '../constants';
+import SwitchButton from 'switch-button-react-native';
 
 const { width,height } = Dimensions.get('screen');
 const thumbMeasure = (width - 48 - 32) / 3;
 
 const DoctorScheduleDetail = (props) => {
+
+  const [ activeSwitch, setActiveSwitch ] = useState(1);
+
+  const renderDetails = (details) => {
+
+    let { heading, doctor, symptom, appointment, medication } = {...details};
+
+    return (
+      <Block style={styles.scheduleDetail}>
+        <Text size={18}>{heading}</Text>
+        <Text size={12}>{doctor}</Text>
+        <Text style={{marginTop: 10}}>{symptom}</Text>
+        <Text>{appointment}</Text>
+        <Text bold style={{marginTop: 10}}>Medication </Text>
+        <Text>{medication}</Text>
+        <TouchableOpacity
+          style={styles.edit}
+        >
+          <Text color='#00CE30'>
+            Edit
+          </Text>
+        </TouchableOpacity>
+      </Block>
+    );
+  }
+
   return (
     <Block flex style={styles.patientInfo}>
       <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
         <Block center style={{paddingTop: 10}}>
-            <Image source={require('../assets/images/grayscale-photo-of-man2.png')} style={styles.imageStyle}></Image>
-            <Text size={20}>
-                Dr. Ronald Joseph
-            </Text>
-            <Text>
-                neurosergion specialist
-            </Text>
-            <Block center style={styles.centerBlock}>
-              <Block row>
-                <Block middle>
-                  <TouchableOpacity
-                    style={{ paddingHorizontal: 20, paddingVertical: 6}}                
-                  >
-                    <Text size={16}>
-                      Upcoming
-                    </Text>
-                  </TouchableOpacity>
-                </Block>
-                <Block middle>
-                  <TouchableOpacity
-                      style={{ borderRadius: 10, paddingHorizontal: 44, paddingVertical: 6, backgroundColor: '#3B3E51'}}                
-                  >
-                      <Text size={16} color='white'>
-                          Past
-                      </Text>
-                  </TouchableOpacity>
-                </Block>
-              </Block>             
-            </Block>
+          <Image source={require('../assets/images/grayscale-photo-of-man2.png')} style={styles.imageStyle}></Image>
+          <Text size={20}>
+            Dr. Ronald Joseph
+          </Text>
+          <Text>
+            neurosergion specialist
+          </Text>
+          <Block center style={styles.centerBlock}>
+            <SwitchButton
+              onValueChange={(val) => setActiveSwitch(val)}      // this is necessary for this component
+              text1 = 'Past'                        // optional: first text in switch button --- default ON
+              text2 = 'Upcoming'                       // optional: second text in switch button --- default OFF
+              switchWidth = {180}                 // optional: switch width --- default 44
+              switchHeight = {40}                 // optional: switch height --- default 100
+              switchdirection = 'rtl'             // optional: switch button direction ( ltr and rtl ) --- default ltr
+              switchBorderRadius = {100}          // optional: switch border radius --- default oval
+              switchSpeedChange = {500}           // optional: button change speed --- default 100
+              switchBorderColor = '#3B3E51'       // optional: switch border color --- default #d4d4d4
+              switchBackgroundColor = '#fff'      // optional: switch background color --- default #fff
+              btnBorderColor = '#3B3E51'          // optional: button border color --- default #00a4b9
+              btnBackgroundColor = '#3B3E51'      // optional: button background color --- default #00bcd4
+              fontColor = '#3B3E51'               // optional: text font color --- default #b1b1b1
+              activeFontColor = '#fff'            // optional: active font color --- default #fff
+            />        
+          </Block>
         </Block>
         <Block style={styles.Container}>
-          <Text style={{ alignSelf: 'flex-start', alignContent: 'flex-start'}}>
+          <Text style={styles.schedules}>
             Schedules
           </Text>
         </Block>
@@ -97,36 +116,20 @@ const DoctorScheduleDetail = (props) => {
             <Text size={16} style={{paddingLeft: 4}}>THE</Text>
           </TouchableOpacity>
         </ScrollView>
-        <Block style={styles.scheduleDetail}>
-          <Text size={18}>Sevre Pain</Text>
-          <Text size={12}>Dr. Naveed Baloch</Text>
-          <Text style={{marginTop: 10}}>Symptoms: Headache</Text>
-          <Text>Appointment Date: 23, November 2020</Text>
-          <Text bold style={{marginTop: 10}}>Medication </Text>
-          <Text>Esso 20g, Amastan 5/80g, Cipronxin 500g</Text>
-          <TouchableOpacity
-            style={styles.edit}
-          >
-            <Text color='#00CE30'>
-              Edit
-            </Text>
-          </TouchableOpacity>
-        </Block>
-        <Block style={styles.scheduleDetail}>
-          <Text size={18}>Sevre Pain</Text>
-          <Text size={12}>Dr. Naveed Baloch</Text>
-          <Text style={{marginTop: 10}}>Symptoms: Headache</Text>
-          <Text>Appointment Date: 23, November 2020</Text>
-          <Text bold style={{marginTop: 10}}>Medication </Text>
-          <Text>Esso 20g, Amastan 5/80g, Cipronxin 500g</Text>
-          <TouchableOpacity
-            style={styles.edit}
-          >
-            <Text color='#00CE30'>
-              Edit
-            </Text>
-          </TouchableOpacity>
-        </Block>
+        {renderDetails({
+          heading: 'Sevre Pain',
+          doctor: 'Dr. Naveed Baloch',
+          symptom: 'Symptoms: Headache',
+          appointment: 'Appointment Date: 23, November 2020',
+          medication: 'Esso 20g, Amastan 5/80g, Cipronxin 500g'
+        })}        
+        {renderDetails({
+          heading: 'Sevre Pain',
+          doctor: 'Dr. Naveed Baloch',
+          symptom: 'Symptoms: Headache',
+          appointment: 'Appointment Date: 23, November 2020',
+          medication: 'Esso 20g, Amastan 5/80g, Cipronxin 500g'
+        })}
       </ScrollView>      
     </Block>
   );
@@ -155,8 +158,6 @@ const styles = StyleSheet.create({
   },
   centerBlock: {
     marginTop: 30, 
-    borderWidth:1, 
-    borderRadius: 12
   },
   scheduleDetail: {
     borderWidth: 1, 
@@ -252,6 +253,15 @@ const styles = StyleSheet.create({
     height: '30%',
     position: 'absolute',
   },
+  past: { 
+    borderRadius: 10, 
+    paddingHorizontal: 44, 
+    paddingVertical: 6, backgroundColor: '#3B3E51'
+  },
+  schedules: {
+    alignContent: 'flex-start',
+    alignSelf: 'flex-start'
+  }
 });
 
 export default DoctorScheduleDetail;

@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
 import { StyleSheet, Dimensions, ScrollView, Image, ImageBackground, Platform } from 'react-native';
 import { Button, Block, Text, theme, Input } from 'galio-framework';
-import { LinearGradient } from 'expo-linear-gradient';
 
-import { Icon } from '../components';
-import { Images, materialTheme } from '../constants';
-import { HeaderHeight } from "../constants/utils";
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { materialTheme } from '../constants';
+import SwitchButton from 'switch-button-react-native';
 
 const { width, height } = Dimensions.get('screen');
 const thumbMeasure = (width - 48 - 32) / 3;
@@ -22,7 +19,8 @@ const EditProfile = (props) => {
       'password': false,
     }
   });
-
+  const [ activeSwitch, setActiveSwitch ] = useState(1);
+  
   const handleChange = (name, value) => {
     setVals({ [name]: value });
   }
@@ -34,25 +32,25 @@ const EditProfile = (props) => {
           <Block middle>
             <Image source={require('../assets/images/avatar.png')} />
           </Block>
-          <Block row>
-            <Block middle>
-              <TouchableOpacity style={{borderWidth: 1, borderRadius: 20, paddingVertical: 5, paddingLeft: 8, paddingRight: 30, marginRight:-26}}>
-                <Text>
-                  Upload 
-                </Text>
-              </TouchableOpacity>                                            
-            </Block>
-            <Block middle>
-              <TouchableOpacity style={{borderWidth: 1, backgroundColor: '#3B3E51',borderRadius: 20, paddingVertical: 5, paddingHorizontal: 8}}>
-                <Text color="white">
-                  Remove 
-                </Text>
-              </TouchableOpacity>
-            </Block>
-          </Block>
+          <SwitchButton
+            onValueChange={(val) => setActiveSwitch(val)}      // this is necessary for this component
+            text1 = 'Remove'                        // optional: first text in switch button --- default ON
+            text2 = 'Upload'                       // optional: second text in switch button --- default OFF
+            switchWidth = {120}                 // optional: switch width --- default 44
+            switchHeight = {30}                 // optional: switch height --- default 100
+            switchdirection = 'rtl'             // optional: switch button direction ( ltr and rtl ) --- default ltr
+            switchBorderRadius = {100}          // optional: switch border radius --- default oval
+            switchSpeedChange = {500}           // optional: button change speed --- default 100
+            switchBorderColor = '#3B3E51'       // optional: switch border color --- default #d4d4d4
+            switchBackgroundColor = '#fff'      // optional: switch background color --- default #fff
+            btnBorderColor = '#3B3E51'          // optional: button border color --- default #00a4b9
+            btnBackgroundColor = '#3B3E51'      // optional: button background color --- default #00bcd4
+            fontColor = '#3B3E51'               // optional: text font color --- default #b1b1b1
+            activeFontColor = '#fff'            // optional: active font color --- default #fff
+          />
         </Block>      
         <Block center style={styles.userInfo}>        
-        <Text style={{paddingTop: 10, alignSelf: 'flex-start'}}>
+        <Text style={styles.label}>
           Full name <Text color={'red'}>*</Text>
         </Text>
         <Input
@@ -67,7 +65,7 @@ const EditProfile = (props) => {
           onChangeText={text => handleChange('name', text)}
           style={[styles.input, vals.email ? styles.inputActive : null]}          
         />
-        <Text style={{paddingTop: 10, alignSelf: 'flex-start'}}>
+        <Text style={styles.label}>
           Email <Text color={'red'}>*</Text>
         </Text>
         <Input
@@ -83,7 +81,7 @@ const EditProfile = (props) => {
           style={[styles.input, vals.email ? styles.inputActive : null]}
           
         />
-        <Text style={{paddingTop: 10, alignSelf: 'flex-start'}}>
+        <Text style={styles.label}>
           Tel <Text color={'red'}>*</Text>
         </Text>
         <Input
@@ -263,6 +261,15 @@ const styles = StyleSheet.create({
   },
   inputActive: {
     borderBottomColor: "black",
+  },
+  upload: {
+    borderWidth: 1, 
+    borderRadius: 20, 
+    paddingVertical: 5, 
+    paddingLeft: 8, paddingRight: 30, marginRight:-26},
+  label: {
+    paddingTop: 10, 
+    alignSelf: 'flex-start'
   },
 });
 

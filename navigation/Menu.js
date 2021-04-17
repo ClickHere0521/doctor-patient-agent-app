@@ -34,6 +34,7 @@ const CustomDrawerContent = ({
   const insets = useSafeArea();
   const screens = [
     "Dashboard",
+    "Profile Info",
     "Agent Info",
     "Patient View",
     "Case View",
@@ -44,8 +45,9 @@ const CustomDrawerContent = ({
     "Patient Info",
     "Doctor Schedule Detail",
     "Edit Profile",
-    "Notification",
+    "Schedule Detail",
     "CaseHistory",
+    "Notification",
     "BookDoctor",
     "Time Slot",
     "Doctor Detail",

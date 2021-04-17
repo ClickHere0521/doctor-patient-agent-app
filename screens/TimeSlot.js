@@ -1,146 +1,141 @@
 import React, { useEffect } from 'react';
 import { ImageBackground, Image, StyleSheet, StatusBar, Dimensions, View, TouchableOpacity } from 'react-native';
 import { Block, Button, Text, theme } from 'galio-framework';
-import { LinearGradient } from 'expo-linear-gradient';
-
-const { height, width } = Dimensions.get('screen');
-
 import materialTheme from '../constants/Theme';
-import Images from '../constants/Images';
 import {IMLocalized, init} from '../src/localization/IMLocalization';
 import { Icon, Product } from '../components/';
-import { useFonts } from 'expo-font';
-import AppLoading from 'expo-app-loading';
 import { ScrollView } from 'react-native-gesture-handler';
+
+const { height, width } = Dimensions.get('screen');
 
 const TimeSlot = (props) => {
   const { navigation } = props;
   
     return (
-        <Block flex style={styles.container}>        
-            <Block >
-                <Block style={styles.roundBlock}>
-                <Block row style={{ marginTop: height * 0.1, paddingHorizontal: theme.SIZES.BASE * 0.5, position: 'absolute', zIndex: 1 }}>
-                    <Block>                
-                        <Icon size={16} name="arrow-left" family="font-awesome" color={'white'} style={{padding: 5}} />
-                    </Block>
-                    <Block>
-                        <Text color="white" size={20} style={{fontFamily: 'Inter-Black'}} bold>Select a time slot</Text>                    
-                    </Block>
-                </Block>
-                </Block>
+      <Block flex style={styles.container}>        
+        <Block>
+          <Block style={styles.roundBlock}>
+            <Block row style={styles.head}>
+              <Block>                
+                <Icon size={16} name="arrow-left" family="font-awesome" color={'white'} style={{padding: 5}} />
+              </Block>
+              <Block>
+                <Text color="white" size={20} style={{fontFamily: 'Inter-Black'}} bold>Select a time slot</Text>                    
+              </Block>
             </Block>
-            <Block style={{marginHorizontal: width * 0.03, marginTop: height * 0.18, zIndex: 2, backgroundColor: 'white', borderTopLeftRadius: 12, borderTopRightRadius: 12}}>
-                <ScrollView>
-                    <Block row style={{margin: 10, borderBottomWidth: 1, borderColor: '#F0F0F0'}}>
-                        <Image source={require('../assets/images/avatar.png')} alt="" ></Image>
-                        <Block center>
-                            <Text bold style={{alignSelf: 'flex-start'}}>
-                                Dr. Jitendra Raut
-                            </Text>
-                            <Text color={'grey'}>
-                                B.Sc, MBBS, DDVL, MD- Dermitol...
-                            </Text>
-                        </Block>
-                    </Block>
-                    <Block row center>
-                        <Icon size={20} name="arrow-circle-left" family="font-awesome" style={{padding: 5, marginRight: width * 0.1}} color="grey" />
-                        <Text>
-                            Tomorrow, 9 Dec
-                        </Text>
-                        <Icon size={20} name="arrow-circle-right" family="font-awesome" style={{padding: 5, marginLeft: width * 0.1}} color="grey" />
-                    </Block>
-                    <Block center row style={{margin: 10, backgroundColor: "#FBFBFB", borderColor: "#D8D8D8", borderWidth: 1, borderRadius: 10, padding: 20}}>
-                        <Text style={{paddingHorizontal: width * 0.03}}>
-                            10.00
-                        </Text>
-                        <Text style={{paddingHorizontal: width * 0.03}}>
-                            11.00
-                        </Text>
-                        <Text style={{paddingHorizontal: width * 0.03}}>
-                            12.00
-                        </Text>
-                        <Text style={{paddingHorizontal: width * 0.03}}>
-                            12.00
-                        </Text>
-                        <Text style={{paddingHorizontal: width * 0.03}}>
-                            12.00
-                        </Text>
-                        <ImageBackground
-                            source={require('../assets/images/morning.png') }  
-                            style={{top: -10, left: 10, width: 100, height: 20,  position: 'absolute'}}
-                        >
-                            <Block style={{top: 0, left: 24, position: 'absolute'}}>
-                                <Text size={12}>
-                                    Morning
-                                </Text>
-                            </Block>
-                        </ImageBackground>
-                    </Block>       
-                    <Block center row style={{margin: 10, backgroundColor: "#FBFBFB", borderColor: "#D8D8D8", borderWidth: 1, borderRadius: 10, padding: 20}}>
-                        <Text style={{paddingHorizontal: width * 0.03}}>
-                            10.00
-                        </Text>
-                        <Text style={{paddingHorizontal: width * 0.03}}>
-                            11.00
-                        </Text>
-                        <Text style={{paddingHorizontal: width * 0.03}}>
-                            12.00
-                        </Text>
-                        <Text style={{paddingHorizontal: width * 0.03}}>
-                            12.00
-                        </Text>
-                        <Text style={{paddingHorizontal: width * 0.03}}>
-                            12.00
-                        </Text>
-                        <ImageBackground
-                            source={require('../assets/images/afternoon.png') }  
-                            style={{top: -10, left: 10, width: 100, height: 20,  position: 'absolute'}}
-                        >
-                            <Block style={{top: 0, left: 24, position: 'absolute'}}>
-                                <Text size={12}>
-                                    Afternoon
-                                </Text>
-                            </Block>
-                        </ImageBackground>
-                    </Block> 
-                    <Block center row style={{margin: 10, backgroundColor: "#FBFBFB", borderColor: "#D8D8D8", borderWidth: 1, borderRadius: 10, padding: 20}}>
-                        <Text style={{paddingHorizontal: width * 0.03}}>
-                            10.00
-                        </Text>
-                        <Text style={{paddingHorizontal: width * 0.03}}>
-                            11.00
-                        </Text>
-                        <Text style={{paddingHorizontal: width * 0.03}}>
-                            12.00
-                        </Text>
-                        <Text style={{paddingHorizontal: width * 0.03}}>
-                            12.00
-                        </Text>
-                        <Text style={{paddingHorizontal: width * 0.03}}>
-                            12.00
-                        </Text>
-                        <ImageBackground
-                            source={require('../assets/images/evening.png') }  
-                            style={{top: -10, left: 10, width: 150, height: 20,  position: 'absolute'}}
-                        >
-                            <Block style={{top: 0, left: 24, position: 'absolute'}}>
-                                <Text size={12}>
-                                    Evening and Night
-                                </Text>
-                            </Block>
-                        </ImageBackground>
-                    </Block>              
-                    <TouchableOpacity
-                        style={{borderRadius: 20, alignSelf: 'center', marginVertical: 30, paddingVertical: 10, paddingHorizontal: 50, backgroundColor: 'rgba(100, 120, 247, 0.84)'}}
-                    >
-                        <Text bold size={16} color={'white'}>
-                            Book
-                        </Text>
-                    </TouchableOpacity>                      
-                </ScrollView>                
-            </Block>            
+          </Block>
         </Block>
+        <Block style={{marginHorizontal: width * 0.03, marginTop: height * 0.18, zIndex: 2, backgroundColor: 'white', borderTopLeftRadius: 12, borderTopRightRadius: 12}}>
+          <ScrollView>
+            <Block row style={{margin: 10, borderBottomWidth: 1, borderColor: '#F0F0F0'}}>
+              <Image source={require('../assets/images/avatar.png')} alt="" ></Image>
+              <Block center>
+                <Text bold style={{alignSelf: 'flex-start'}}>
+                  Dr. Jitendra Raut
+                </Text>
+                <Text color={'grey'}>
+                  B.Sc, MBBS, DDVL, MD- Dermitol...
+                </Text>
+              </Block>
+            </Block>
+            <Block row center>
+              <Icon size={20} name="arrow-circle-left" family="font-awesome" style={{padding: 5, marginRight: width * 0.1}} color="grey" />
+              <Text>
+                Tomorrow, 9 Dec
+              </Text>
+              <Icon size={20} name="arrow-circle-right" family="font-awesome" style={{padding: 5, marginLeft: width * 0.1}} color="grey" />
+            </Block>
+            <Block center row style={{margin: 10, backgroundColor: "#FBFBFB", borderColor: "#D8D8D8", borderWidth: 1, borderRadius: 10, padding: 20}}>
+              <Text style={{paddingHorizontal: width * 0.03}}>
+                10.00
+              </Text>
+              <Text style={{paddingHorizontal: width * 0.03}}>
+                11.00
+              </Text>
+              <Text style={{paddingHorizontal: width * 0.03}}>
+                12.00
+              </Text>
+              <Text style={{paddingHorizontal: width * 0.03}}>
+                12.00
+              </Text>
+              <Text style={{paddingHorizontal: width * 0.03}}>
+                12.00
+              </Text>
+              <ImageBackground
+                source={require('../assets/images/morning.png') }  
+                style={{top: -10, left: 10, width: 100, height: 20,  position: 'absolute'}}
+              >
+                <Block style={{top: 0, left: 24, position: 'absolute'}}>
+                  <Text size={12}>
+                    Morning
+                  </Text>
+                </Block>
+              </ImageBackground>
+            </Block>       
+            <Block center row style={{margin: 10, backgroundColor: "#FBFBFB", borderColor: "#D8D8D8", borderWidth: 1, borderRadius: 10, padding: 20}}>
+              <Text style={{paddingHorizontal: width * 0.03}}>
+                10.00
+              </Text>
+              <Text style={{paddingHorizontal: width * 0.03}}>
+                11.00
+              </Text>
+              <Text style={{paddingHorizontal: width * 0.03}}>
+                12.00
+              </Text>
+              <Text style={{paddingHorizontal: width * 0.03}}>
+                12.00
+              </Text>
+              <Text style={{paddingHorizontal: width * 0.03}}>
+                12.00
+              </Text>
+              <ImageBackground
+                source={require('../assets/images/afternoon.png') }  
+                style={{top: -10, left: 10, width: 100, height: 20,  position: 'absolute'}}
+              >
+                <Block style={{top: 0, left: 24, position: 'absolute'}}>
+                  <Text size={12}>
+                    Afternoon
+                  </Text>
+                </Block>
+              </ImageBackground>
+            </Block> 
+            <Block center row style={{margin: 10, backgroundColor: "#FBFBFB", borderColor: "#D8D8D8", borderWidth: 1, borderRadius: 10, padding: 20}}>
+              <Text style={{paddingHorizontal: width * 0.03}}>
+                10.00
+              </Text>
+              <Text style={{paddingHorizontal: width * 0.03}}>
+                11.00
+              </Text>
+              <Text style={{paddingHorizontal: width * 0.03}}>
+                12.00
+              </Text>
+              <Text style={{paddingHorizontal: width * 0.03}}>
+                12.00
+              </Text>
+              <Text style={{paddingHorizontal: width * 0.03}}>
+                12.00
+              </Text>
+              <ImageBackground
+                source={require('../assets/images/evening.png') }  
+                style={{top: -10, left: 10, width: 150, height: 20,  position: 'absolute'}}
+              >
+                <Block style={{top: 0, left: 24, position: 'absolute'}}>
+                  <Text size={12}>
+                    Evening and Night
+                  </Text>
+                </Block>
+              </ImageBackground>
+            </Block>              
+            <TouchableOpacity
+              style={{borderRadius: 20, alignSelf: 'center', marginVertical: 30, paddingVertical: 10, paddingHorizontal: 50, backgroundColor: 'rgba(100, 120, 247, 0.84)'}}
+            >
+              <Text bold size={16} color={'white'}>
+                Book
+              </Text>
+            </TouchableOpacity>                      
+          </ScrollView>                
+        </Block>            
+      </Block>
     );
   
 }
@@ -204,7 +199,13 @@ const styles = StyleSheet.create({
   buttonTextStyle: {
     fontSize: 14,
     fontWeight: 'bold',
-  }
+  },
+  head: { 
+    marginTop: height * 0.1, 
+    paddingHorizontal: theme.SIZES.BASE * 0.5, 
+    position: 'absolute', 
+    zIndex: 1 
+  },
 });
 
 export default TimeSlot;
