@@ -211,6 +211,7 @@ const Components = (props) => {
             bgColor="transparent"
             placeholder="password"
             style={[styles.input, styles.inputDefault]}
+            iconContent={<Icon size={16} color={theme.COLORS.ICON} name="camera-18" family="GalioExtra" />}
           />
 
           <Input

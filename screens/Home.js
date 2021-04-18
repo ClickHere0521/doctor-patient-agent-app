@@ -2,9 +2,9 @@ import React from 'react';
 import { StyleSheet, Dimensions, ImageBackground, Platform } from 'react-native';
 import { Block, Text, theme } from 'galio-framework';
 import { LinearGradient } from 'expo-linear-gradient';
-
 import { materialTheme } from '../constants';
 import { HeaderHeight } from "../constants/utils";
+import { useDispatch, useSelector } from "react-redux";
 
 const { width } = Dimensions.get('screen');
 
@@ -13,6 +13,7 @@ const Home = (props) => {
   const renderEvents = (events) => {
 
     let { eventHeading, eventContent } = {...events};
+    const userRole = useSelector(state => state.user.role);
 
     return(
       <Block style={styles.options}>          

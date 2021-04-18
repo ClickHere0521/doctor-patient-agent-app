@@ -13,6 +13,7 @@ import { Button, Block, Text, Input, theme } from 'galio-framework';
 import { materialTheme, products, Images, tabs } from '../constants/';
 import { Select, Icon, Header, Product, Switch, Tabs, ListItem } from '../components/';
 import { LinearGradient } from 'expo-linear-gradient';
+import SwitchButton from 'switch-button-react-native';
 
 
 const { width } = Dimensions.get('screen');
@@ -60,16 +61,16 @@ const categories = [
 
 const sortCategories = [
     {
-      title: 'Eddie'
+      title: 'Name'
     },
     {
-      title: 'Julia'
+      title: 'Case'
     },
     {
-      title: 'Frank'
+      title: 'Date'
     },
     {
-      title: 'Sam'
+      title: 'Current Status'
     },
   ];
 
@@ -87,26 +88,6 @@ const Components = (props) => {
     {
       setSwitch2(!switch2);
     }
-  };
-
-  const renderPatient = (item, index) => {
-    const { navigation } = props;
-
-    return (
-      <TouchableWithoutFeedback
-        style={{ zIndex: 3 }}
-        key={`product-${item.title}`}
-        onPress={() => navigation.navigate('Pro', { product: item })}>
-        <Block center style={styles.productItem}>
-          <Block style={[styles.productRounded]}>
-            <Image resizeMode='cover' style={styles.productImage} source={{ uri: item.image }} />
-          </Block>
-          <Block center>
-            <Text center size={10}>{item.title}</Text>
-          </Block>
-        </Block>
-      </TouchableWithoutFeedback>
-    )
   };
 
   const renderSort = (item, index) => {
@@ -129,48 +110,7 @@ const Components = (props) => {
       </TouchableWithoutFeedback>
     )
   };
-
-  const onclick = () => {
-      
-  }
-
-  const navbar = () => {
-    return (
-        <Block flex flexDirection='row' style={{padding: 10}}>
-            <Block left>
-                <Image source={require('../assets/icons/PatientIcon.png')} style={{ height:theme.SIZES.BASE * 3, width: theme.SIZES.BASE * 3, marginRight: theme.SIZES.BASE}}/>
-            </Block>
-            <Block center>
-                <Text h6 center middle>Patient View</Text>
-            </Block>
-        </Block>
-    )
-  }
-  
-  const renderPatients = () => {
-    return (
-      <Block flex>
-        <Block flex>          
-          <Block flex style={{ marginTop: theme.SIZES.BASE / 2 }}>
-            <ScrollView
-              horizontal={true}
-              pagingEnabled={true}
-              decelerationRate={0}
-              scrollEventThrottle={16}
-              snapToAlignment="center"
-              style={{width}}
-              showsHorizontalScrollIndicator={false}
-              snapToInterval={cardWidth + (theme.SIZES.BASE * 0.375)}
-              contentContainerStyle={{ paddingHorizontal: theme.SIZES.BASE / 2 }}
-            >
-              {categories && categories.map((item, index) => renderPatient(item, index))}
-            </ScrollView>
-          </Block>
-        </Block>
-      </Block>
-    )
-  }
-
+ 
   const renderSorts = () => {
     return (
       <Block flex>
@@ -221,7 +161,7 @@ const Components = (props) => {
       <ScrollView
         style={styles.components}
         showsVerticalScrollIndicator={false}>
-        {navbar()}
+        {/* {navbar()} */}
         {renderSorts()}
         {renderPatientsList()}
       </ScrollView>
@@ -230,8 +170,13 @@ const Components = (props) => {
 }
 
 const styles = StyleSheet.create({
+  sortBox: {
+    borderTopWidth:2,
+    borderColor: 'white',
+    margin: theme.SIZES.BASE,
+    marginBottom: 0
+  },
   components: {
-    paddingTop: theme.SIZES.BASE * 3,
     backgroundColor: "#FFF",
   },
   title: {
@@ -308,15 +253,15 @@ const styles = StyleSheet.create({
     height: cardWidth - theme.SIZES.BASE,
   },
   searchBtn: {
-      position: 'absolute',
-      right: theme.SIZES.BASE,
-      borderRadius: 1000,
-      borderWidth:1,
-      borderColor: '#DDD',
-      backgroundColor: "#FFF",
-      width: theme.SIZES.BASE * 2,
-      height: theme.SIZES.BASE * 2,
-      marginLeft: 5
+    position: 'absolute',
+    right: theme.SIZES.BASE,
+    borderRadius: 1000,
+    borderWidth:1,
+    borderColor: '#DDD',
+    backgroundColor: "#FFF",
+    width: theme.SIZES.BASE * 2,
+    height: theme.SIZES.BASE * 2,
+    marginLeft: 5
   },
   greyGradient: {
     shadowColor: 'black',

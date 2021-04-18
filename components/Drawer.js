@@ -30,6 +30,15 @@ const DrawerItem = props => {
             color={focused ? "white" : materialTheme.COLORS.MUTED}
           />
         );
+      case "Patient Dashboard":
+        return (
+          <Icon
+            size={16}
+            name="home"
+            family="font-awesome"
+            color={focused ? "white" : materialTheme.COLORS.MUTED}
+          />
+        );
       case "Profile Info":
         return (
           <Icon
@@ -39,6 +48,15 @@ const DrawerItem = props => {
             color={focused ? "white" : materialTheme.COLORS.MUTED}
           />
         );
+      case "Doctor Dashboard":
+          return (
+            <Icon
+              size={16}
+              name="home"
+              family="font-awesome"
+              color={focused ? "white" : materialTheme.COLORS.MUTED}
+            />
+          );
       case "Patient View":
         return (
           <Icon

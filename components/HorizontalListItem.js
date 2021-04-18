@@ -2,7 +2,7 @@ import React from 'react';
 import { withNavigation } from '@react-navigation/compat';
 import { StyleSheet, Dimensions, Image, TouchableWithoutFeedback } from 'react-native';
 import { Block, Text, theme } from 'galio-framework';
-import { Icon, Drawer as DrawerCustomItem } from "../components/";
+import { Icon, Drawer as DrawerCustomItem } from "../components/Icon";
 
 const { width } = Dimensions.get('screen');
 
@@ -21,7 +21,7 @@ const Product = props => {
         <Block flex space="between" style={styles.productDescription}>
           <Text size={14} style={styles.productTitle}>Doctor Name</Text>
           <Text size={14} style={styles.productTitle}>{product.title}</Text>
-          <Block flex flexDirection="row" center>
+          <Block flex flexDirection="row" middle>
             <Icon name="shape-star" family="GalioExtra" size={14} />
             <Text size={14} >{product.price}</Text>
           </Block>
@@ -67,11 +67,11 @@ const styles = StyleSheet.create({
     width: width - theme.SIZES.BASE * 3,
   },
   shadow: {
-    shadowColor: theme.COLORS.BLACK,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 3,
-    shadowOpacity: 0.1,
-    elevation: 2,
+    shadowColor: 'black',
+    shadowOffset: { width: 4, height: 4 },
+    shadowRadius: 4,
+    shadowOpacity: 0.4,
+    elevation: 5,
   },
 });
 

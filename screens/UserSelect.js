@@ -1,27 +1,33 @@
-import React, { useEffect } from 'react';
-import { ImageBackground, Image, StyleSheet, StatusBar, Dimensions, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Image, StyleSheet, Dimensions, View, TouchableOpacity } from 'react-native';
 import { Block, Button, Text, theme } from 'galio-framework';
-import { LinearGradient } from 'expo-linear-gradient';
+import materialTheme from '../constants/Theme';
+import {IMLocalized, init} from '../src/localization/IMLocalization';
+import { useFonts } from 'expo-font';
+import AppLoading from 'expo-app-loading';
+import { useDispatch, useSelector } from 'react-redux';
+import { roleSelector } from '../store/duck/action'
 
 const { height, width } = Dimensions.get('screen');
 
-import materialTheme from '../constants/Theme';
-import Images from '../constants/Images';
-import {IMLocalized, init} from '../src/localization/IMLocalization';
-import { Icon, Product } from '../components/';
-import { useFonts } from 'expo-font';
-import AppLoading from 'expo-app-loading';
-
 const Onboarding = (props) => {
-  const { navigation } = props;
+  const { navigation } = props;  
+  const dispatch = useDispatch();
+
+  let [fontsLoaded] = useFonts({
+    'Inter-Black': require('../assets/fonts/LeagueSpartan-Bold.otf'),
+  });
+
+  const handleRole = (role) => {    
+    dispatch(roleSelector(role));
+    navigation.navigate('App');
+  }
 
   useEffect(() => {
     // Update the document title using the browser API
     init('en-US');
   }, []);
-  let [fontsLoaded] = useFonts({
-    'Inter-Black': require('../assets/fonts/LeagueSpartan-Bold.otf'),
-  });
+
   if (!fontsLoaded) {
     return <AppLoading />;
   } else {
@@ -31,10 +37,10 @@ const Onboarding = (props) => {
         <Block middle style={{height: height / 1.8}}>
           <Image
             source={require('../assets/images/doctor.png')}
-            style={{ height: height / 2.5, width: width / 1.2, zIndex: 1 , borderRadius: 30} }
+            style={styles.doctorImage}
           />
           <Block middle style={styles.roundBlock}>
-            <Block style={{ marginBottom: theme.SIZES.BASE / 2, paddingHorizontal: theme.SIZES.BASE * 2, position: 'absolute', zIndex: 3 }} middle>
+            <Block style={styles.bodyTitle} middle>
               <Block>
                 <Image source={require('../assets/icons/cureBag.png')} style={{ height:theme.SIZES.BASE * 2, width: theme.SIZES.BASE * 2.2}}/>
               </Block>
@@ -50,7 +56,8 @@ const Onboarding = (props) => {
               shadowless
               style={styles.button}
               textStyle={{fontSize: 14, color: '#3F4079', fontWeight: 'bold'}}
-              onPress={() => navigation.navigate('App')}>
+              onPress={() => handleRole('agent')}
+            >
               {IMLocalized('Workforce agent')}
             </Button>
             
@@ -58,7 +65,8 @@ const Onboarding = (props) => {
               shadowless
               style={styles.button}
               textStyle={{fontSize: 14, color: '#3082CC', fontWeight: 'bold'}}
-              onPress={() => navigation.navigate('App')}>
+              onPress={() => handleRole('patient')}
+            >
               {IMLocalized('Patient')}
             </Button>
             
@@ -66,7 +74,8 @@ const Onboarding = (props) => {
               shadowless
               style={styles.button}
               textStyle={[styles.buttonTextStyle, {color: '#FF6B6B'}]}
-              onPress={() => navigation.navigate('App')}>
+              onPress={() => handleRole('doctor')}
+            >
               {IMLocalized('Primary Care Doctor')}
             </Button>
             
@@ -138,7 +147,20 @@ const styles = StyleSheet.create({
   buttonTextStyle: {
     fontSize: 14,
     fontWeight: 'bold',
-  }
+  },
+  doctorImage: { 
+    height: height / 2.5, 
+    width: width / 1.2, 
+    zIndex: 1, 
+    borderRadius: 30
+  },
+  bodyTitle: { 
+    marginBottom: theme.SIZES.BASE / 2, 
+    paddingHorizontal: theme.SIZES.BASE * 2, 
+    position: 'absolute', 
+    zIndex: 3 
+  },
+  
 });
 
 export default Onboarding;

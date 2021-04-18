@@ -10,7 +10,9 @@ const initialState = {
 	riskGroupCategorySelected: null,
 	permanentResidence: false,
 	loading: false,
-	page: null
+	role: '',
+	page: null,
+
 };
 
 const user = (state = initialState, action) => {
@@ -23,6 +25,12 @@ const user = (state = initialState, action) => {
 			return { ...state, loading: false };
 		case types.RESET_USER_STATE:
 			return initialState;
+		case types.AGENT_ROLE:
+			return { ...state, role: 'agent' };
+		case types.PATIENT_ROLE:
+			return { ...state, role: 'patient' };
+		case types.DOCTOR_ROLE:
+			return { ...state, role: 'doctor' };
 		default:
 			return state;
 	}

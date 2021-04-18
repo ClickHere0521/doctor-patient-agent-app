@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Alert, Dimensions, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { Alert, Dimensions, StyleSheet, KeyboardAvoidingView, Platform, CheckBox, TouchableWithoutFeedback } from 'react-native';
 
 import { Block, Button, Input, Text, theme } from 'galio-framework';
 
@@ -7,6 +7,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { materialTheme } from '../constants/';
 import { HeaderHeight } from "../constants/utils";
 import {IMLocalized, init} from '../src/localization/IMLocalization';
+import { Select, Icon, Header, Product, Switch, Tabs } from '../components/';
 
 const { height, width } = Dimensions.get('window');
 
@@ -36,73 +37,83 @@ const SignUp = (props) => {
     setVals({ active });
   }
 
+  const [isSelected, setSelection] = useState(false);
+
   return (
-    <LinearGradient
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0.25, y: 1.1 }}
-      locations={[0.2, 1]}
-      colors={['#4E54C8', '#8F94FB']}
-      style={[styles.signup, { flex: 1, paddingTop: theme.SIZES.BASE * 4 }]}>
-      <Block flex middle>
-        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "position"} enabled keyboardVerticalOffset={0}> 
-          <Block middle style={{ paddingTop: theme.SIZES.BASE * 5, paddingHorizontal: width * 0.1 }}>
-            <Text color="white" size={34} style={{alignSelf: 'flex-start', fontWeight: 'bold'}}>
-              {IMLocalized('Welcome')}
+      <Block flex middle style={{backgroundColor:'white'}}>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "-position"} enabled keyboardVerticalOffset={0}> 
+          <Block middle style={{ paddingTop: theme.SIZES.BASE * 5, paddingLeft: theme.SIZES.BASE * 2}}>
+            <Text color="black" size={40} style={{alignSelf: 'flex-start', marginVertical: theme.SIZES.BASE}}>
+              Sign Up
+            </Text>
+            <Text color="grey" muted size={20} style={{alignSelf: 'flex-start'}}>
+              Welcome to AMD
             </Text>
           </Block>
+
           <Block flex={1} center space="between">
-            <Block center>
+            <Block center>    
+              <Text color="grey" size={12} 
+                style={{textAlign: 'left', width: width * 0.8, margin: theme.SIZES.BASE * 2, marginBottom: -theme.SIZES.BASE * 2, marginLeft: 4 * theme.SIZES.BASE}}>Email</Text>          
               <Input
                 bgColor='transparent'
                 placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
                 borderless
-                color="white"
-                placeholder="Username"
-                autoCapitalize="none"
-                style={[styles.input, vals.user ? styles.inputActive : null]}
-                onChangeText={text => handleChange('user', text)}
-                onBlur={() => toggleActive('user')}
-                onFocus={() => toggleActive('user')}
-              />
-              <Input
-                bgColor='transparent'
-                placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
-                borderless
-                color="white"
+                color="black"
                 type="email-address"
                 placeholder="Email"
                 autoCapitalize="none"
                 style={[styles.input, vals.email ? styles.inputActive : null]}
-                onChangeText={text => handleChange('email', text)}
-                onBlur={() => toggleActive('email')}
-                onFocus={() => toggleActive('email')}
+                iconContent={<Icon size={16} style={{marginRight: theme.SIZES.BASE}}color={theme.COLORS.ICON} name="envelope" family="font-awesome" />}
               />
+              
+              <Text color="grey" size={12} 
+                style={{textAlign: 'left', width: width * 0.8, margin: theme.SIZES.BASE * 2, marginBottom: -theme.SIZES.BASE * 2, marginLeft: 4 * theme.SIZES.BASE}}>Username</Text>          
               <Input
                 bgColor='transparent'
                 placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
                 borderless
-                color="white"
+                color="black"
+                placeholder="Username"
+                autoCapitalize="none"
+                style={[styles.input, vals.user ? styles.inputActive : null]}
+                iconContent={<Icon size={16} style={{marginRight: theme.SIZES.BASE}}color={theme.COLORS.ICON} name="user" family="font-awesome" />}
+                // onChangeText={text => handleChange('user', text)}
+                // onBlur={() => toggleActive('user')}
+                // onFocus={() => toggleActive('user')}
+              />              
+              <Text color="grey" size={12} 
+                style={{textAlign: 'left', width: width * 0.8, margin: theme.SIZES.BASE * 2, marginBottom: -theme.SIZES.BASE * 2, marginLeft: 4 * theme.SIZES.BASE}}>Password</Text>
+              <Input
                 password
                 viewPass
-                placeholder="Password"
-                iconColor="white"
-                style={[styles.input, vals.password ? styles.inputActive : null]}
-                onChangeText={text => handleChange('password', text)}
-                onBlur={() => toggleActive('password')}
-                onFocus={() => toggleActive('password')}
+                borderless
+                bgColor="transparent"
+                placeholder="password"
+                color="black"
+                style={[styles.input, styles.inputDefault]}
+                iconContent={<Icon size={16} style={{marginRight: theme.SIZES.BASE}}color={theme.COLORS.ICON} name="lock" family="font-awesome" />}
               />
             </Block>
-            <Block flex center style={{ marginTop: 20, width: width * 0.8 }}>
+            <Block style={styles.checkboxContainer} middle>
+              <CheckBox
+                value={isSelected}
+                onValueChange={setSelection}
+                style={styles.checkbox}
+              />
+              <Text style={styles.label}>By creating an account, you agree to our Term & Conditions</Text>
+            </Block>
+            <Block flex center style={{ marginTop: 20}}>
               <Button
               size="large"
                 shadowless
-                style={{ height: 48 }}
-                color={materialTheme.COLORS.BUTTON_COLOR}
+                style={{ height: 48, borderRadius: 16, width: width * 0.6}}
+                color={'#00CE30'}
               >
                 SIGN UP
               </Button>
               <Button size="large" color="transparent" shadowless onPress={() => navigation.navigate('Sign In')}>
-                <Text center color={theme.COLORS.WHITE} size={theme.SIZES.FONT * 0.75}>
+                <Text center color={theme.COLORS.BLACK} size={theme.SIZES.FONT * 0.75}>
                   Already have an account? Sign In
                 </Text>
               </Button>
@@ -110,11 +121,23 @@ const SignUp = (props) => {
           </Block>
         </KeyboardAvoidingView>
       </Block>
-    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
+  label: {
+    width: width * 0.7
+  },
+  checkboxContainer: {
+    flexDirection: "row",
+    marginBottom: 20,
+  },
+  checkbox: {
+    alignSelf: "center",
+  },
+  inputDefault: {
+    color: 'black',
+  },
   signup: {
     marginTop: Platform.OS === 'android' ? -HeaderHeight : 0,
   },
@@ -132,13 +155,14 @@ const styles = StyleSheet.create({
     shadowOpacity: 1
   },
   input: {
+    marginVertical: theme.SIZES.BASE,
     width: width * 0.8,
-    borderRadius: 0,
     borderBottomWidth: 1,
     borderBottomColor: materialTheme.COLORS.PLACEHOLDER,
+    color: 'black',
   },
   inputActive: {
-    borderBottomColor: "white",
+    borderBottomColor: "black",
   },
 });
 

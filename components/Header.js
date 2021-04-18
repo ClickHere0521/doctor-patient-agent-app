@@ -46,6 +46,39 @@ const SearchButton = ({isWhite, style, navigation}) => (
   </TouchableOpacity>
 );
 
+const AddButton = ({isWhite, style, navigation}) => (
+  <TouchableOpacity style={[styles.button, style]} onPress={() => navigation.navigate('Add')}>
+    <Icon
+      family="font-awesome"
+      size={18}
+      name="plus"
+      color={theme.COLORS[isWhite ? 'WHITE' : 'ICON']}
+    />
+  </TouchableOpacity>
+);
+
+const EditButton = ({isWhite, style, navigation}) => (
+  <TouchableOpacity style={[styles.button, style]} onPress={() => navigation.navigate('Edit')}>
+    <Icon
+      family="font-awesome"
+      size={18}
+      name="edit"
+      color={theme.COLORS[isWhite ? 'WHITE' : 'ICON']}
+    />
+  </TouchableOpacity>
+);
+
+const RemoveButton = ({isWhite, style, navigation}) => (
+  <TouchableOpacity style={[styles.button, style]} onPress={() => navigation.navigate('Edit')}>
+    <Icon
+      family="font-awesome"
+      size={18}
+      name="trash"
+      color={theme.COLORS[isWhite ? 'WHITE' : 'ICON']}
+    />
+  </TouchableOpacity>
+);
+
 const Header = (props) => {
 
   const { back, title, white, transparent, navigation, scene } = props;
@@ -89,7 +122,20 @@ const Header = (props) => {
       case 'Home':
       case 'Woman':
       case 'Man':
+      case 'Case View':
+      case 'Primary Care Doctor View':
+        return ([
+          <AddButton key='addCase' navigation={navigation} isWhite={white} />,
+          <EditButton key='editCase' navigation={navigation} isWhite={white} />,
+          <RemoveButton key='removeCase' navigation={navigation} isWhite={white} />
+        ]);
       case 'Kids':
+      case 'Schedule View':
+        return ([
+          <AddButton key='addCase' navigation={navigation} isWhite={white} />,
+          <EditButton key='editCase' navigation={navigation} isWhite={white} />,
+          <RemoveButton key='removeCase' navigation={navigation} isWhite={white} />
+        ]);
       case 'NewCollection':
       case 'Notifications':
       case 'Privacy':

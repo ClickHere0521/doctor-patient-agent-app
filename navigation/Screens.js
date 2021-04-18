@@ -3,8 +3,12 @@ import { Easing, Dimensions } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 
+//constants
 import { Icon, Header } from "../components/";
 import { Images, materialTheme } from "../constants/";
+
+//redux
+import { useDispatch, useSelector } from "react-redux";
 
 // screens
 import HomeScreen from "../screens/Home";
@@ -30,6 +34,9 @@ import PatientViewScreen from "../screens/PatientView";
 import PrimaryCareDoctorViewScreen from "../screens/PrimaryCareDoctorView";
 import BookDoctorScreen from "../screens/BookDoctor";
 import CaseViewScreen from "../screens/CaseView";
+import ScheduleViewScreen from "../screens/ScheduleView";
+import DashboardPatientScreen from "../screens/DashboardPatient";
+import DashboardDoctorScreen from "../screens/DashboardDoctor";
 import CustomDrawerContent from "./Menu";
 import TimeSlotScreen from "../screens/TimeSlot";
 import DoctorDetailScreen from "../screens/DoctorDetail";
@@ -267,329 +274,665 @@ const ProfileInfoStack = (props) => {
 }
 
 const AppStack = (props) => {
-  return (
-    <Drawer.Navigator
-      style={{ flex: 1 }}
-      drawerContent={props => (
-        <CustomDrawerContent {...props} profile={profile} />
-      )}
-      drawerStyle={{
-        backgroundColor: "white",
-        width: width * 0.8
-      }}
-      drawerContentOptions={{
-        activeTintColor: "white",
-        inactiveTintColor: "#000",
-        activeBackgroundColor: materialTheme.COLORS.ACTIVE,
-        inactiveBackgroundColor: "transparent",
-        itemStyle: {
-          width: width * 0.74,
-          paddingHorizontal: 12,
-          // paddingVertical: 4,
-          justifyContent: "center",
-          alignContent: "center",
-          // alignItems: 'center',
-          overflow: "hidden"
-        },
-        labelStyle: {
-          fontSize: 48,
-          fontWeight: "normal"
-        }
-      }}
-      initialRouteName="Home"
-    >
-      <Drawer.Screen
-        name="Dashboard"
-        component={HomeStack}
-        options={{
-          drawerIcon: ({ focused }) => (
-            <Icon
-              size={16}
-              name="md-woman"
-              family="ionicon"
-              color={focused ? "white" : materialTheme.COLORS.MUTED}
-              style={{ marginLeft: 4, marginRight: 4 }}
-            />
-          )
-        }}
-      />
-      <Drawer.Screen
-        name="Profile Info"
-        component={ProfileInfoStack}
-        options={{
-          drawerIcon: ({ focused }) => (
-            <Icon
-              size={16}
-              name="md-woman"
-              family="ionicon"
-              color={focused ? "white" : materialTheme.COLORS.MUTED}
-              style={{ marginLeft: 4, marginRight: 4 }}
-            />
-          )
-        }}
-      />
-      <Drawer.Screen
-        name="Agent Info"
-        component={ProfileStack}
-        options={{
-          drawerIcon: ({ focused }) => (
-            <Icon
-              size={16}
-              name="shop"
-              family="GalioExtra"
-              color={focused ? "white" : materialTheme.COLORS.MUTED}
-            />
-          )
-        }}
-      />
-      <Drawer.Screen
-        name="Patient View"
-        component={PatientViewStack}
-        options={{
-          drawerIcon: ({ focused }) => (
-            <Icon
-              size={16}
-              name="user"
-              family="font-awesome"
-              color={focused ? "white" : materialTheme.COLORS.MUTED}
-            />
-          )
-        }}
-      />
-      <Drawer.Screen
-        name="Case View"
-        component={CaseViewStack}
-        options={{
-          drawerIcon: ({ focused }) => (
-            <Icon
-              size={16}
-              name="id-badge"
-              family="font-awesome"
-              color={focused ? "white" : materialTheme.COLORS.MUTED}
-            />
-          )
-        }}
-      />
-      <Drawer.Screen
-        name="Primary Care Doctor View"
-        component={PrimaryCareDoctorViewStack}
-        options={{
-          drawerIcon: ({ focused }) => (
-            <Icon
-              size={16}
-              name="briefcase-medical"
-              family="font-awesome"
-              color={focused ? "white" : materialTheme.COLORS.MUTED}
-            />
-          )
-        }}
-      />
-      <Drawer.Screen
-        name="Schedule View"
-        component={ProfileStack}
-        options={{
-          drawerIcon: ({ focused }) => (
-            <Icon
-              size={16}
-              name="calender"
-              family="font-awesome"
-              color={focused ? "white" : materialTheme.COLORS.MUTED}
-            />
-          )
-        }}
-      />
-      <Drawer.Screen
-        name="Settings"
-        component={SettingsStack}
-        options={{
-          drawerIcon: ({ focused }) => (
-            <Icon
-              size={16}
-              name="gears"
-              family="font-awesome"
-              color={focused ? "white" : materialTheme.COLORS.MUTED}
-              style={{ marginRight: -3 }}
-            />
-          )
-        }}
-      />
-      <Drawer.Screen
-        name="Components"
-        component={ComponentsStack}
-        options={{
-          drawerIcon: ({ focused }) => (
-            <Icon
-              size={16}
-              name="md-switch"
-              family="ionicon"
-              color={focused ? "white" : materialTheme.COLORS.MUTED}
-              style={{ marginRight: 2, marginLeft: 2 }}
-            />
-          )
-        }}
-      />
-      <Drawer.Screen
-        name="Patient Info"
-        component={PatientInfoStack}
-        options={{
-          drawerIcon: ({ focused }) => (
-            <Icon
-              size={16}
-              name="md-woman"
-              family="ionicon"
-              color={focused ? "white" : materialTheme.COLORS.MUTED}
-              style={{ marginLeft: 4, marginRight: 4 }}
-            />
-          )
-        }}
-      />
-      <Drawer.Screen
-        name="Doctor Schedule Detail"
-        component={DoctorScheduleDetailStack}
-        options={{
-          drawerIcon: ({ focused }) => (
-            <Icon
-              size={16}
-              name="md-woman"
-              family="ionicon"
-              color={focused ? "white" : materialTheme.COLORS.MUTED}
-              style={{ marginLeft: 4, marginRight: 4 }}
-            />
-          )
-        }}
-      />
-      <Drawer.Screen
-        name="Edit Profile"
-        component={EditProfileStack}
-        options={{
-          drawerIcon: ({ focused }) => (
-            <Icon
-              size={16}
-              name="md-woman"
-              family="ionicon"
-              color={focused ? "white" : materialTheme.COLORS.MUTED}
-              style={{ marginLeft: 4, marginRight: 4 }}
-            />
-          )
-        }}
-      />
-      <Drawer.Screen
-        name="Schedule Detail"
-        component={ScheduleDetailStack}
-        options={{
-          drawerIcon: ({ focused }) => (
-            <Icon
-              size={16}
-              name="md-woman"
-              family="ionicon"
-              color={focused ? "white" : materialTheme.COLORS.MUTED}
-              style={{ marginLeft: 4, marginRight: 4 }}
-            />
-          )
-        }}
-      />
-      <Drawer.Screen
-        name="CaseHistory"
-        component={CaseHistoryStack}
-        options={{
-          drawerIcon: ({ focused }) => (
-            <Icon
-              size={16}
-              name="md-woman"
-              family="ionicon"
-              color={focused ? "white" : materialTheme.COLORS.MUTED}
-              style={{ marginLeft: 4, marginRight: 4 }}
-            />
-          )
-        }}
-      />
-      <Drawer.Screen
-        name="Notification"
-        component={NotificationStack}
-        options={{
-          drawerIcon: ({ focused }) => (
-            <Icon
-              size={16}
-              name="md-woman"
-              family="ionicon"
-              color={focused ? "white" : materialTheme.COLORS.MUTED}
-              style={{ marginLeft: 4, marginRight: 4 }}
-            />
-          )
-        }}
-      />
-      <Drawer.Screen
-        name="BookDoctor"
-        component={BookDoctorScreen}
-        options={{
-          drawerIcon: ({ focused }) => (
-            <Icon
-              size={16}
-              name="md-person-add"
-              family="ionicon"
-              color={focused ? "white" : materialTheme.COLORS.MUTED}
-            />
-          )
-        }}
-      />
-      <Drawer.Screen
-        name="Time Slot"
-        component={TimeSlotStack}
-        options={{
-          drawerIcon: ({ focused }) => (
-            <Icon
-              size={16}
-              name="briefcase-medical"
-              family="font-awesome"
-              color={focused ? "white" : materialTheme.COLORS.MUTED}
-            />
-          )
-        }}
-      />
-      <Drawer.Screen
-        name="Doctor Detail"
-        component={DoctorDetailStack}
-        options={{
-          drawerIcon: ({ focused }) => (
-            <Icon
-              size={16}
-              name="briefcase-medical"
-              family="font-awesome"
-              color={focused ? "white" : materialTheme.COLORS.MUTED}
-            />
-          )
-        }}
-      />
-      <Drawer.Screen
-        name="Sign In"
-        component={SignInScreen}
-        options={{
-          drawerIcon: ({ focused }) => (
-            <Icon
-              size={16}
-              name="ios-log-in"
-              family="ionicon"
-              color={focused ? "white" : materialTheme.COLORS.MUTED}
-            />
-          )
-        }}
-      />
-      <Drawer.Screen
-        name="Sign Up"
-        component={SignUpScreen}
-        options={{
-          drawerIcon: ({ focused }) => (
-            <Icon
-              size={16}
-              name="md-person-add"
-              family="ionicon"
-              color={focused ? "white" : materialTheme.COLORS.MUTED}
-            />
-          )
-        }}
-      />
-    </Drawer.Navigator>
-  );
+  
+  const userRole = useSelector(state => state.user.role);
+ 
+  switch (userRole) {
+    case "agent":
+      return (
+        <Drawer.Navigator
+          style={{ flex: 1 }}
+          drawerContent={props => (
+            <CustomDrawerContent {...props} profile={profile} />
+          )}
+          drawerStyle={{
+            backgroundColor: "white",
+            width: width * 0.8
+          }}
+          drawerContentOptions={{
+            activeTintColor: "white",
+            inactiveTintColor: "#000",
+            activeBackgroundColor: materialTheme.COLORS.ACTIVE,
+            inactiveBackgroundColor: "transparent",
+            itemStyle: {
+              width: width * 0.74,
+              paddingHorizontal: 12,
+              justifyContent: "center",
+              alignContent: "center",
+              overflow: "hidden"
+            },
+            labelStyle: {
+              fontSize: 48,
+              fontWeight: "normal"
+            }
+          }}
+          initialRouteName="Home"
+        >
+          <Drawer.Screen
+            name="Dashboard"
+            component={HomeStack}
+            options={{
+              drawerIcon: ({ focused }) => (
+                <Icon
+                  size={16}
+                  name="md-woman"
+                  family="ionicon"
+                  color={focused ? "white" : materialTheme.COLORS.MUTED}
+                  style={{ marginLeft: 4, marginRight: 4 }}
+                />
+              )
+            }}
+          />
+          <Drawer.Screen
+            name="Agent Info"
+            component={ProfileStack}
+            options={{
+              drawerIcon: ({ focused }) => (
+                <Icon
+                  size={16}
+                  name="shop"
+                  family="GalioExtra"
+                  color={focused ? "white" : materialTheme.COLORS.MUTED}
+                />
+              )
+            }}
+          />
+          <Drawer.Screen
+            name="Patient View"
+            component={PatientViewStack}
+            options={{
+              drawerIcon: ({ focused }) => (
+                <Icon
+                  size={16}
+                  name="user"
+                  family="font-awesome"
+                  color={focused ? "white" : materialTheme.COLORS.MUTED}
+                />
+              )
+            }}
+          />
+          <Drawer.Screen
+            name="Case View"
+            component={CaseViewStack}
+            options={{
+              drawerIcon: ({ focused }) => (
+                <Icon
+                  size={16}
+                  name="id-badge"
+                  family="font-awesome"
+                  color={focused ? "white" : materialTheme.COLORS.MUTED}
+                />
+              )
+            }}
+          />
+          <Drawer.Screen
+            name="Primary Care Doctor View"
+            component={PrimaryCareDoctorViewStack}
+            options={{
+              drawerIcon: ({ focused }) => (
+                <Icon
+                  size={16}
+                  name="briefcase-medical"
+                  family="font-awesome"
+                  color={focused ? "white" : materialTheme.COLORS.MUTED}
+                />
+              )
+            }}
+          />
+          <Drawer.Screen
+            name="Schedule View"
+            component={ProfileStack}
+            options={{
+              drawerIcon: ({ focused }) => (
+                <Icon
+                  size={16}
+                  name="calender"
+                  family="font-awesome"
+                  color={focused ? "white" : materialTheme.COLORS.MUTED}
+                />
+              )
+            }}
+          />
+          <Drawer.Screen
+            name="Settings"
+            component={SettingsStack}
+            options={{
+              drawerIcon: ({ focused }) => (
+                <Icon
+                  size={16}
+                  name="gears"
+                  family="font-awesome"
+                  color={focused ? "white" : materialTheme.COLORS.MUTED}
+                  style={{ marginRight: -3 }}
+                />
+              )
+            }}
+          />
+        </Drawer.Navigator>
+      )          
+    case "patient":
+      return (
+        <Drawer.Navigator
+          style={{ flex: 1 }}
+          drawerContent={props => (
+            <CustomDrawerContent {...props} profile={profile} />
+          )}
+          drawerStyle={{
+            backgroundColor: "white",
+            width: width * 0.8
+          }}
+          drawerContentOptions={{
+            activeTintColor: "white",
+            inactiveTintColor: "#000",
+            activeBackgroundColor: materialTheme.COLORS.ACTIVE,
+            inactiveBackgroundColor: "transparent",
+            itemStyle: {
+              width: width * 0.74,
+              paddingHorizontal: 12,
+              justifyContent: "center",
+              alignContent: "center",
+              overflow: "hidden"
+            },
+            labelStyle: {
+              fontSize: 48,
+              fontWeight: "normal"
+            }
+          }}
+          initialRouteName="Home"
+        >
+          <Drawer.Screen
+            name="Dashboard"
+            component={HomeStack}
+            options={{
+              drawerIcon: ({ focused }) => (
+                <Icon
+                  size={16}
+                  name="md-woman"
+                  family="ionicon"
+                  color={focused ? "white" : materialTheme.COLORS.MUTED}
+                  style={{ marginLeft: 4, marginRight: 4 }}
+                />
+              )
+            }}
+          />
+          <Drawer.Screen
+            name="Profile Info"
+            component={ProfileInfoStack}
+            options={{
+              drawerIcon: ({ focused }) => (
+                <Icon
+                  size={16}
+                  name="md-woman"
+                  family="ionicon"
+                  color={focused ? "white" : materialTheme.COLORS.MUTED}
+                  style={{ marginLeft: 4, marginRight: 4 }}
+                />
+              )
+            }}
+          />
+          <Drawer.Screen
+            name="CaseHistory"
+            component={CaseHistoryStack}
+            options={{
+              drawerIcon: ({ focused }) => (
+                <Icon
+                  size={16}
+                  name="md-woman"
+                  family="ionicon"
+                  color={focused ? "white" : materialTheme.COLORS.MUTED}
+                  style={{ marginLeft: 4, marginRight: 4 }}
+                />
+              )
+            }}
+          />
+          <Drawer.Screen
+            name="Notification"
+            component={NotificationStack}
+            options={{
+              drawerIcon: ({ focused }) => (
+                <Icon
+                  size={16}
+                  name="md-woman"
+                  family="ionicon"
+                  color={focused ? "white" : materialTheme.COLORS.MUTED}
+                  style={{ marginLeft: 4, marginRight: 4 }}
+                />
+              )
+            }}
+          />
+          <Drawer.Screen
+            name="Settings"
+            component={SettingsStack}
+            options={{
+              drawerIcon: ({ focused }) => (
+                <Icon
+                  size={16}
+                  name="gears"
+                  family="font-awesome"
+                  color={focused ? "white" : materialTheme.COLORS.MUTED}
+                  style={{ marginRight: -3 }}
+                />
+              )
+            }}
+          />
+        </Drawer.Navigator>
+      )
+    case "doctor":
+      return (
+        <Drawer.Navigator
+          style={{ flex: 1 }}
+          drawerContent={props => (
+            <CustomDrawerContent {...props} profile={profile} />
+          )}
+          drawerStyle={{
+            backgroundColor: "white",
+            width: width * 0.8
+          }}
+          drawerContentOptions={{
+            activeTintColor: "white",
+            inactiveTintColor: "#000",
+            activeBackgroundColor: materialTheme.COLORS.ACTIVE,
+            inactiveBackgroundColor: "transparent",
+            itemStyle: {
+              width: width * 0.74,
+              paddingHorizontal: 12,
+              justifyContent: "center",
+              alignContent: "center",
+              overflow: "hidden"
+            },
+            labelStyle: {
+              fontSize: 48,
+              fontWeight: "normal"
+            }
+          }}
+          initialRouteName="Home"
+        >
+          <Drawer.Screen
+            name="Dashboard"
+            component={HomeStack}
+            options={{
+              drawerIcon: ({ focused }) => (
+                <Icon
+                  size={16}
+                  name="md-woman"
+                  family="ionicon"
+                  color={focused ? "white" : materialTheme.COLORS.MUTED}
+                  style={{ marginLeft: 4, marginRight: 4 }}
+                />
+              )
+            }}
+          />  
+          <Drawer.Screen
+            name="Profile Info"
+            component={PatientInfoStack}
+            options={{
+              drawerIcon: ({ focused }) => (
+                <Icon
+                  size={16}
+                  name="md-woman"
+                  family="ionicon"
+                  color={focused ? "white" : materialTheme.COLORS.MUTED}
+                  style={{ marginLeft: 4, marginRight: 4 }}
+                />
+              )
+            }}
+          />
+          <Drawer.Screen
+            name="Case History"
+            component={CaseHistoryStack}
+            options={{
+              drawerIcon: ({ focused }) => (
+                <Icon
+                  size={16}
+                  name="md-woman"
+                  family="ionicon"
+                  color={focused ? "white" : materialTheme.COLORS.MUTED}
+                  style={{ marginLeft: 4, marginRight: 4 }}
+                />
+              )
+            }}
+          />
+          <Drawer.Screen
+            name="Settings"
+            component={SettingsStack}
+            options={{
+              drawerIcon: ({ focused }) => (
+                <Icon
+                  size={16}
+                  name="gears"
+                  family="font-awesome"
+                  color={focused ? "white" : materialTheme.COLORS.MUTED}
+                  style={{ marginRight: -3 }}
+                />
+              )
+            }}
+          />      
+        </Drawer.Navigator>
+      )
+    default:
+      break;
+  }
+    // return (
+    //   <Drawer.Navigator
+    //     style={{ flex: 1 }}
+    //     drawerContent={props => (
+    //       <CustomDrawerContent {...props} profile={profile} />
+    //     )}
+    //     drawerStyle={{
+    //       backgroundColor: "white",
+    //       width: width * 0.8
+    //     }}
+    //     drawerContentOptions={{
+    //       activeTintColor: "white",
+    //       inactiveTintColor: "#000",
+    //       activeBackgroundColor: materialTheme.COLORS.ACTIVE,
+    //       inactiveBackgroundColor: "transparent",
+    //       itemStyle: {
+    //         width: width * 0.74,
+    //         paddingHorizontal: 12,
+    //         justifyContent: "center",
+    //         alignContent: "center",
+    //         overflow: "hidden"
+    //       },
+    //       labelStyle: {
+    //         fontSize: 48,
+    //         fontWeight: "normal"
+    //       }
+    //     }}
+    //     initialRouteName="Home"
+    //   >
+    //     <Drawer.Screen
+    //       name="Dashboard"
+    //       component={HomeStack}
+    //       options={{
+    //         drawerIcon: ({ focused }) => (
+    //           <Icon
+    //             size={16}
+    //             name="md-woman"
+    //             family="ionicon"
+    //             color={focused ? "white" : materialTheme.COLORS.MUTED}
+    //             style={{ marginLeft: 4, marginRight: 4 }}
+    //           />
+    //         )
+    //       }}
+    //     />
+    //     <Drawer.Screen
+    //       name="Profile Info"
+    //       component={ProfileInfoStack}
+    //       options={{
+    //         drawerIcon: ({ focused }) => (
+    //           <Icon
+    //             size={16}
+    //             name="md-woman"
+    //             family="ionicon"
+    //             color={focused ? "white" : materialTheme.COLORS.MUTED}
+    //             style={{ marginLeft: 4, marginRight: 4 }}
+    //           />
+    //         )
+    //       }}
+    //     />
+    //     <Drawer.Screen
+    //       name="Agent Info"
+    //       component={ProfileStack}
+    //       options={{
+    //         drawerIcon: ({ focused }) => (
+    //           <Icon
+    //             size={16}
+    //             name="shop"
+    //             family="GalioExtra"
+    //             color={focused ? "white" : materialTheme.COLORS.MUTED}
+    //           />
+    //         )
+    //       }}
+    //     />
+    //     <Drawer.Screen
+    //       name="Patient View"
+    //       component={PatientViewStack}
+    //       options={{
+    //         drawerIcon: ({ focused }) => (
+    //           <Icon
+    //             size={16}
+    //             name="user"
+    //             family="font-awesome"
+    //             color={focused ? "white" : materialTheme.COLORS.MUTED}
+    //           />
+    //         )
+    //       }}
+    //     />
+    //     <Drawer.Screen
+    //       name="Case View"
+    //       component={CaseViewStack}
+    //       options={{
+    //         drawerIcon: ({ focused }) => (
+    //           <Icon
+    //             size={16}
+    //             name="id-badge"
+    //             family="font-awesome"
+    //             color={focused ? "white" : materialTheme.COLORS.MUTED}
+    //           />
+    //         )
+    //       }}
+    //     />
+    //     <Drawer.Screen
+    //       name="Primary Care Doctor View"
+    //       component={PrimaryCareDoctorViewStack}
+    //       options={{
+    //         drawerIcon: ({ focused }) => (
+    //           <Icon
+    //             size={16}
+    //             name="briefcase-medical"
+    //             family="font-awesome"
+    //             color={focused ? "white" : materialTheme.COLORS.MUTED}
+    //           />
+    //         )
+    //       }}
+    //     />
+    //     <Drawer.Screen
+    //       name="Schedule View"
+    //       component={ProfileStack}
+    //       options={{
+    //         drawerIcon: ({ focused }) => (
+    //           <Icon
+    //             size={16}
+    //             name="calender"
+    //             family="font-awesome"
+    //             color={focused ? "white" : materialTheme.COLORS.MUTED}
+    //           />
+    //         )
+    //       }}
+    //     />
+    //     <Drawer.Screen
+    //       name="Settings"
+    //       component={SettingsStack}
+    //       options={{
+    //         drawerIcon: ({ focused }) => (
+    //           <Icon
+    //             size={16}
+    //             name="gears"
+    //             family="font-awesome"
+    //             color={focused ? "white" : materialTheme.COLORS.MUTED}
+    //             style={{ marginRight: -3 }}
+    //           />
+    //         )
+    //       }}
+    //     />
+    //     <Drawer.Screen
+    //       name="Components"
+    //       component={ComponentsStack}
+    //       options={{
+    //         drawerIcon: ({ focused }) => (
+    //           <Icon
+    //             size={16}
+    //             name="md-switch"
+    //             family="ionicon"
+    //             color={focused ? "white" : materialTheme.COLORS.MUTED}
+    //             style={{ marginRight: 2, marginLeft: 2 }}
+    //           />
+    //         )
+    //       }}
+    //     />
+    //     <Drawer.Screen
+    //       name="Patient Info"
+    //       component={PatientInfoStack}
+    //       options={{
+    //         drawerIcon: ({ focused }) => (
+    //           <Icon
+    //             size={16}
+    //             name="md-woman"
+    //             family="ionicon"
+    //             color={focused ? "white" : materialTheme.COLORS.MUTED}
+    //             style={{ marginLeft: 4, marginRight: 4 }}
+    //           />
+    //         )
+    //       }}
+    //     />
+    //     <Drawer.Screen
+    //       name="Doctor Schedule Detail"
+    //       component={DoctorScheduleDetailStack}
+    //       options={{
+    //         drawerIcon: ({ focused }) => (
+    //           <Icon
+    //             size={16}
+    //             name="md-woman"
+    //             family="ionicon"
+    //             color={focused ? "white" : materialTheme.COLORS.MUTED}
+    //             style={{ marginLeft: 4, marginRight: 4 }}
+    //           />
+    //         )
+    //       }}
+    //     />
+    //     <Drawer.Screen
+    //       name="Edit Profile"
+    //       component={EditProfileStack}
+    //       options={{
+    //         drawerIcon: ({ focused }) => (
+    //           <Icon
+    //             size={16}
+    //             name="md-woman"
+    //             family="ionicon"
+    //             color={focused ? "white" : materialTheme.COLORS.MUTED}
+    //             style={{ marginLeft: 4, marginRight: 4 }}
+    //           />
+    //         )
+    //       }}
+    //     />
+    //     <Drawer.Screen
+    //       name="Schedule Detail"
+    //       component={ScheduleDetailStack}
+    //       options={{
+    //         drawerIcon: ({ focused }) => (
+    //           <Icon
+    //             size={16}
+    //             name="md-woman"
+    //             family="ionicon"
+    //             color={focused ? "white" : materialTheme.COLORS.MUTED}
+    //             style={{ marginLeft: 4, marginRight: 4 }}
+    //           />
+    //         )
+    //       }}
+    //     />
+    //     <Drawer.Screen
+    //       name="CaseHistory"
+    //       component={CaseHistoryStack}
+    //       options={{
+    //         drawerIcon: ({ focused }) => (
+    //           <Icon
+    //             size={16}
+    //             name="md-woman"
+    //             family="ionicon"
+    //             color={focused ? "white" : materialTheme.COLORS.MUTED}
+    //             style={{ marginLeft: 4, marginRight: 4 }}
+    //           />
+    //         )
+    //       }}
+    //     />
+    //     <Drawer.Screen
+    //       name="Notification"
+    //       component={NotificationStack}
+    //       options={{
+    //         drawerIcon: ({ focused }) => (
+    //           <Icon
+    //             size={16}
+    //             name="md-woman"
+    //             family="ionicon"
+    //             color={focused ? "white" : materialTheme.COLORS.MUTED}
+    //             style={{ marginLeft: 4, marginRight: 4 }}
+    //           />
+    //         )
+    //       }}
+    //     />
+    //     <Drawer.Screen
+    //       name="BookDoctor"
+    //       component={BookDoctorScreen}
+    //       options={{
+    //         drawerIcon: ({ focused }) => (
+    //           <Icon
+    //             size={16}
+    //             name="md-person-add"
+    //             family="ionicon"
+    //             color={focused ? "white" : materialTheme.COLORS.MUTED}
+    //           />
+    //         )
+    //       }}
+    //     />
+    //     <Drawer.Screen
+    //       name="Time Slot"
+    //       component={TimeSlotStack}
+    //       options={{
+    //         drawerIcon: ({ focused }) => (
+    //           <Icon
+    //             size={16}
+    //             name="briefcase-medical"
+    //             family="font-awesome"
+    //             color={focused ? "white" : materialTheme.COLORS.MUTED}
+    //           />
+    //         )
+    //       }}
+    //     />
+    //     <Drawer.Screen
+    //       name="Doctor Detail"
+    //       component={DoctorDetailStack}
+    //       options={{
+    //         drawerIcon: ({ focused }) => (
+    //           <Icon
+    //             size={16}
+    //             name="briefcase-medical"
+    //             family="font-awesome"
+    //             color={focused ? "white" : materialTheme.COLORS.MUTED}
+    //           />
+    //         )
+    //       }}
+    //     />
+    //     <Drawer.Screen
+    //       name="Sign In"
+    //       component={SignInScreen}
+    //       options={{
+    //         drawerIcon: ({ focused }) => (
+    //           <Icon
+    //             size={16}
+    //             name="ios-log-in"
+    //             family="ionicon"
+    //             color={focused ? "white" : materialTheme.COLORS.MUTED}
+    //           />
+    //         )
+    //       }}
+    //     />
+    //     <Drawer.Screen
+    //       name="Sign Up"
+    //       component={SignUpScreen}
+    //       options={{
+    //         drawerIcon: ({ focused }) => (
+    //           <Icon
+    //             size={16}
+    //             name="md-person-add"
+    //             family="ionicon"
+    //             color={focused ? "white" : materialTheme.COLORS.MUTED}
+    //           />
+    //         )
+    //       }}
+    //     />
+    //   </Drawer.Navigator>
+    // );
 }
 
 const UserSelectStack = (props) => {
@@ -629,21 +972,40 @@ const PatientInfoStack = (props) => {
 
 const PatientViewStack = (props) => {
   return (
-    <Stack.Navigator mode="card" headerMode="none">
+    <Stack.Navigator mode="card" headerMode="screen">
       <Stack.Screen
         name="Patient View"
         component={PatientViewScreen}
-        option={{
+        options={{
           header: ({ navigation, scene }) => (
             <Header
-              back 
-              title="Patient View" 
+              home
+              title="Patient View"
               navigation={props.navigation}
             />
           )
         }}
       />
-      <Stack.Screen name="App" component={AppStack} />
+    </Stack.Navigator>
+  );
+}
+
+const CaseViewStack = (props) => {
+  return (
+    <Stack.Navigator mode="card" headerMode="screen">
+      <Stack.Screen
+        name="Case View"
+        component={CaseViewScreen}
+        options={{
+          header: ({ navigation, scene }) => (
+            <Header
+              home
+              title="Case View" 
+              navigation={props.navigation}
+            />
+          )
+        }}
+      />
     </Stack.Navigator>
   );
 }
@@ -670,15 +1032,40 @@ const DoctorScheduleDetailStack = (props) => {
 
 const PrimaryCareDoctorViewStack = (props) => {
   return (
-    <Stack.Navigator mode="card" headerMode="none">
+    <Stack.Navigator mode="card" headerMode="screen">
       <Stack.Screen
         name="Primary Care Doctor View"
         component={PrimaryCareDoctorViewScreen}
-        option={{
-          headerTransparent: true
+        options={{
+          header: ({ navigation, scene }) => (
+            <Header
+              home
+              title="Primary Care Doctor View" 
+              navigation={props.navigation}
+            />
+          )
         }}
       />
-      <Stack.Screen name="App" component={AppStack} />
+    </Stack.Navigator>
+  );
+}
+
+const ScheduleViewStack = (props) => {
+  return (
+    <Stack.Navigator mode="card" headerMode="screen">
+      <Stack.Screen
+        name="Schedule View"
+        component={ScheduleViewScreen}
+        options={{
+          header: ({ navigation, scene }) => (
+            <Header
+              home
+              title="Schedule View" 
+              navigation={props.navigation}
+            />
+          )
+        }}
+      />
     </Stack.Navigator>
   );
 }
@@ -751,17 +1138,42 @@ const CaseHistoryStack = (props) => {
   );
 }
 
-const CaseViewStack = (props) => {
+const DashboardPatientStack = (props) => {
   return (
-    <Stack.Navigator mode="card" headerMode="none">
+    <Stack.Navigator mode="card" headerMode="screen">
       <Stack.Screen
-        name="Case View"
-        component={CaseViewScreen}
-        option={{
-          headerTransparent: true
+        name="Patient Dashboard"
+        component={DashboardPatientScreen}
+        options={{
+          header: ({ navigation, scene }) => (
+            <Header
+              home
+              title="Patient Dashboard" 
+              navigation={props.navigation}
+            />
+          )
         }}
       />
-      <Stack.Screen name="App" component={AppStack} />
+    </Stack.Navigator>
+  );
+}
+
+const DashboardDoctorStack = (props) => {
+  return (
+    <Stack.Navigator mode="card" headerMode="screen">
+      <Stack.Screen
+        name="Doctor Dashboard"
+        component={DashboardDoctorScreen}
+        options={{
+          header: ({ navigation, scene }) => (
+            <Header
+              home
+              title="Doctor Dashboard" 
+              navigation={props.navigation}
+            />
+          )
+        }}
+      />
     </Stack.Navigator>
   );
 }

@@ -1,22 +1,23 @@
 import types from './types';
 
-const progressUpdate = (payload) => {
-	return {
-		type: types.PROGRESS_UPDATE,
-		payload: payload
-	};
+const roleSelector = (role) => {
+	switch (role) {
+		case 'agent':
+			return {
+				type: types.AGENT_ROLE
+			};			
+		case 'patient':
+			return {
+				type: types.PATIENT_ROLE
+			};
+		case 'doctor':
+			return {
+				type: types.DOCTOR_ROLE
+			};
+		default:
+			break;
+	}
+
 };
 
-const submitPartialForm = (data) => (dispatch) => {
-    return {
-		type: types.SUBMIT_PARTIAL_FORM,
-		payload: payload
-	};
-};
-
-const resetUserState = () => {
-	return {
-		type: types.RESET_USER_STATE
-	};
-};
-export { progressUpdate, submitPartialForm, resetUserState };
+export { roleSelector };

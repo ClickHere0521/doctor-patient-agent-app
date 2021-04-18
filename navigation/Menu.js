@@ -5,23 +5,15 @@ import {
   StyleSheet,
   Dimensions,
   Image,
-  TouchableOpacity,
-  ListView
 } from "react-native";
 import { Block, Text, theme } from "galio-framework";
 import { useSafeArea } from "react-native-safe-area-context";
 
-import { Icon, Drawer as DrawerCustomItem } from "../components/";
-import { Images, materialTheme } from "../constants/";
+import { Drawer as DrawerCustomItem } from "../components/";
+import { materialTheme } from "../constants/";
+import { useSelector } from "react-redux";
 
 const { width, height } = Dimensions.get("screen");
-
-const profile = {
-  avatar: Images.Profile,
-  name: "Workforce Agent",
-  type: "Agnecy",
-  plan: "Workforce",  
-};
 
 const CustomDrawerContent = ({
   drawerPosition,
@@ -32,28 +24,40 @@ const CustomDrawerContent = ({
   ...rest
 }) => {
   const insets = useSafeArea();
-  const screens = [
-    "Dashboard",
-    "Profile Info",
-    "Agent Info",
-    "Patient View",
-    "Case View",
-    "Primary Care Doctor View",
-    "Schedule View",
-    "Settings",
-    "Components",
-    "Patient Info",
-    "Doctor Schedule Detail",
-    "Edit Profile",
-    "Schedule Detail",
-    "CaseHistory",
-    "Notification",
-    "BookDoctor",
-    "Time Slot",
-    "Doctor Detail",
-    "Sign In",
-    "Sign Up"
-  ];
+  const userRole = useSelector( state => state.user.role );
+  let screens = [];
+  switch (userRole) {
+    case "agent":
+      screens = [
+        "Dashboard",
+        "Agent Info",
+        "Patient View",
+        "Case View",
+        "Primary Care Doctor View",
+        "Schedule View",
+        "Settings",
+      ];
+      break;
+    case "patient":
+      screens = [
+        "Dashboard",
+        "Profile Info",
+        "Case history",
+        "Notification",
+        "Settings",
+      ];
+      break;
+    case "doctor":
+      screens = [
+        "Dashboard",
+        "Profile Info",
+        "Case History",
+        "Settings"
+      ]  
+    default: 
+      break;
+  }
+
   return (
     <Block
       style={styles.container}
@@ -96,24 +100,6 @@ const CustomDrawerContent = ({
           })}
         </ScrollView>
       </Block>
-      {/* <Block flex={0.25} style={{ paddingLeft: width * 0.1, paddingTop: height * 0.1 }}>
-        <Text>
-          © 2021-2022  AMGAPP.          
-        </Text>
-        <Text>
-          All Rights Reserved  
-        </Text>
-        <DrawerCustomItem
-          title="Sign In"
-          navigation={navigation}
-          focused={state.index === 8 ? true : false}
-        />
-        <DrawerCustomItem
-          title="Sign Up"
-          navigation={navigation}
-          focused={state.index === 9 ? true : false}
-        />
-      </Block> */}
     </Block>
   );
 }
