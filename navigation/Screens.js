@@ -47,6 +47,7 @@ import AgentCaseDetailScreen from "../screens/AgentCaseDetail";
 import DoctorCaseDetailScreen from "../screens/DoctorCaseDetail";
 import PatientCaseDetailScreen from "../screens/PatientCaseDetail";
 import PatientTimeSlotScreen from "../screens/PatientTimeSlot";
+import { IMLocalized } from "../src/localization/IMLocalization";
 
 const { width } = Dimensions.get("screen");
 

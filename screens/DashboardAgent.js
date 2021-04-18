@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { materialTheme } from '../constants';
 import { HeaderHeight } from "../constants/utils";
 import { useDispatch, useSelector } from "react-redux";
+import { IMLocalized } from "../src/localization/IMLocalization";
 
 const { width } = Dimensions.get('screen');
 
@@ -21,7 +22,7 @@ const DashboardAgent = (props) => {
           <Block row style={styles.marginLB10}>
             <Block>
               <Text color={'grey'} size={14}>
-                {eventHeading}            
+                {IMLocalized(eventHeading)}
               </Text>
             </Block>
             <Block>
@@ -59,19 +60,19 @@ const DashboardAgent = (props) => {
       </ImageBackground>
       <Block flex={0.7}>        
         {renderEvents({
-          eventHeading: 'Total active case', 
+          eventHeading: IMLocalized('Total active case'), 
           eventContent: 3000
         })}
         {renderEvents({
-          eventHeading: 'This year', 
+          eventHeading: IMLocalized('This year'), 
           eventContent: 700
         })}
         {renderEvents({
-          eventHeading: 'Case resolved this year', 
+          eventHeading: IMLocalized('Case resolved this year'),
           eventContent: 605
         })}
         {renderEvents({
-          eventHeading: 'Ongoing case', 
+          eventHeading: IMLocalized('ongoingCase'),
           eventContent: 80
         })}                       
       </Block>      

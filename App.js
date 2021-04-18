@@ -5,11 +5,11 @@ import { Asset } from 'expo-asset';
 import { Block, GalioProvider } from 'galio-framework';
 import { NavigationContainer } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-
+import { PersistGate } from 'redux-persist/integration/react'
 // Configure redux
 import { Provider } from 'react-redux';
 import { configureStore } from './store';
-const store = configureStore();
+const {store, persistor} = configureStore();
 
 // Before rendering any navigation stack
 import { enableScreens } from 'react-native-screens';
@@ -17,6 +17,7 @@ enableScreens();
 
 import Screens from './navigation/Screens';
 import { Images, materialTheme } from './constants/';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const assetImages = [
   Images.Profile,
@@ -44,6 +45,7 @@ const cacheImages = (images) => {
 }
 
 const App = props => {
+
 
   const [isLoadingComplete, setIsLoadingComplete] = useState(false)
 
@@ -75,14 +77,16 @@ const App = props => {
           />
         ) : (
           <Provider store={store}>
-            <NavigationContainer>
-              <GalioProvider theme={materialTheme}>
-                <Block flex>
-                  {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
-                  <Screens />
-                </Block>
-              </GalioProvider>
-            </NavigationContainer>
+            <PersistGate loading={null} persistor={persistor}>
+              <NavigationContainer>
+                <GalioProvider theme={materialTheme}>
+                  <Block flex>
+                    {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
+                    <Screens />
+                  </Block>
+                </GalioProvider>
+              </NavigationContainer>
+            </PersistGate>
           </Provider>
           )
         }
@@ -90,5 +94,4 @@ const App = props => {
     )
   
 }
-
 export default App;

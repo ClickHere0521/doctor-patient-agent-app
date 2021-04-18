@@ -6,7 +6,8 @@ const types = {
 	RESET_USER_STATE    :     'RESET_USER_STATE',
 	AGENT_ROLE          :     'AGENT_ROLE',
 	PATIENT_ROLE		: 	  'PATIENT_ROLE',
-	DOCTOR_ROLE			:  	  'DOCTOR_ROLE'
+	DOCTOR_ROLE			:  	  'DOCTOR_ROLE',
+	SET_LAN			    :  	  'SET_LAN'
 };
 
 export default types;

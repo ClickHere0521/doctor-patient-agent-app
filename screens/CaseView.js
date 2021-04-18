@@ -13,7 +13,7 @@ import { Button, Block, Text, Input, theme } from 'galio-framework';
 import { materialTheme, products, Images, tabs } from '../constants/';
 import { Select, Icon, Header, Product, Switch, Tabs, ListItem } from '../components/';
 import { LinearGradient } from 'expo-linear-gradient';
-
+import { IMLocalized } from "../src/localization/IMLocalization";
 
 const { width } = Dimensions.get('screen');
 
@@ -60,13 +60,13 @@ const categories = [
 
 const sortCategories = [
     {
-      title: 'Case'
+      title: IMLocalized('Case')
     },
     {
-      title: 'Date'
+      title: IMLocalized('Date')
     },
     {
-      title: 'Current Status'
+      title: IMLocalized('currentStatus')
     },
   ];
 

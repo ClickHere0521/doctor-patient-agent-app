@@ -8,7 +8,7 @@
                 "tel": "+7654654654",
                 "photoURL": "assets/images/avatars/profile.jpg",
                 "settings": {
-                    "language": "es-US",
+                    "language": "en-US",
                     "fontName": "arial",
                     "fontSize": "16",
                     "rememberMe": "true"
@@ -47,7 +47,7 @@
                     "tel": "+7654654654",
                     "photoURL": "assets/images/avatars/profile.jpg",
                     "settings": {
-                        "language": "es-US",
+                        "language": "en-US",
                         "fontName": "arial",
                         "fontSize": "16",
                         "rememberMe": "true"
@@ -88,7 +88,7 @@
                     "tel": "+7654654654",
                     "photoURL": "assets/images/avatars/profile.jpg",
                     "settings": {
-                        "language": "es-US",
+                        "language": "en-US",
                         "fontName": "arial",
                         "fontSize": "16",
                         "rememberMe": "true"

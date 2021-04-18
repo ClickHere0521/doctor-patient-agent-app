@@ -5,6 +5,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 import { materialTheme } from '../constants';
 import { HeaderHeight } from "../constants/utils";
+import { IMLocalized } from "../src/localization/IMLocalization";
 
 const { width, height } = Dimensions.get('screen');
 
@@ -20,7 +21,7 @@ const ProfileInfo = (props) => {
           <Block row style={styles.marginLB10}>
             <Block>
               <Text color={'grey'} size={14}>
-                {eventHeading}            
+                {IMLocalized(eventHeading)}
               </Text>
             </Block>
             <Block>
@@ -69,19 +70,19 @@ const ProfileInfo = (props) => {
           </Block>
         </Block>
         {renderEvents({
-          eventHeading: 'Full Name', 
+          eventHeading: IMLocalized('fullName'), 
           eventContent: 'Rachel Brown'
         })}
         {renderEvents({
-          eventHeading: 'Address', 
+          eventHeading: IMLocalized('Address'), 
           eventContent: 'Los Angeles,CA'
         })}
         {renderEvents({
-          eventHeading: 'Phone number', 
+          eventHeading: IMLocalized('Phone number'), 
           eventContent: '+92 314 1254789'
         })}
         {renderEvents({
-          eventHeading: 'Ongoing case', 
+          eventHeading: IMLocalized('ongoingCase'), 
           eventContent: 80
         })}                       
       </Block>      

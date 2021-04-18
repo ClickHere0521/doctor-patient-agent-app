@@ -2,20 +2,15 @@ import React, { useEffect } from 'react';
 import { ImageBackground, Image, StyleSheet, StatusBar, Dimensions } from 'react-native';
 import { Block, Button, Text, theme } from 'galio-framework';
 import { LinearGradient } from 'expo-linear-gradient';
-
+import { IMLocalized } from '../src/localization/IMLocalization';
 const { height, width } = Dimensions.get('screen');
 
 import materialTheme from '../constants/Theme';
 import Images from '../constants/Images';
-import {IMLocalized, init} from '../src/localization/IMLocalization';
 
 const Onboarding = (props) => {
   const { navigation } = props;
-
-  useEffect(() => {
-    // Update the document title using the browser API
-    init('en-US');
-  }, []);
+  
 
   return (
     <Block flex style={styles.container}>

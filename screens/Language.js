@@ -5,6 +5,8 @@ import * as Localization from 'expo-localization';
 import { I18nManager } from 'react-native';
 import materialTheme from '../constants/Theme';
 import { IMLocalized, init } from '../src/localization/IMLocalization';
+import AsyncStorage from '@react-native-community/async-storage';
+import { useDispatch } from 'react-redux';
   
 export const LocalizationContext = React.createContext();
 
@@ -29,8 +31,10 @@ const ListItem = ( { item, onPress, style } ) => (
     </TouchableOpacity>
 );
 
+
 const Language = () => {    
     const [selectedId, setSelectedId] = useState(null);
+    const languageDispatch = useDispatch();
 
     const renderItem = ({ item }) => {
         const backgroundColor = item.id === selectedId ? '#aaaaaa' : '#ffffff';
@@ -41,9 +45,11 @@ const Language = () => {
         {
           case '1':
             init('en-US');
+            languageDispatch({type:'SET_LAN', payload:'en-US'});
             break;
           case '2':
             init('fr-FR');
+            languageDispatch({type:'SET_LAN', payload:'fr-FR'});
             break;
           case '3':
             init('fr-FR');
@@ -60,9 +66,6 @@ const Language = () => {
                 keyExtractor={item => item.id}
                 extraData={selectedId}
             />
-            <Text>
-                {IMLocalized('Home')}
-            </Text>
         </ScrollView>
       </Block>
     );

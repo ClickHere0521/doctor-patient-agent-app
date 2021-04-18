@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { StyleSheet, Dimensions, ScrollView, Image, ImageBackground, Platform } from 'react-native';
 import { Button, Block, Text, theme, Input } from 'galio-framework';
-
-import { materialTheme } from '../constants';
 import SwitchButton from 'switch-button-react-native';
+import { Icon } from '../components';
+import { Images, materialTheme } from '../constants';
+import { HeaderHeight } from "../constants/utils";
+import { IMLocalized } from "../src/localization/IMLocalization";
 
 const { width, height } = Dimensions.get('screen');
 const thumbMeasure = (width - 48 - 32) / 3;
@@ -28,115 +30,189 @@ const PatientInfo = (props) => {
   return (
     <Block center flex style={styles.profile}>
       <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
-        <Block center row>
-          <Block middle>
-            <Image source={require('../assets/images/avatar.png')} />
-          </Block>
-          <SwitchButton
-            onValueChange={(val) => setActiveSwitch(val)}      
-            text1 = 'Remove'                        
-            text2 = 'Upload'                       
-            switchWidth = {120}                 
-            switchHeight = {30}                 
-            switchdirection = 'rtl'             
-            switchBorderRadius = {100}          
-            switchSpeedChange = {500}           
-            switchBorderColor = '#3B3E51'       
-            switchBackgroundColor = '#fff'      
-            btnBorderColor = '#3B3E51'          
-            btnBackgroundColor = '#3B3E51'      
-            fontColor = '#3B3E51'               
-            activeFontColor = '#fff'            
-          />
-        </Block>      
-        <Block center style={styles.userInfo}>        
-        <Text style={styles.label}>
-          Full name <Text color={'red'}>*</Text>
-        </Text>
-        <Input
-          borderless
-          color="grey"
-          placeholder="Mark Veronic"
-          type="email-address"
-          autoCapitalize="none"
-          bgColor='transparent'
-          value="Mark Veronic"
-          placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
-          onChangeText={text => handleChange('name', text)}
-          style={[styles.input, vals.email ? styles.inputActive : null]}          
-        />
-        <Text style={styles.label}>
-          Email <Text color={'red'}>*</Text>
-        </Text>
-        <Input
-          borderless
-          color="grey"
-          placeholder="Markveronic@gmail.com"
-          type="email-address"
-          autoCapitalize="none"
-          bgColor='transparent' 
-          value="Markveronic@gmail.com"         
-          placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
-          onChangeText={text => handleChange('email', text)}
-          style={[styles.input, vals.email ? styles.inputActive : null]}
-          
-        />
-        <Text style={styles.label}>
-          Tel <Text color={'red'}>*</Text>
-        </Text>
-        <Input
-          borderless
-          color="grey"
-          placeholder="+1234567890"
-          type="email-address"
-          autoCapitalize="none"
-          bgColor='transparent'    
-          value='+1234567890'      
-          placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
-          onChangeText={text => handleChange('email', text)}
-          style={[styles.input, vals.email ? styles.inputActive : null]}
-          
-        />
-        <Text style={{paddingTop: 10, alignSelf: 'flex-start'}}>
-          Location <Text color={'red'}>*</Text>
-        </Text>
-        <Input
-          borderless
-          color="grey"
-          placeholder="California, US"
-          type="email-address"
-          autoCapitalize="none"
-          bgColor='transparent'     
-          value="California, US"     
-          placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
-          onChangeText={text => handleChange('email', text)}
-          style={[styles.input, vals.email ? styles.inputActive : null]}
-          
-        />
-        <Block row style={{alignSelf: 'flex-end'}}>
-          <Button
-            center
-            shadowless
-            color='#6E78F7'
-            textStyle={styles.optionsButtonText}
-            style={styles.optionsButton}
-            onPress={() => handleDelete(item.id)}
-          >
-            EDIT
-          </Button>  
-          <Button
-            center
-            shadowless
-            color='#6E78F7'
-            textStyle={styles.optionsButtonText}
-            style={styles.optionsButton}
-            onPress={() => handleDelete(item.id)}
-          >
-            SAVE
-          </Button>
-        </Block>      
-      </Block>
-      </ScrollView>
+        <Block style={{paddingTop: height * 0.05}} >
+          <Block style={styles.options}>
+            <Block row>
+              <Block block space="between" style={{ padding: theme.SIZES.BASE, paddingVertical: theme.SIZES.BASE * 0.3}}>
+                <Block middle>
+                  <Block row style={{ alignSelf: 'flex-start'}}>
+                    <Block middle>
+                      <Icon name="user" family="font-awesome" color={theme.COLORS.MUTED} size={16}> </Icon>  
+                    </Block>
+                    <Block>
+                      <Text muted size={12}>{IMLocalized('patientName')}</Text>
+                    </Block>                      
+                  </Block>                                    
+                  <Text bold size={12} color="black" style={{marginBottom: 8, alignSelf: 'flex-start' , width: width * 0.36, padding: width * 0.02}}>Jimmy Fallon</Text>
+                </Block>
+                <Block middle>
+                  <Block row style={{ alignSelf: 'flex-start'}}>
+                    <Block middle>
+                      <Icon name="phone" family="font-awesome" color={theme.COLORS.MUTED} size={16}> </Icon>  
+                    </Block>
+                    <Block>
+                    <Text muted size={12} >{IMLocalized('phoneNumber')}</Text>
+                    </Block>                      
+                  </Block>                    
+                  <Text bold size={12} color="black" style={{marginBottom: 8, alignSelf: 'flex-start' , width: width * 0.36, padding: width * 0.02}}>01234567890</Text>
+                </Block>
+                <Block middle>
+                <Block row style={{ alignSelf: 'flex-start'}}>
+                  <Block middle>
+                    <Icon name="envelope" family="font-awesome" color={theme.COLORS.MUTED} size={16}> </Icon>  
+                  </Block>
+                  <Block>
+                    <Text muted size={12} >{IMLocalized('emailAddress')}</Text>
+                    </Block>                      
+                  </Block>                    
+                  <Text bold size={12} color="black" style={{marginBottom: 8, alignSelf: 'flex-start', width: width * 0.36, padding: width * 0.02}}>emailaddress@gmail.com</Text>
+                </Block>
+              </Block>   
+              <Block block space="between" style={{ padding: theme.SIZES.BASE, paddingVertical: theme.SIZES.BASE * 0.3}}>
+                <Block middle>
+                  <Block row style={{ alignSelf: 'flex-start'}}>
+                    <Block middle>
+                      <Icon name="id-card" family="font-awesome" color={theme.COLORS.MUTED} size={16}> </Icon>  
+                    </Block>
+                    <Block>
+                    <Text muted size={12}>{IMLocalized('nationalId')}</Text>
+                    </Block>                      
+                  </Block>                  
+                  <Text bold size={12} color="black" style={{marginBottom: 8, alignSelf: 'flex-start', padding: width * 0.02}}>3236945328940784098</Text>
+                </Block>
+                <Block middle>
+                  <Block row style={{ alignSelf: 'flex-start'}}>
+                    <Block middle>
+                      <Icon name="map-marker" family="font-awesome" color={theme.COLORS.MUTED} size={16}> </Icon>  
+                    </Block>
+                    <Block>
+                    <Text muted size={12}>{IMLocalized('countryProvince')}</Text>
+                    </Block>                      
+                  </Block>                   
+                  <Text bold size={12} color="black" style={{marginBottom: 8, alignSelf: 'flex-start', padding: width * 0.02}}>US California</Text>
+                </Block>
+                <Block middle>
+                  <Block row style={{ alignSelf: 'flex-start'}}>
+                    <Block middle>
+                      <Icon name="address-book" family="font-awesome" color={theme.COLORS.MUTED} size={16}> </Icon>  
+                    </Block>
+                    <Block>
+                    <Text muted size={12}>address</Text>
+                    </Block>                      
+                  </Block>                  
+                  <Text bold size={12} color="black" style={{marginBottom: 8, alignSelf: 'flex-start', padding: width * 0.02}}>Address here</Text>
+                </Block>
+              </Block>   
+            </Block>    
+          </Block>        
+        </Block>
+        <Block style={{paddingTop: height * 0.05}} >
+          <Block style={styles.options}>        
+            <Block row>
+              <Block block space="between" style={{ padding: theme.SIZES.BASE, paddingVertical: theme.SIZES.BASE * 0.3, width: width * 0.45}}>
+                <Block middle>
+                  <Block row style={{ alignSelf: 'flex-start'}}>
+                    <Block block>                      
+                      <Icon name="heart" family="font-awesome" color={theme.COLORS.MUTED} size={16}> </Icon>  
+                      <Text bold size={12} color="black" style={{marginBottom: 8, alignSelf: 'flex-start'}}>{IMLocalized('age')}</Text>
+                    </Block>
+                    <Block block>
+                      <Text bold size={12} color="black" style={{marginBottom: 8, alignSelf: 'flex-end', padding: width * 0.02, paddingLeft: width * 0.18}}>33</Text>
+                    </Block>                    
+                  </Block>                  
+                </Block>
+                <Block middle>
+                  <Block row style={{ alignSelf: 'flex-start'}}>
+                    <Block block>
+                      <Icon name="arrow-up" family="font-awesome" color={theme.COLORS.MUTED} size={16}> </Icon>                        
+                      <Text bold size={12} color="black" style={{marginBottom: 8, alignSelf: 'flex-start'}}>{IMLocalized('height')}</Text>
+                    </Block>
+                    <Block block>
+                      <Text bold size={12} color="black" style={{marginBottom: 8, alignSelf: 'flex-end', padding: width * 0.02, paddingLeft: width * 0.1}}>170CM</Text>
+                    </Block>                    
+                  </Block>                  
+                </Block>
+                <Block middle>
+                  <Block row style={{ alignSelf: 'flex-start'}}>
+                    <Block block>
+                      <Icon name="tint" family="font-awesome" color={theme.COLORS.MUTED} size={16}> </Icon>                        
+                      <Text bold size={12} color="black" style={{marginBottom: 8, alignSelf: 'flex-start'}}>{IMLocalized('bloodType')}</Text>
+                    </Block>
+                    <Block block>
+                      <Text bold size={12} color="black" style={{marginBottom: 8, alignSelf: 'flex-end', padding: width * 0.02, paddingLeft: width * 0.07}}>AB</Text>
+                    </Block>                    
+                  </Block>                  
+                </Block>
+              </Block>   
+              <Block block space="between" style={{ padding: theme.SIZES.BASE, paddingVertical: theme.SIZES.BASE * 0.3}}>
+                <Block middle>
+                  <Block row style={{ alignSelf: 'flex-start'}}>
+                    <Block block>
+                      <Icon name="venus-mars" family="font-awesome" color={theme.COLORS.MUTED} size={16}> </Icon>                        
+                      <Text bold size={12} color="black" style={{marginBottom: 8, alignSelf: 'flex-start'}}>{IMLocalized('gender')}</Text>
+                    </Block>
+                    <Block block>
+                      <Text bold size={12} color="black" style={{marginBottom: 8, alignSelf: 'flex-end', padding: width * 0.02, paddingLeft: width * 0.19}}>F</Text>
+                    </Block>                    
+                  </Block>                  
+                </Block>
+                <Block middle>
+                  <Block row style={{ alignSelf: 'flex-start'}}>
+                    <Block block>
+                      <Icon name="fire" family="font-awesome" color={theme.COLORS.MUTED} size={16}> </Icon>                        
+                      <Text bold size={12} color="black" style={{marginBottom: 8, alignSelf: 'flex-start'}}>{IMLocalized('weight')}</Text>
+                    </Block>
+                    <Block block>
+                      <Text bold size={12} color="black" style={{marginBottom: 8, alignSelf: 'flex-end', padding: width * 0.02, paddingLeft: width * 0.16}}>70 kg</Text>
+                    </Block>                    
+                  </Block>                  
+                </Block>
+                <Block middle>
+                  <Block row style={{ alignSelf: 'flex-start'}}>
+                    <Block block>
+                      <Icon name="shield" family="font-awesome" color={theme.COLORS.MUTED} size={16}> </Icon>                        
+                      <Text bold size={12} color="black" style={{marginBottom: 8, alignSelf: 'flex-start'}}>{IMLocalized('insurance')}</Text>
+                    </Block>
+                    <Block block>
+                      <Text bold size={12} color="black" style={{marginBottom: 8, alignSelf: 'flex-end', padding: width * 0.02, paddingLeft: width * 0.1}}>Insured</Text>
+                    </Block>                    
+                  </Block>                  
+                </Block>
+              </Block>  
+            </Block>  
+          </Block>        
+        </Block>
+        <Block style={{paddingTop: height * 0.05}}>
+          <Block style={styles.options}>          
+            <Block row>
+              <Block block space="between" style={{ padding: theme.SIZES.BASE, paddingVertical: theme.SIZES.BASE * 0.3}}>
+                <Block middle>
+                  <Text muted size={10} style={{ alignSelf: 'flex-start'}}>15</Text>
+                  <Text bold size={10} color="black" style={{marginBottom: 8, alignSelf: 'flex-start' }}>{IMLocalized('prescriptions')}</Text>
+                </Block>
+              </Block>   
+              <Block block space="between" style={{ padding: theme.SIZES.BASE, paddingVertical: theme.SIZES.BASE * 0.3}}>
+                <Block middle>
+                  <Text muted size={10} style={{ alignSelf: 'flex-start'}}>6</Text>
+                  <Text bold size={10} color="black" style={{marginBottom: 8, alignSelf: 'flex-start'}}>{IMLocalized('ongoingMeds')}</Text>
+                </Block>
+              </Block>  
+              <Block block space="between" style={{ padding: theme.SIZES.BASE, paddingVertical: theme.SIZES.BASE * 0.3}}>
+                <Block middle>
+                  <Text muted size={10} style={{ alignSelf: 'flex-start'}}>10</Text>
+                  <Text bold size={10} color="black" style={{marginBottom: 8, alignSelf: 'flex-start'}}>{IMLocalized('visits')}</Text>
+                </Block>
+              </Block>
+              <Block block space="between" style={{ padding: theme.SIZES.BASE, paddingVertical: theme.SIZES.BASE * 0.3}}>
+                <Block middle>
+                  <Text muted size={10} style={{ alignSelf: 'flex-start'}}>10</Text>
+                  <Text bold size={10} color="black" style={{marginBottom: 8, alignSelf: 'flex-start'}}>{IMLocalized('consultations')}</Text>
+                </Block>
+              </Block>    
+            </Block>    
+          </Block>        
+        </Block>
+      </ScrollView>      
     </Block>
   );
 }

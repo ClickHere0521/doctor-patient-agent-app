@@ -17,17 +17,21 @@ const Onboarding = (props) => {
   let [fontsLoaded] = useFonts({
     'Inter-Black': require('../assets/fonts/LeagueSpartan-Bold.otf'),
   });
+  
+  const setLang = useSelector(({language})=>language.language);
+  
+
+  useEffect(() => {
+    console.log("lang->>>" + setLang);
+    // Update the document title using the browser API
+    init(setLang);
+  }, [setLang]);
 
   const handleRole = (role) => {    
     dispatch(roleSelector(role));
     navigation.navigate('SignIn');
   }
-
-  useEffect(() => {
-    // Update the document title using the browser API
-    init('en-US');
-  }, []);
-
+  
   if (!fontsLoaded) {
     return <AppLoading />;
   } else {
@@ -79,7 +83,7 @@ const Onboarding = (props) => {
               {IMLocalized('Primary Care Doctor')}
             </Button>
             
-            <Text color="grey" size={10}>{IMLocalized('AgreeTerm')}</Text>
+            <Text color="grey" size={10}>{IMLocalized('agreeTerm')}</Text>
 
           </Block>
         </Block>

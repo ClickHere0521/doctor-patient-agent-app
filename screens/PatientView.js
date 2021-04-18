@@ -10,6 +10,8 @@ import { Button, Block, Text, Input, theme } from 'galio-framework';
 import { products } from '../constants/';
 import { ListItem } from '../components/';
 import { LinearGradient } from 'expo-linear-gradient';
+import SwitchButton from 'switch-button-react-native';
+import { IMLocalized } from "../src/localization/IMLocalization";
 
 const { width } = Dimensions.get('screen');
 
@@ -56,16 +58,16 @@ const categories = [
 
 const sortCategories = [
     {
-      title: 'Name'
+      title: IMLocalized('name'),
     },
     {
-      title: 'Case'
+      title: IMLocalized('case'),
     },
     {
-      title: 'Date'
+      title: IMLocalized('date'),
     },
     {
-      title: 'Current Status'
+      title: IMLocalized('currentStatus'),
     },
   ];
 

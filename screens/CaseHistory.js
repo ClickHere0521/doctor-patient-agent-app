@@ -4,6 +4,7 @@ import { Block, Text, theme } from "galio-framework";
 
 import materialTheme from '../constants/Theme';
 import { Icon } from '../components'
+import { IMLocalized } from "../src/localization/IMLocalization";
 
 const { width, height } = Dimensions.get('screen');
 
@@ -54,7 +55,7 @@ const CaseHistory = (props) => {
         <TouchableOpacity           
           style={styles.dateActive}
         >              
-          <Text size={16} color={'white'} style={{paddingLeft: 10}} >Today</Text>
+          <Text size={16} color={'white'} style={{paddingLeft: 10}} >{IMLocalized("today")}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.dateInActive}

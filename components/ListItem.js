@@ -10,6 +10,7 @@ import { Block, Text, theme } from "galio-framework";
 import Icon from "./Icon";
 import Button from "./Button";
 import { useSelector } from "react-redux";
+import { IMLocalized } from "../src/localization/IMLocalization";
 
 const { width } = Dimensions.get("screen");
 

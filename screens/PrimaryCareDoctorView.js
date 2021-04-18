@@ -15,7 +15,7 @@ import { Button, Block, Text, Input, theme } from 'galio-framework';
 import { materialTheme, products, Images, tabs } from '../constants/';
 import { Select, Icon, Header, Product, Switch, Tabs, ListItem } from '../components/';
 import Accordion from 'react-native-collapsible/Accordion';
-
+import { IMLocalized } from "../src/localization/IMLocalization";
 
 const { width } = Dimensions.get('screen');
 
@@ -72,7 +72,7 @@ const PrimaryCareDoctorView = (props) => {
           </Block>
         </Block>
         <Block style={{paddingTop: 10}}>
-          <Text size={16} >6 years exp. <Text bold>| Consultation</Text>: Mon, Tue, Wed</Text>
+          <Text size={16} >6 {IMLocalized('yearsExp')}. <Text bold>| {IMLocalized('consultation')}</Text>: {IMLocalized('mon')}, {IMLocalized('tue')}, {IMLocalized('wed')}</Text>
         </Block>
       </Block>
     )
@@ -82,12 +82,12 @@ const PrimaryCareDoctorView = (props) => {
       <Block flex style={[styles.contentContainer]}>
         <Block flex style={{flexDirection: 'column'}}>
           <Block flex>
-            <Text size={16} ><Text bold>Description:</Text>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonu
+            <Text size={16} ><Text bold>{IMLocalized('description')}:</Text>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonu
 my eirmod tempor invidunt ut labore et doloremagna aliquyam erat, sed diam volup tua.</Text>
           </Block>
         </Block>
-        <Button shadowless color={"#00CE30"} style={[styles.button]} onPress={() => navigation.navigate("DoctorDetail")}>
-            <Text size={15} color={'white'}>Detail</Text>
+        <Button shadowless color={"#00CE30"} style={[styles.button]}>
+            <Text size={15} color={'white'}>{IMLocalized('Detail')}</Text>
         </Button>
       </Block>
     );
@@ -108,7 +108,7 @@ my eirmod tempor invidunt ut labore et doloremagna aliquyam erat, sed diam volup
                 <Image source={require('../assets/icons/PatientIcon.png')} style={{ height:theme.SIZES.BASE * 3, width: theme.SIZES.BASE * 3, marginRight: theme.SIZES.BASE}}/>
             </Block>
             <Block center>
-                <Text h6 center middle>Patient View</Text>
+                <Text h6 center middle>{IMLocalized('patientView')}</Text>
             </Block>
             <TouchableWithoutFeedback onclick={onclick()}>
                 <Block center middle style={[styles.searchBtn, styles.greyGradient]}>

@@ -1,29 +1,18 @@
 import React, { useState } from 'react';
 import { StyleSheet, Switch, FlatList, Platform, TouchableOpacity, View } from "react-native";
 import { Block, Text, theme, Icon } from "galio-framework";
-
+import { IMLocalized } from "../src/localization/IMLocalization";
 import materialTheme from '../constants/Theme';
 
 const Settings = (props) => {
   const language = [
-    { title: "Change Language", id: "Language", type: "button" },
+    { title: IMLocalized("changeLanguage"), id: "Language", type: "button" },
   ];
 
-  const recommended = [
-    { title: "Use FaceID to sign in", id: "face", type: "switch" },
-    { title: "Auto-Lock security", id: "autolock", type: "switch" },
-    { title: "Notifications", id: "Notifications", type: "button" },
-  ];
-
-  const payment = [
-    { title: "Manage Payment Options", id: "Payment", type: "button" },
-    { title: "Manage Gift Cards", id: "gift", type: "button" },
-  ];
-  
   const privacy = [
-    { title: "User Agreement", id: "Agreement", type: "button" },
-    { title: "Privacy", id: "Privacy", type: "button" },
-    { title: "About", id: "About", type: "button" },
+    { title: IMLocalized("userAgreement"), id: "Agreement", type: "button" },
+    { title: IMLocalized("privacy"), id: "Privacy", type: "button" },
+    { title: IMLocalized("about"), id: "About", type: "button" },
   ];
 
   const [itemID, setItemID] = useState({});
@@ -68,10 +57,10 @@ const Settings = (props) => {
 
       <Block center style={styles.title}>
         <Text bold size={theme.SIZES.BASE} style={{ paddingBottom: 5 }}>
-          Language Settings
+          {IMLocalized('languageSettings')}
         </Text>
         <Text size={12} color={materialTheme.COLORS.CAPTION}>
-          You can change language
+          {IMLocalized('canChangeLang')}
         </Text>
       </Block>
 
@@ -81,41 +70,12 @@ const Settings = (props) => {
         renderItem={renderItem}
       />
 
-      <FlatList
-        data={recommended}
-        keyExtractor={(item, index) => item.id}
-        renderItem={renderItem}
-        ListHeaderComponent={
-          <Block center style={styles.title}>
-            <Text bold size={theme.SIZES.BASE} style={{ paddingBottom: 5 }}>
-              Recommended Settings
-            </Text>
-            <Text size={12} color={materialTheme.COLORS.CAPTION}>
-              These are the most important settings
-            </Text>
-          </Block>
-        }
-      />
       <Block center style={styles.title}>
         <Text bold size={theme.SIZES.BASE} style={{ paddingBottom: 5 }}>
-          Payment Settings
+          {IMLocalized("privacySettings")}
         </Text>
         <Text size={12} color={materialTheme.COLORS.CAPTION}>
-          These are also important settings
-        </Text>
-      </Block>
-
-      <FlatList
-        data={payment}
-        keyExtractor={(item, index) => item.id}
-        renderItem={renderItem} />
-
-      <Block center style={styles.title}>
-        <Text bold size={theme.SIZES.BASE} style={{ paddingBottom: 5 }}>
-          Privacy Settings
-        </Text>
-        <Text size={12} color={materialTheme.COLORS.CAPTION}>
-          Third most important settings
+          {IMLocalized("privacySettingsText")}
         </Text>
       </Block>
 
