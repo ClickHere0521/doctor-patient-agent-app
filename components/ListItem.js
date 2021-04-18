@@ -1,49 +1,154 @@
-import React from 'react';
-import { withNavigation } from '@react-navigation/compat';
-import { StyleSheet, Dimensions, Image, TouchableWithoutFeedback } from 'react-native';
-import { Block, Text, theme } from 'galio-framework';
-import { Icon } from '../components/Icon';
+import React from "react";
+import { withNavigation } from "@react-navigation/compat";
+import {
+  StyleSheet,
+  Dimensions,
+  Image,
+  TouchableWithoutFeedback,
+} from "react-native";
+import { Block, Text, theme } from "galio-framework";
+import Icon from "./Icon";
+import Button from "./Button";
+import { useSelector } from "react-redux";
 
-const { width } = Dimensions.get('screen');
+const { width } = Dimensions.get("screen");
 
-const ListItem = props => {
-  const { navigation, product, horizontal, full, style, priceColor, imageStyle, time, unReaden, weekday } = props;
-  const imageStyles = [styles.image, full ? styles.fullImage : styles.horizontalImage, imageStyle];
+const ListItem = (props) => {
+  const {
+    navigation,
+    product,
+    horizontal,
+    full,
+    style,
+    priceColor,
+    imageStyle,
+    time,
+    unReaden,
+    weekday,
+  } = props;
+  
+  const imageStyles = [
+    styles.image,
+    full ? styles.fullImage : styles.horizontalImage,
+    imageStyle,
+  ];
+  const userRole = useSelector(state => state.user.role)
 
   return (
-        
-      <Block row={horizontal} card flex style={[styles.product, styles.shadow, style]}>
-          <TouchableWithoutFeedback onPress={() =>  ('Product', { product: product })}>
-            <Block style={[styles.imageContainer, styles.shadow]}>
-              <Image source={{ uri: product.image }} style={imageStyles}/>
-            </Block>
-          </TouchableWithoutFeedback>
-          <TouchableWithoutFeedback onPress={() => navigation.navigate('Product', { product: product })}>
-            <Block flex={3}>
-              <Text size={16} style={styles.userName}>{product.title}</Text>
-              <Block flexDirection={'row'}>
-                <Icon name="photo" family="font-awesome" color={theme.COLORS.MUTED} size={theme.SIZES.BASE} style={styles.icons}> </Icon>  
-                <Icon name="check" family="font-awesome" color={theme.COLORS.MUTED} size={theme.SIZES.BASE} style={styles.icons}> </Icon>  
-                <Text size={16} muted={!priceColor} color={priceColor}>${product.price}</Text>
-              </Block>
-            </Block>
-          </TouchableWithoutFeedback>
-          <TouchableWithoutFeedback onPress={() => navigation.navigate('Product', { product: product })}>
-            <Block flex={1}>
-              <Text size={12} style={styles.times} color={"#06D81E"}>{product.time}</Text>
-                              
-              <Button shadowless color={'#06D81E'} style={[styles.button, styles.shadow]} size={12}>
-                <Text size={13} center bold style={{justifyContent: 'center', alignItems: 'center'}} color={"#FFF"} fontWeight={"semiBold"}>Detail</Text>
-              </Button>
-                            
-            </Block>
-          </TouchableWithoutFeedback>
-          <Block center middle style={{borderRadius: 50, backgroundColor: '#06D81E', width: theme.SIZES.BASE* 1.3, height: theme.SIZES.BASE * 1.3, position: 'absolute', right: -5, top: -5}}>
-            <Icon name="check" family="font-awesome" color={theme.COLORS.WHITE} size={theme.SIZES.BASE} style={{paddingLeft: 3, paddingTop: 0}}> </Icon>  
+    <Block
+      row={horizontal}
+      card
+      flex
+      style={[styles.product, styles.shadow, style]}
+    >
+      <TouchableWithoutFeedback
+        onPress={() => ("Product", { product: product })}
+      >
+        <Block style={[styles.imageContainer, styles.shadow]}>
+          <Image source={{ uri: product.image }} style={imageStyles} />
+        </Block>
+      </TouchableWithoutFeedback>
+      <TouchableWithoutFeedback
+        onPress={() => navigation.navigate("Product", { product: product })}
+      >
+        <Block flex={3}>
+          <Text size={16} style={styles.userName}>
+            {product.title}
+          </Text>
+          <Block flexDirection={"row"}>
+            <Icon
+              name="photo"
+              family="font-awesome"
+              color={theme.COLORS.MUTED}
+              size={theme.SIZES.BASE}
+              style={styles.icons}
+            >
+              {" "}
+            </Icon>
+            <Icon
+              name="check"
+              family="font-awesome"
+              color={theme.COLORS.MUTED}
+              size={theme.SIZES.BASE}
+              style={styles.icons}
+            >
+              {" "}
+            </Icon>
+            <Text size={16} muted={!priceColor} color={priceColor}>
+              ${product.price}
+            </Text>
           </Block>
+        </Block>
+      </TouchableWithoutFeedback>
+      <TouchableWithoutFeedback
+        onPress={() => navigation.navigate("Product", { product: product })}
+      >
+        <Block flex={1}>
+          <Text size={12} style={styles.times} color={"#06D81E"}>
+            {product.time}
+          </Text>
+
+          <Button
+            shadowless
+            color={"#06D81E"}
+            style={[styles.button, styles.shadow]}
+            size={12}
+            onPress={() => {
+              switch (userRole) {
+                case "agent":
+                  {
+                    navigation.navigate("AgentCaseDetail");
+                    break;
+                  }
+                case "doctor":
+                  {
+                    navigation.navigate("DoctorCaseDetail");
+                    break;
+                  }                  
+                default:
+                  break;
+              }              
+            }}
+          >
+            <Text
+              size={13}
+              center
+              bold
+              style={{ justifyContent: "center", alignItems: "center" }}
+              color={"#FFF"}
+              fontWeight={"semiBold"}
+            >
+              Detail
+            </Text>
+          </Button>
+        </Block>
+      </TouchableWithoutFeedback>
+      <Block
+        center
+        middle
+        style={{
+          borderRadius: 50,
+          backgroundColor: "#06D81E",
+          width: theme.SIZES.BASE * 1.3,
+          height: theme.SIZES.BASE * 1.3,
+          position: "absolute",
+          right: -5,
+          top: -5,
+        }}
+      >
+        <Icon
+          name="check"
+          family="font-awesome"
+          color={theme.COLORS.WHITE}
+          size={theme.SIZES.BASE}
+          style={{ paddingLeft: 3, paddingTop: 0 }}
+        >
+          {" "}
+        </Icon>
       </Block>
+    </Block>
   );
-}
+};
 
 const styles = StyleSheet.create({
   product: {
@@ -53,14 +158,14 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: theme.COLORS.WHITE,
     minHeight: theme.SIZES.BASE * 2,
-    borderRadius: theme.SIZES.BASE
+    borderRadius: theme.SIZES.BASE,
   },
   productTitle: {
     paddingBottom: 6,
   },
   productDescription: {
     padding: theme.SIZES.BASE / 2,
-    width : width / 1.5,
+    width: width / 1.5,
   },
   imageContainer: {
     elevation: 1,
@@ -92,8 +197,8 @@ const styles = StyleSheet.create({
     paddingBottom: theme.SIZES.BASE / 2,
   },
   userName: {
-    padding: theme.SIZES.BASE/2,
-    paddingBottom: theme.SIZES.BASE / 2
+    padding: theme.SIZES.BASE / 2,
+    paddingBottom: theme.SIZES.BASE / 2,
   },
   icons: {
     paddingTop: 2,
@@ -106,7 +211,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: theme.SIZES.BASE / 2,
     borderRadius: 40,
-    bottom: 0
+    bottom: 0,
   },
 });
 

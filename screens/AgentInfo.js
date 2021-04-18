@@ -8,7 +8,7 @@ import SwitchButton from 'switch-button-react-native';
 const { width, height } = Dimensions.get('screen');
 const thumbMeasure = (width - 48 - 32) / 3;
 
-const PatientInfo = (props) => {
+const AgentInfo = (props) => {
   const { navigation } = props;  
 
   const [vals, setVals] = useState({
@@ -273,4 +273,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PatientInfo;
+export default AgentInfo;

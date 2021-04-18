@@ -4,10 +4,9 @@ import { Block, Text, theme } from "galio-framework";
 
 import Icon from "./Icon";
 import materialTheme from "../constants/Theme";
-import {IMLocalized, init} from '../src/localization/IMLocalization';
+import { IMLocalized, init } from "../src/localization/IMLocalization";
 
-
-const DrawerItem = props => {
+const DrawerItem = (props) => {
   const renderIcon = () => {
     const { title, focused } = props;
 
@@ -49,14 +48,14 @@ const DrawerItem = props => {
           />
         );
       case "Doctor Dashboard":
-          return (
-            <Icon
-              size={16}
-              name="home"
-              family="font-awesome"
-              color={focused ? "white" : materialTheme.COLORS.MUTED}
-            />
-          );
+        return (
+          <Icon
+            size={16}
+            name="home"
+            family="font-awesome"
+            color={focused ? "white" : materialTheme.COLORS.MUTED}
+          />
+        );
       case "Patient View":
         return (
           <Icon
@@ -138,6 +137,33 @@ const DrawerItem = props => {
             color={focused ? "white" : materialTheme.COLORS.MUTED}
           />
         );
+      case "Case History":
+        return (
+          <Icon
+            size={15}
+            name="history"
+            family="font-awesome"
+            color={focused ? "white" : materialTheme.COLORS.MUTED}
+          />
+        );
+      case "Notification":
+        return (
+          <Icon
+            size={15}
+            name="bell"
+            family="font-awesome"
+            color={focused ? "white" : materialTheme.COLORS.MUTED}
+          />
+        );
+      case "DashboardPatient":
+        return (
+          <Icon
+            size={15}
+            name="home"
+            family="font-awesome"
+            color={focused ? "white" : materialTheme.COLORS.MUTED}
+          />
+        );
       default:
         return null;
     }
@@ -153,7 +179,7 @@ const DrawerItem = props => {
         row
         style={[
           styles.defaultStyle,
-          focused ? [styles.activeStyle, styles.shadow] : null
+          focused ? [styles.activeStyle, styles.shadow] : null,
         ]}
       >
         <Block middle flex={0.1} style={{ marginRight: 28 }}>
@@ -167,27 +193,27 @@ const DrawerItem = props => {
       </Block>
     </TouchableOpacity>
   );
-}
+};
 
 const styles = StyleSheet.create({
   defaultStyle: {
     paddingVertical: 16,
     paddingHorizontal: 16,
-    marginBottom: 6
+    marginBottom: 6,
   },
   activeStyle: {
     backgroundColor: materialTheme.COLORS.ACTIVE,
-    borderRadius: 4
+    borderRadius: 4,
   },
   shadow: {
     shadowColor: theme.COLORS.BLACK,
     shadowOffset: {
       width: 0,
-      height: 2
+      height: 2,
     },
     shadowRadius: 8,
-    shadowOpacity: 0.2
-  }
+    shadowOpacity: 0.2,
+  },
 });
 
 export default DrawerItem;

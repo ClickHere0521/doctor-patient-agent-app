@@ -7,7 +7,7 @@ import { Icon } from '../components'
 
 const { width, height } = Dimensions.get('screen');
 
-const ScheduleDetail = (props) => {  
+const PatientScheduleDetail = (props) => {  
 
   const [isOpenCalendar, setIsOpenCalendar] = useState(false);
 
@@ -258,4 +258,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default ScheduleDetail;
+export default PatientScheduleDetail;

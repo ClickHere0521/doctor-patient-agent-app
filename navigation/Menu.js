@@ -40,9 +40,9 @@ const CustomDrawerContent = ({
       break;
     case "patient":
       screens = [
-        "Dashboard",
+        "DashboardPatient",
         "Profile Info",
-        "Case history",
+        "Case History",
         "Notification",
         "Settings",
       ];
@@ -51,7 +51,7 @@ const CustomDrawerContent = ({
       screens = [
         "Dashboard",
         "Profile Info",
-        "Case History",
+        "Case View",
         "Settings"
       ]  
     default: 

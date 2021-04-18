@@ -20,7 +20,7 @@ const Onboarding = (props) => {
 
   const handleRole = (role) => {    
     dispatch(roleSelector(role));
-    navigation.navigate('App');
+    navigation.navigate('SignIn');
   }
 
   useEffect(() => {

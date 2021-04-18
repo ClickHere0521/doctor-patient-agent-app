@@ -81,15 +81,20 @@ const RemoveButton = ({isWhite, style, navigation}) => (
 
 const Header = (props) => {
 
-  const { back, title, white, transparent, navigation, scene } = props;
+  const { back, title, white, transparent, navigation, scene } = props;    
   // const { routeName } = navigation.state;
   // const { options } = scene.descriptor;
-  // const routeName = scene.descriptor?.options.headerTitle ?? '';
+  // const routeName = scene.descriptor?.options.headerTitle ?? '';  
   const noShadow = ["Search", "Profile"].includes(title);
   const headerStyles = [
     !noShadow ? styles.shadow : null,
     transparent ? { backgroundColor: 'rgba(0,0,0,0)' } : null,
   ];
+
+  if(title == "DoctorDetail") return(
+    <>
+    </>
+  );
 
   const handleLeftPress = () => {
     const { back, navigation } = props;

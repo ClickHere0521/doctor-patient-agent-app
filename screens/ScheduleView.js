@@ -45,8 +45,9 @@ const SECTIONS = [
     content: 'Lorem ipsum...',
   },
 ];
-const PrimaryCareDoctorView = (props) => {
+const ScheduleView = (props) => {
 
+  const { navigation } = props;
   const [activeSections, setActiveSections] = useState([]);
 
   const _renderSectionTitle = section => {
@@ -137,7 +138,7 @@ const PrimaryCareDoctorView = (props) => {
 my eirmod tempor invidunt ut labore et doloremagna aliquyam erat, sed diam volup tua.</Text>
           </Block>
         </Block>
-        <Button shadowless color={"#00CE30"} style={[styles.button]}>
+        <Button shadowless color={"#00CE30"} style={[styles.button]} onPress={() => navigation.navigate("ScheduleDetail") } >
             <Text size={15} color={'white'}>Detail</Text>
         </Button>
       </Block>
@@ -305,4 +306,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PrimaryCareDoctorView;
+export default ScheduleView;

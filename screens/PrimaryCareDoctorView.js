@@ -47,6 +47,7 @@ const SECTIONS = [
 ];
 const PrimaryCareDoctorView = (props) => {
 
+  const { navigation } = props;
   const [activeSections, setActiveSections] = useState([]);
 
   const _renderSectionTitle = section => {
@@ -85,7 +86,7 @@ const PrimaryCareDoctorView = (props) => {
 my eirmod tempor invidunt ut labore et doloremagna aliquyam erat, sed diam volup tua.</Text>
           </Block>
         </Block>
-        <Button shadowless color={"#00CE30"} style={[styles.button]}>
+        <Button shadowless color={"#00CE30"} style={[styles.button]} onPress={() => navigation.navigate("DoctorDetail")}>
             <Text size={15} color={'white'}>Detail</Text>
         </Button>
       </Block>

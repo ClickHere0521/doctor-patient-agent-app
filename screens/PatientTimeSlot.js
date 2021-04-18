@@ -18,7 +18,7 @@ const TimeSlot = (props) => {
             <Block row style={styles.head}>
               <Block>
                 <TouchableOpacity
-                  onPress={() => navigation.navigate("DoctorScheduleDetail")}
+                  onPress={() => navigation.navigate("DashboardPatient")}
                 >
                   <Icon size={16} name="chevron-left" family="font-awesome" color={'white'} style={{padding: 7}} />
                 </TouchableOpacity>                                

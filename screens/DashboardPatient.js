@@ -2,16 +2,17 @@ import React, { useState } from 'react';
 import {
   ScrollView,
   StyleSheet,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
   Image,
   ImageBackground,
-  Dimensions
+  Dimensions,
+  TouchableOpacity,
+  TouchableOpacityComponent
 } from 'react-native';
-import { Button, Block, Text, Input, theme } from 'galio-framework';
+import { Button, Block, Text, theme } from 'galio-framework';
 
-import { materialTheme, products, Images, tabs } from '../constants';
-import { Select, Icon, Header, Product, Switch, Tabs, HorizontalListItem } from '../components';
+import { Products, Images } from '../constants';
+
+import { HorizontalListItem } from '../components';
 import SwitchButton from 'switch-button-react-native';
 
 const { width } = Dimensions.get('screen');
@@ -19,8 +20,9 @@ const { width } = Dimensions.get('screen');
 const thumbMeasure = (width - 48 - 32) / 3;
 const cardWidth = width - (theme.SIZES.BASE * 2);
 
-const Components = (props) => {
+const DashboardPatient = (props) => {
 
+  const { navigation } = props;
   const [ activeSwitch, setActiveSwitch ] = useState(null);
 
   const firstTimeCheck = () => {
@@ -28,20 +30,20 @@ const Components = (props) => {
       <Block flex flexDirection="row" center middle style={{marginTop: theme.SIZES.BASE * 2}}>
         <Text size={12} color='grey'>Are you using our app for the first time？</Text>
         <SwitchButton
-            onValueChange={(val) => setActiveSwitch(val)}      // this is necessary for this component
-            text1 = 'Yes'                        // optional: first text in switch button --- default ON
-            text2 = 'No'                       // optional: second text in switch button --- default OFF
-            switchWidth = {100}                 // optional: switch width --- default 44
-            switchHeight = {40}                 // optional: switch height --- default 100
-            switchDirection = 'rtl'             // optional: switch button direction ( ltr and rtl ) --- default ltr
-            switchBorderRadius = {100}          // optional: switch border radius --- default oval
-            switchSpeedChange = {500}           // optional: button change speed --- default 100
-            switchBorderColor = '#3B3E51'       // optional: switch border color --- default #d4d4d4
-            switchBackgroundColor = '#fff'      // optional: switch background color --- default #fff
-            btnBorderColor = '#3B3E51'          // optional: button border color --- default #00a4b9
-            btnBackgroundColor = '#3B3E51'      // optional: button background color --- default #00bcd4
-            fontColor = '#3B3E51'               // optional: text font color --- default #b1b1b1
-            activeFontColor = '#fff'            // optional: active font color --- default #fff
+            onValueChange={(val) => setActiveSwitch(val)}      
+            text1 = 'Yes'                        
+            text2 = 'No'                       
+            switchWidth = {100}                 
+            switchHeight = {40}                 
+            switchDirection = 'rtl'             
+            switchBorderRadius = {100}          
+            switchSpeedChange = {500}           
+            switchBorderColor = '#3B3E51'       
+            switchBackgroundColor = '#fff'      
+            btnBorderColor = '#3B3E51'          
+            btnBackgroundColor = '#3B3E51'      
+            fontColor = '#3B3E51'               
+            activeFontColor = '#fff'            
           />
       </Block>
     )
@@ -50,22 +52,30 @@ const Components = (props) => {
     return (
         <Block flex flexDirection={'row'} style={[styles.navbarBtnGroup]}>
           <Block flexDirection={'column'} style={[styles.navbarBtn]} center>
-            <Block center middle style={[styles.imageBtn]}>
-              <Image source={require('../assets/icons/microscope.png')} style={{ width: theme.SIZES.BASE * 2.5, height: theme.SIZES.BASE * 3 }}/>
-            </Block>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("PatientCaseDetail") }
+            >
+              <Block center middle style={[styles.imageBtn]}>
+                <Image source={require('../assets/icons/microscope.png')} style={{ width: theme.SIZES.BASE * 2.5, height: theme.SIZES.BASE * 3 }}/>
+              </Block>
+            </TouchableOpacity>
             <Block center style={{width: theme.SIZES.BASE * 6}}>
               <Text size={17} center color={'#000'} >Doctor</Text>
               <Text size={14} muted color={'#000'} center>Search doctor around you</Text>
             </Block>
           </Block>
           <Block flexDirection={'column'} style={[styles.navbarBtn]} center>
-            <Block center middle style={[styles.imageBtn]}>
-              <>{(activeSwitch)?(
-                <Image shadow source={require('../assets/icons/status.png')} style={{ width: theme.SIZES.BASE * 2.4, height: theme.SIZES.BASE * 2.5}}/>
-              ):(
-                <Image shadow source={require('../assets/icons/group.png')} style={{ width: theme.SIZES.BASE * 2.4, height: theme.SIZES.BASE * 2.5}}/>
-              )}</>
-            </Block>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("PatientScheduleDetail")}
+            >
+              <Block center middle style={[styles.imageBtn]}>
+                <>{(activeSwitch)?(
+                  <Image shadow source={require('../assets/icons/status.png')} style={{ width: theme.SIZES.BASE * 2.4, height: theme.SIZES.BASE * 2.5}}/>
+                ):(
+                  <Image shadow source={require('../assets/icons/group.png')} style={{ width: theme.SIZES.BASE * 2.4, height: theme.SIZES.BASE * 2.5}}/>
+                )}</>
+              </Block>
+            </TouchableOpacity>
             <Block center style={{width: theme.SIZES.BASE * 6}}>
               <Text size={17} center color={'#000'} >Medicines</Text>
               <Text size={14} muted color={'#000'} center>Order Medicine to home</Text>
@@ -121,13 +131,26 @@ const Components = (props) => {
                     </ImageBackground>
                 </Block>
             </ScrollView>
-            <Text color={'#3F4079'} bold size={17} style={styles.marginV2Base}>Doctors near by you</Text>
+            <Block>
+              <Text color={'#3F4079'} bold size={17} style={styles.marginV2Base}>Doctors near by you</Text>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("Primary Care Doctor View")}
+              >
+                <Text color={'#3F4079'} bold size={17} style={{}}>See All</Text>
+              </TouchableOpacity>
+            </Block>            
             <ScrollView horizontal={true} showsHorizontalScrollIndicator={false}>
                 <Block flex row>
-                        <HorizontalListItem product={products[1]} style={styles.marginRBase} />
-                        <HorizontalListItem product={products[2]} />
-                        <HorizontalListItem product={products[3]} />
-                        <HorizontalListItem product={products[4]} />
+                  
+                  <TouchableOpacity 
+                    onPress={() => navigation.navigate("PatientTimeSlot")}
+                  >
+                    <Text>timeslot</Text>
+                  </TouchableOpacity>
+                        {/* <HorizontalListItem product={Products[1]} style={styles.marginRBase} />
+                        <HorizontalListItem product={Products[2]} />
+                        <HorizontalListItem product={Products[3]} />
+                        <HorizontalListItem product={Products[4]} /> */}
                 </Block>
             </ScrollView>
           </Block>
@@ -228,4 +251,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Components;
+export default DashboardPatient;

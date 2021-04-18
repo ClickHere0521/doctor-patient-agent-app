@@ -19,7 +19,7 @@ const DoctorDetail = (props) => {
         <Block style={styles.roundBlock}>
         <Block row style={styles.headArrow}>
           <Block>                
-            <Icon size={16} name="arrow-left" family="font-awesome" color={'white'} style={{padding: 5}} />
+            <Icon size={16} name="chevron-left" family="font-awesome" color={'white'} style={{padding: 5}} onPress={() => navigation.navigate("Primary Care Doctor View")} />
           </Block>
         </Block>
         </Block>
@@ -86,7 +86,7 @@ const DoctorDetail = (props) => {
               <TouchableOpacity                                                                                        
                 textStyle={styles.optionsButtonText}
                 style={styles.optionsButton}
-                onPress={() => handleDelete(item.id)}
+                onPress={() => navigation.navigate("DoctorInfo")}
               >
               <Text color="white">
                 Detail
@@ -101,7 +101,7 @@ const DoctorDetail = (props) => {
               <TouchableOpacity                                                                                        
                 textStyle={styles.optionsButtonText}
                 style={styles.optionsButton}
-                onPress={() => handleDelete(item.id)}
+                onPress={() => navigation.navigate("DoctorScheduleDetail")}
               >
                 <Text color="white">
                     Detail

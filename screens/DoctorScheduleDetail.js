@@ -9,6 +9,7 @@ const thumbMeasure = (width - 48 - 32) / 3;
 
 const DoctorScheduleDetail = (props) => {
 
+  const { navigation } = props;
   const [ activeSwitch, setActiveSwitch ] = useState(1);
 
   const renderDetails = (details) => {
@@ -25,6 +26,7 @@ const DoctorScheduleDetail = (props) => {
         <Text>{medication}</Text>
         <TouchableOpacity
           style={styles.edit}
+          onPress={() => navigation.navigate("TimeSlot")}
         >
           <Text color='#00CE30'>
             Edit
@@ -47,20 +49,20 @@ const DoctorScheduleDetail = (props) => {
           </Text>
           <Block center style={styles.centerBlock}>
             <SwitchButton
-              onValueChange={(val) => setActiveSwitch(val)}      // this is necessary for this component
-              text1 = 'Past'                        // optional: first text in switch button --- default ON
-              text2 = 'Upcoming'                       // optional: second text in switch button --- default OFF
-              switchWidth = {180}                 // optional: switch width --- default 44
-              switchHeight = {40}                 // optional: switch height --- default 100
-              switchdirection = 'rtl'             // optional: switch button direction ( ltr and rtl ) --- default ltr
-              switchBorderRadius = {100}          // optional: switch border radius --- default oval
-              switchSpeedChange = {500}           // optional: button change speed --- default 100
-              switchBorderColor = '#3B3E51'       // optional: switch border color --- default #d4d4d4
-              switchBackgroundColor = '#fff'      // optional: switch background color --- default #fff
-              btnBorderColor = '#3B3E51'          // optional: button border color --- default #00a4b9
-              btnBackgroundColor = '#3B3E51'      // optional: button background color --- default #00bcd4
-              fontColor = '#3B3E51'               // optional: text font color --- default #b1b1b1
-              activeFontColor = '#fff'            // optional: active font color --- default #fff
+              onValueChange={(val) => setActiveSwitch(val)}      
+              text1 = 'Past'                       
+              text2 = 'Upcoming'                       
+              switchWidth = {180}                 
+              switchHeight = {40}                 
+              switchdirection = 'rtl'             
+              switchBorderRadius = {100}          
+              switchSpeedChange = {500}           
+              switchBorderColor = '#3B3E51'       
+              switchBackgroundColor = '#fff'      
+              btnBorderColor = '#3B3E51'          
+              btnBackgroundColor = '#3B3E51'      
+              fontColor = '#3B3E51'               
+              activeFontColor = '#fff'            
             />        
           </Block>
         </Block>
@@ -178,7 +180,8 @@ const styles = StyleSheet.create({
     borderColor: '#00CE30'
   },
   patientInfo: {
-    marginTop: Platform.OS === 'android' ? height * 0.01 : height * 0.01,
+    marginTop: Platform.OS === 'android' ? height * 0.03 : height * 0.03,
+    paddingTop: height * 0.1,
     marginHorizontal: width * 0.04,
     backgroundColor: 'white',
     shadowColor: 'black',

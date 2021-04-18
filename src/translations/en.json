@@ -5,6 +5,8 @@
     "Agent": "Agent",
     "Workforce Agent": "Workforce Agent",
     "Patient": "Patient",
+    "Primary": "Primary",
+    "Care Doctor": "Care Doctor",
     "AgreeTerm": "By continuing, you agree to Terms & Conditions",
     "Primary Care Doctor": "Primary Care Doctor",
     "Fully coded React Native components.": "Fully coded React Native components.",
