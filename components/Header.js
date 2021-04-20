@@ -91,7 +91,12 @@ const Header = (props) => {
     transparent ? { backgroundColor: 'rgba(0,0,0,0)' } : null,
   ];
 
-  if(title == "DoctorDetail") return(
+  if(title == "DoctorDetail") return (
+    <>
+    </>
+  );
+
+  if(title == "Case Detail") return (
     <>
     </>
   );

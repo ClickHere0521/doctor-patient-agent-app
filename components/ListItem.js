@@ -50,7 +50,7 @@ const ListItem = (props) => {
         </Block>
       </TouchableWithoutFeedback>
       <TouchableWithoutFeedback
-        onPress={() => navigation.navigate("Product", { product: product })}
+        onPress={() => console.log("Patient Pressed")}
       >
         <Block flex={3}>
           <Text size={16} style={styles.userName}>
@@ -82,7 +82,7 @@ const ListItem = (props) => {
         </Block>
       </TouchableWithoutFeedback>
       <TouchableWithoutFeedback
-        onPress={() => navigation.navigate("Product", { product: product })}
+        onPress={() => console.log("Patient Pressed")}
       >
         <Block flex={1}>
           <Text size={12} style={styles.times} color={"#06D81E"}>

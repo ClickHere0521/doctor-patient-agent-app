@@ -5,6 +5,8 @@ import {
   KeyboardAvoidingView,
   Alert,
   Platform,
+  TouchableOpacity,
+  TouchableWithoutFeedback
 } from "react-native";
 import { Block, Button, Input, Text, theme } from "galio-framework";
 
@@ -12,7 +14,6 @@ import { LinearGradient } from "expo-linear-gradient";
 import { materialTheme } from "../constants/";
 import { HeaderHeight } from "../constants/utils";
 import { IMLocalized, init } from "../src/localization/IMLocalization";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import { useSelector } from "react-redux";
 import { Icon } from "../components";
 
@@ -33,13 +34,6 @@ const SignIn = (props) => {
   const handleChange = (name, value) => {
     setVals({ ...vals, [name]: value });
   };
-
-  // const toggleActive = (name) => {
-  //   const { active } = vals;
-  //   active[name] = !active[name];
-
-  //   setVals( active );
-  // }
 
   const SignInHeading = (role) => {
     switch (role) {
@@ -112,14 +106,18 @@ const SignIn = (props) => {
       style={[styles.signin, { flex: 1, paddingTop: theme.SIZES.BASE * 4 }]}
     >
       <Block flex middle>
-        <KeyboardAvoidingView behavior="padding" enabled>
-          <Icon
-            name="chevron-left"
-            family="font-awesome"
-            color={"white"}
-            size={16}
-            style={styles.chevronLeft}
-          />
+        <KeyboardAvoidingView behavior="height" enabled >
+          <TouchableOpacity
+            onPress={() => console.log("Back pressed")}
+          >
+            <Icon
+              name="chevron-left"
+              family="font-awesome"
+              color={"white"}
+              size={16}
+              style={styles.chevronLeft}
+            />
+          </TouchableOpacity>
           {SignInHeading(userRole)}
           <Block flex>
             <Block center>
@@ -130,8 +128,6 @@ const SignIn = (props) => {
                 type="email-address"
                 autoCapitalize="none"
                 bgColor="transparent"
-                // onBlur={() => toggleActive('email')}
-                // onFocus={() => toggleActive('email')}
                 placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
                 onChangeText={(text) => handleChange("email", text)}
                 style={[
@@ -147,8 +143,6 @@ const SignIn = (props) => {
                 iconColor="white"
                 placeholder="Password"
                 bgColor="transparent"
-                // onBlur={() => toggleActive('password')}
-                // onFocus={() => toggleActive('password')}
                 placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
                 onChangeText={(text) => handleChange("password", text)}
                 style={[
@@ -236,8 +230,8 @@ const styles = StyleSheet.create({
     borderColor: "white",
     height: 40,
     width: width * 0.8,
-    position: "relative",   
-    marginTop: theme.SIZES.BASE * 1 
+    position: "relative",
+    marginTop: theme.SIZES.BASE * 1,
   },
   chevronLeft: {
     position: "absolute",

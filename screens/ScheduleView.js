@@ -48,7 +48,7 @@ const SECTIONS = [
 const ScheduleView = (props) => {
 
   const { navigation } = props;
-  const [activeSections, setActiveSections] = useState([]);
+  const [activeSections, setActiveSections] = useState([0]);
 
   const _renderSectionTitle = section => {
     return (

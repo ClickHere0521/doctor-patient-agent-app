@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="66.628" height="66.628" viewBox="0 0 66.628 66.628">
+  <defs>
+    <clipPath id="clip-path">
+      <path id="Path_6390" data-name="Path 6390" d="M66.628,66.628H0V0H66.628Z" fill="#979797"/>
+    </clipPath>
+  </defs>
+  <g id="baseline-add_a_photo-24px" clip-path="url(#clip-path)">
+    <path id="Path_6389" data-name="Path 6389" d="M8.328,9.328V1h5.552V9.328h8.328v5.552H13.881v8.328H8.328V14.881H0V9.328Zm8.328,16.657V17.657h8.328V9.328H44.419l5.08,5.552h8.8a5.569,5.569,0,0,1,5.552,5.552V53.747A5.569,5.569,0,0,1,58.3,59.3H13.881a5.569,5.569,0,0,1-5.552-5.552V25.985ZM36.09,50.971A13.881,13.881,0,1,0,22.209,37.09,13.886,13.886,0,0,0,36.09,50.971ZM27.206,37.09a8.884,8.884,0,1,0,8.884-8.884,8.874,8.874,0,0,0-8.884,8.884Z" transform="translate(0 1.776)" fill="#979797"/>
+  </g>
+</svg>

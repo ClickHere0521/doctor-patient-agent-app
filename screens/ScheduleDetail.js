@@ -8,7 +8,8 @@ import { Icon } from '../components'
 const { width, height } = Dimensions.get('screen');
 
 const ScheduleDetail = (props) => {  
-
+  
+  const { navigation } = props;
   const [isOpenCalendar, setIsOpenCalendar] = useState(false);
 
   const handleCalendar = () => {
@@ -59,9 +60,9 @@ const ScheduleDetail = (props) => {
       <Block >
         <Block style={styles.roundBlock}>
           <Block row style={styles.heading}>
-            <Block>                
+            <TouchableOpacity onPress={() => navigation.goBack()} >                
               <Icon size={16} name="chevron-left" family="font-awesome" color={'white'} style={{padding: 7}} />
-            </Block>
+            </TouchableOpacity>
             <Block>
               <Text color="white" size={20} style={{fontFamily: 'Inter-Black'}} bold>Dr.Adila Tahir</Text>                                    
             </Block>

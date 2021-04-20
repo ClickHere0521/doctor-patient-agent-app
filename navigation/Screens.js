@@ -47,6 +47,7 @@ import AgentCaseDetailScreen from "../screens/AgentCaseDetail";
 import DoctorCaseDetailScreen from "../screens/DoctorCaseDetail";
 import PatientCaseDetailScreen from "../screens/PatientCaseDetail";
 import PatientTimeSlotScreen from "../screens/PatientTimeSlot";
+import AgentReviewScreen from "../screens/AgentTreatmentReview";
 import { IMLocalized } from "../src/localization/IMLocalization";
 
 const { width } = Dimensions.get("screen");
@@ -240,6 +241,11 @@ const DashboardAgentStack = (props) => {
       <Stack.Screen
         name="AgentCaseDetail"
         component={AgentCaseDetailScreen}
+        options={{
+          header: ({ navigation, scene }) => (
+            <Header back title="Case Detail" navigation={props.navigation} />
+          ),
+        }}
       />
     </Stack.Navigator>
   );
@@ -435,7 +441,14 @@ const AppStack = (props) => {
               headerTransparent: true,
             }}
           />
-            </Drawer.Navigator>
+          <Stack.Screen
+            name="AgentReview"
+            component={AgentReviewScreen}
+            options={{
+              headerTransparent: true,
+            }}
+          />
+        </Drawer.Navigator>
       );
     case "patient":
       return (
