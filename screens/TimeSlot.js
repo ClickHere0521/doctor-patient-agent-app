@@ -27,14 +27,14 @@ const TimeSlot = (props) => {
           <Block row style={styles.head}>
             <Block>
               <TouchableOpacity
-                onPress={() => navigation.navigate("DoctorScheduleDetail")}
+                onPress={() => navigation.goBack()}
+                style={{ paddingTop:7, paddingLeft: theme.SIZES.BASE }}
               >
                 <Icon
                   size={16}
                   name="chevron-left"
                   family="font-awesome"
-                  color={"white"}
-                  style={{ padding: 7 }}
+                  color={"white"}                  
                 />
               </TouchableOpacity>
             </Block>
@@ -42,7 +42,7 @@ const TimeSlot = (props) => {
               <Text
                 color="white"
                 size={20}
-                style={{ fontFamily: "Inter-Black" }}
+                style={{ fontFamily: "Inter-Black", paddingLeft: theme.SIZES.BASE }}
                 bold
               >
                 Select a time slot
@@ -268,9 +268,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   head: {
-    marginTop: height * 0.1,
-    paddingHorizontal: theme.SIZES.BASE * 0.5,
-    position: "absolute",
+    marginTop: height * 0.09,
+    paddingHorizontal: theme.SIZES.BASE * 0.5,    
     zIndex: 1,
   },
   circleArrow: {

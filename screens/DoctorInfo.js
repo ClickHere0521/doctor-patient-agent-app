@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.SIZES.BASE,
     paddingVertical: theme.SIZES.BASE,
     marginHorizontal: theme.SIZES.BASE,
-    marginTop: -theme.SIZES.BASE *10,
+    marginTop: -theme.SIZES.BASE *14,
     marginBottom: theme.SIZES.BASE * 4,
     borderRadius: 30,    
     zIndex: 2,

@@ -108,14 +108,14 @@ const SignIn = (props) => {
       <Block flex middle>
         <KeyboardAvoidingView behavior="height" enabled >
           <TouchableOpacity
-            onPress={() => console.log("Back pressed")}
+            style={styles.chevronLeft}
+            onPress={() => navigation.goBack()}
           >
             <Icon
               name="chevron-left"
               family="font-awesome"
               color={"white"}
               size={16}
-              style={styles.chevronLeft}
             />
           </TouchableOpacity>
           {SignInHeading(userRole)}
@@ -234,10 +234,10 @@ const styles = StyleSheet.create({
     marginTop: theme.SIZES.BASE * 1,
   },
   chevronLeft: {
-    position: "absolute",
-    marginTop: theme.SIZES.BASE * 8,
-    marginLeft: theme.SIZES.BASE * 1,
-  },
+    position: 'absolute', 
+    marginTop: theme.SIZES.BASE * 8, 
+    marginLeft: theme.SIZES.BASE
+  }
 });
 
 export default SignIn;

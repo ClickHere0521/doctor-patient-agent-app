@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
   },
   backIcon: {
-    marginLeft: 30,    
+    marginLeft: theme.SIZES.BASE,    
   },
 });
 

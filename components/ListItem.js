@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: theme.SIZES.BASE / 2,
     borderRadius: 40,
-    bottom: 0,
+    bottom: 0,    
   },
 });
 

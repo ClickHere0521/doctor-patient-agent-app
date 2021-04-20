@@ -23,7 +23,7 @@ const DoctorDetail = (props) => {
                 name="chevron-left"
                 family="font-awesome"
                 color={"white"}
-                style={{ padding: 5 }}
+                style={{ paddingLeft: theme.SIZES.BASE }}
                 onPress={() => navigation.goBack()}
               />
             </Block>

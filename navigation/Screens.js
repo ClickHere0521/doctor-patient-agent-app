@@ -48,6 +48,7 @@ import DoctorCaseDetailScreen from "../screens/DoctorCaseDetail";
 import PatientCaseDetailScreen from "../screens/PatientCaseDetail";
 import PatientTimeSlotScreen from "../screens/PatientTimeSlot";
 import AgentReviewScreen from "../screens/AgentTreatmentReview";
+import DoctorReviewScreen from "../screens/DoctorTreatmentReview";
 import { IMLocalized } from "../src/localization/IMLocalization";
 
 const { width } = Dimensions.get("screen");
@@ -660,6 +661,13 @@ const AppStack = (props) => {
           <Stack.Screen
             name="DoctorCaseDetail"
             component={DoctorCaseDetailScreen}
+          />
+          <Stack.Screen
+            name="DoctorReview"
+            component={DoctorReviewScreen}
+            options={{
+              headerTransparent: true,
+            }}
           />
         </Drawer.Navigator>
       );
