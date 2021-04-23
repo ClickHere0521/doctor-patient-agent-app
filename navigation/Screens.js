@@ -49,6 +49,12 @@ import PatientCaseDetailScreen from "../screens/PatientCaseDetail";
 import PatientTimeSlotScreen from "../screens/PatientTimeSlot";
 import AgentReviewScreen from "../screens/AgentTreatmentReview";
 import DoctorReviewScreen from "../screens/DoctorTreatmentReview";
+import CreateCaseScreen from "../screens/CreateCase";
+import AddPatientScreen from "../screens/AddPatient";
+import AddAttorneyScreen from "../screens/AddAttorney";
+import AddInsuranceScreen from "../screens/AddInsurance";
+import AddNotesScreen from "../screens/AddNotes";
+
 import { IMLocalized } from "../src/localization/IMLocalization";
 
 const { width } = Dimensions.get("screen");
@@ -449,6 +455,41 @@ const AppStack = (props) => {
               headerTransparent: true,
             }}
           />
+          <Stack.Screen
+            name="CreateCase"
+            component={CreateCaseScreen}
+            options={{
+              headerTransparent: true,
+            }}
+          />
+          <Stack.Screen
+            name="AddPatient"
+            component={AddPatientScreen}
+            options={{
+              headerTransparent: true,
+            }}
+          />
+          <Stack.Screen
+            name="AddAttorney"
+            component={AddAttorneyScreen}
+            options={{
+              headerTransparent: true,
+            }}
+          />
+          <Stack.Screen
+            name="AddInsurance"
+            component={AddInsuranceScreen}
+            options={{
+              headerTransparent: true,
+            }}
+          />
+          <Stack.Screen
+            name="AddNotes"
+            component={AddNotesScreen}
+            options={{
+              headerTransparent: true,
+            }}
+          />
         </Drawer.Navigator>
       );
     case "patient":
@@ -496,14 +537,8 @@ const AppStack = (props) => {
               ),
             }}
           />
-          <Drawer.Screen
-            name="Profile Info"
-            component={PatientInfoStack}
-          />
-          <Drawer.Screen
-            name="Case History"
-            component={CaseHistoryStack}
-          />
+          <Drawer.Screen name="Profile Info" component={PatientInfoStack} />
+          <Drawer.Screen name="Case History" component={CaseHistoryStack} />
           <Drawer.Screen
             name="Notification"
             component={NotificationStack}
@@ -1048,10 +1083,7 @@ const PatientInfoStack = (props) => {
         component={PatientInfoScreen}
         options={{
           header: ({ navigation, scene }) => (
-            <Header              
-              title="Patient Information"
-              navigation={props.navigation}
-            />
+            <Header title="Patient Information" navigation={props.navigation} />
           ),
         }}
       />
@@ -1110,10 +1142,7 @@ const DoctorCaseViewStack = (props) => {
 const AgentCaseDetailStack = (props) => {
   return (
     <Stack.Navigator mode="card" headerMode="screen">
-      <Stack.Screen
-        name="AgentCaseDetail"
-        component={AgentCaseDetailScreen}
-      />
+      <Stack.Screen name="AgentCaseDetail" component={AgentCaseDetailScreen} />
     </Stack.Navigator>
   );
 };

@@ -1,14 +1,24 @@
-import React from 'react';
-import { StyleSheet, Dimensions, ImageBackground, Platform, TouchableWithoutFeedback, Image } from 'react-native';
-import { Block, Text, theme } from 'galio-framework';
-import { LinearGradient } from 'expo-linear-gradient';
-import { materialTheme, products } from '../constants';
+import React from "react";
+import {
+  StyleSheet,
+  Dimensions,
+  ImageBackground,
+  Platform,
+  TouchableWithoutFeedback,
+  TouchableOpacity,
+  Image,
+} from "react-native";
+import { Block, Text, theme } from "galio-framework";
+import { LinearGradient } from "expo-linear-gradient";
+import { materialTheme, products } from "../constants";
 import { HeaderHeight } from "../constants/utils";
 import { useDispatch, useSelector } from "react-redux";
 import { IMLocalized } from "../src/localization/IMLocalization";
-import { ScrollView } from 'react-native-gesture-handler';
-import { ListItem } from "../components/"
-const { width } = Dimensions.get('screen');
+import { ScrollView } from "react-native-gesture-handler";
+import { ListItem } from "../components/";
+import SvgUri from "expo-svg-uri";
+
+const { width } = Dimensions.get("screen");
 const cardWidth = theme.SIZES.BASE * 4;
 
 const categories = [
@@ -72,34 +82,33 @@ const sortCategories = [
 ];
 
 const DashboardAgent = (props) => {
+  const { navigation } = props;
 
   const renderEvents = (events) => {
-
-    let { eventHeading, eventContent } = {...events};
-    const userRole = useSelector(state => state.user.role);
-
-    return(
-      <Block style={styles.options}>          
+    let { eventHeading, eventContent } = { ...events };
+    const userRole = useSelector((state) => state.user.role);
+    return (
+      <Block style={styles.options}>
         <Block column space="between" style={styles.events}>
-          <Block row >
+          <Block row>
             <Block style={styles.marginLB10}>
-              <Text color={'grey'} size={14}>
+              <Text color={"grey"} size={14}>
                 {IMLocalized(eventHeading)}
               </Text>
             </Block>
             <Block>
-              <Text color={'red'}>
-                *
-              </Text>
-            </Block>      
+              <Text color={"red"}>*</Text>
+            </Block>
             <Block style={styles.marginR10}>
-              <Text  size={16} color={'black'}>{eventContent}</Text>
-            </Block>                        
+              <Text size={16} color={"black"}>
+                {eventContent}
+              </Text>
+            </Block>
           </Block>
-        </Block>          
+        </Block>
       </Block>
     );
-  }
+  };
 
   const renderSorts = () => {
     return (
@@ -128,8 +137,7 @@ const DashboardAgent = (props) => {
     );
   };
 
-  const renderSort = (item, index) => {
-    const { navigation } = props;
+  const renderSort = (item, index) => {    
 
     return (
       <TouchableWithoutFeedback
@@ -176,74 +184,108 @@ const DashboardAgent = (props) => {
   return (
     <Block flex style={styles.profile}>
       <ImageBackground
-        source={ require('../assets/images/dashboard.png')}
+        source={require("../assets/images/dashboard.png")}
         style={styles.profileContainer}
-        imageStyle={styles.profileImage}>
+        imageStyle={styles.profileImage}
+      >
         <Block flex style={styles.profileDetails}>
-          <Block style={styles.profileTexts}>            
-          </Block>
-          <LinearGradient 
-            colors={['rgba(110,120,247,0.2)', 'rgba(110,120,247,0.3)']} 
-            style={styles.gradient} 
+          <Block style={styles.profileTexts}></Block>
+          <LinearGradient
+            colors={["rgba(110,120,247,0.2)", "rgba(110,120,247,0.3)"]}
+            style={styles.gradient}
           />
-          <LinearGradient 
-            colors={['rgba(110,120,247,0.2)', 'rgba(110,120,247,0.3)']} 
-            style={styles.gradient} 
+          <LinearGradient
+            colors={["rgba(110,120,247,0.2)", "rgba(110,120,247,0.3)"]}
+            style={styles.gradient}
           />
         </Block>
       </ImageBackground>
-      <Block flex={0.7} style={{top: theme.SIZES.BASE * 12, position:'absolute'}}>        
+      <Block
+        flex={0.7}
+        style={{ top: theme.SIZES.BASE * 14, position: "absolute" }}
+      >
         {renderEvents({
-          eventHeading: IMLocalized('Total active case'), 
-          eventContent: 3000
+          eventHeading: IMLocalized("Total active case"),
+          eventContent: 3000,
         })}
         {renderEvents({
-          eventHeading: IMLocalized('This year'), 
-          eventContent: 700
+          eventHeading: IMLocalized("This year"),
+          eventContent: 700,
         })}
         {renderEvents({
-          eventHeading: IMLocalized('Case resolved this year'),
-          eventContent: 605
+          eventHeading: IMLocalized("Case resolved this year"),
+          eventContent: 605,
         })}
-        {renderEvents({
-          eventHeading: IMLocalized('ongoingCase'),
-          eventContent: 80
-        })}                       
-      </Block>      
-      <Block flex={1}>
-        <ScrollView          
-          showsVerticalScrollIndicator={false}
+      </Block>
+      <Block flex={1.3} style={{ backgroundColor: "#F8F8F8" }}>
+        <Block
+          style={{
+            backgroundColor: "white",
+            paddingHorizontal: theme.SIZES.BASE * 2.2,
+            paddingVertical: theme.SIZES.BASE * 0.3,
+          }}
         >
+          <Block column space="between">
+            <Block row>
+              <Block style={styles.marginLB10}>
+                <Text color={"grey"} size={14}>
+                  {IMLocalized("On going case")}
+                </Text>
+              </Block>
+              <Block>
+                <Text color={"red"}>*</Text>
+              </Block>
+            </Block>
+            <TouchableOpacity
+              style={{
+                right: -theme.SIZES.BASE * 0.5,
+                top: theme.SIZES.BASE * 0.3,
+                position: "absolute",
+                zIndex: 10,
+              }}
+              onPress={() => navigation.navigate("CreateCase")}
+            >
+              <Text color={"white"}>
+                <SvgUri
+                  width="16"
+                  height="16"
+                  source={require("../assets/icons/add.svg")}
+                />
+              </Text>
+            </TouchableOpacity>
+          </Block>
+        </Block>
+        <ScrollView showsVerticalScrollIndicator={false}>
           {renderSorts()}
           {renderPatientsList()}
         </ScrollView>
       </Block>
     </Block>
   );
-}
+};
 
 const styles = StyleSheet.create({
   profile: {
-    marginTop: Platform.OS === 'android' ? -HeaderHeight : 0,
+    marginTop: Platform.OS === "android" ? -HeaderHeight : 0,
   },
   profileImage: {
     width: width * 1.1,
-    height: 'auto',
+    height: "auto",
   },
   profileContainer: {
     width: width,
-    height: 'auto',
+    height: "auto",
     flex: 1,
   },
   profileDetails: {
     paddingTop: theme.SIZES.BASE * 4,
-    justifyContent: 'flex-end',
-    position: 'relative',
+    justifyContent: "flex-end",
+    position: "relative",
   },
   profileTexts: {
     paddingHorizontal: theme.SIZES.BASE * 2,
     paddingVertical: theme.SIZES.BASE * 2,
-    zIndex: 2
+    zIndex: 2,
   },
   pro: {
     backgroundColor: materialTheme.COLORS.LABEL,
@@ -254,31 +296,31 @@ const styles = StyleSheet.create({
     width: 90,
   },
   events: {
-    padding: theme.SIZES.BASE * 0.2, 
-    marginLeft: 10 
+    padding: theme.SIZES.BASE * 0.2,
+    marginLeft: 10,
   },
   marginLB10: {
-    marginLeft: 10, 
-    marginBottom: 10
+    marginLeft: 10,
+    marginBottom: 10,
   },
   marginR10: {
     right: theme.SIZES.BASE * 2,
-    position: 'absolute' 
+    position: "absolute",
   },
   options: {
     width: width * 0.9,
-    paddingHorizontal: theme.SIZES.BASE,
-    paddingVertical: theme.SIZES.BASE * 0.5,
+    paddingHorizontal: theme.SIZES.BASE * 0.3,
+    paddingVertical: theme.SIZES.BASE * 0.2,
     marginHorizontal: theme.SIZES.BASE,
     marginTop: -theme.SIZES.BASE * 3,
     marginBottom: theme.SIZES.BASE * 4,
-    borderRadius: 40,    
-    backgroundColor: theme.COLORS.WHITE,    
-    shadowColor: 'black',
-    shadowOffset: { width:0, height: 0 },
+    borderRadius: 40,
+    backgroundColor: theme.COLORS.WHITE,
+    shadowColor: "black",
+    shadowOffset: { width: 0, height: 0 },
     shadowRadius: 8,
     shadowOpacity: 0.2,
-    elevation:3,
+    elevation: 3,
     zIndex: 2,
   },
   gradient: {
@@ -286,8 +328,8 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    height: '100%',
-    position: 'absolute',
+    height: "100%",
+    position: "absolute",
   },
   button: {
     marginBottom: theme.SIZES.BASE,
@@ -337,15 +379,15 @@ const styles = StyleSheet.create({
   sortItem: {
     borderWidth: 2,
     borderRadius: 1000,
-    borderColor: "#FFF",
+    borderColor: "#EFEFEF",
     paddingVertical: 8,
     paddingHorizontal: width * 0.05,
     marginHorizontal: theme.SIZES.BASE,
     shadowColor: "black",
-    shadowOffset: { width: -3, height: -3 },
-    shadowRadius: 10,
+    shadowOffset: { width: -1, height: -1 },
+    shadowRadius: 2,
     shadowOpacity: 0.2,
-    elevation: 2,
+    elevation: 1,
     margin: 2,
   },
   productItem: {
@@ -359,7 +401,7 @@ const styles = StyleSheet.create({
   productRounded: {
     borderWidth: 2,
     borderRadius: 1000,
-    borderColor: "#DDDDDD",
+    borderColor: "#fff",
     padding: 3,
     shadowColor: "black",
     shadowOffset: { width: 2, height: 2 },

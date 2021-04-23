@@ -237,7 +237,7 @@ const styles = StyleSheet.create({
     position: 'absolute', 
     marginTop: theme.SIZES.BASE * 8, 
     marginLeft: theme.SIZES.BASE
-  }
+  },
 });
 
 export default SignIn;
