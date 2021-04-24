@@ -1,90 +1,78 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   ScrollView,
   StyleSheet,
+  TouchableOpacity,
   TouchableWithoutFeedback,
-  Dimensions
-} from 'react-native';
-import { Button, Block, Text, Input, theme } from 'galio-framework';
+  Image,
+  ImageBackground,
+  Dimensions,
+} from "react-native";
+import { Button, Block, Text, Input, theme } from "galio-framework";
 
-import { products } from '../constants/';
-import { ListItem } from '../components/';
-import { LinearGradient } from 'expo-linear-gradient';
-import SwitchButton from 'switch-button-react-native';
+import products from "../constants/images/home";
+import { materialTheme, Images, tabs } from "../constants/";
+import {
+  Select,
+  Icon,
+  Header,
+  Product,
+  Switch,
+  Tabs,
+  ListItem,
+} from "../components/";
+import { LinearGradient } from "expo-linear-gradient";
 import { IMLocalized } from "../src/localization/IMLocalization";
 
-const { width } = Dimensions.get('screen');
+const { width } = Dimensions.get("screen");
 
 const thumbMeasure = (width - 48 - 32) / 3;
 const cardWidth = theme.SIZES.BASE * 4;
-const categories = [
+
+const sortCategories = [
   {
-    title: 'Eddie',
-    image: 'https://images.unsplash.com/photo-1507290439931-a861b5a38200?fit=crop&w=840&q=80'
+    title: IMLocalized("Name"),
   },
   {
-    title: 'Julia',
-    image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?fit=crop&w=840&q=80'
+    title: IMLocalized("Case"),
   },
   {
-    title: 'Frank',
-    image: 'https://images.unsplash.com/photo-1536942338469-91c7022e55a7?fit=crop&w=840&q=80'
+    title: IMLocalized("Date"),
   },
   {
-    title: 'Sam',
-    image: 'https://images.unsplash.com/photo-1507290439931-a861b5a38200?fit=crop&w=840&q=80'
-  },
-  {
-    title: 'Yan',
-    image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?fit=crop&w=840&q=80'
-  },
-  {
-    title: 'John',
-    image: 'https://images.unsplash.com/photo-1536942338469-91c7022e55a7?fit=crop&w=840&q=80'
-  },
-  {
-    title: 'Nick',
-    image: 'https://images.unsplash.com/photo-1507290439931-a861b5a38200?fit=crop&w=840&q=80'
-  },
-  {
-    title: 'Power',
-    image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?fit=crop&w=840&q=80'
-  },
-  {
-    title: 'Sarah',
-    image: 'https://images.unsplash.com/photo-1536942338469-91c7022e55a7?fit=crop&w=840&q=80'
+    title: IMLocalized("currentStatus"),
   },
 ];
 
-const sortCategories = [
-    {
-      title: IMLocalized('name'),
-    },
-    {
-      title: IMLocalized('case'),
-    },
-    {
-      title: IMLocalized('date'),
-    },
-    {
-      title: IMLocalized('currentStatus'),
-    },
-  ];
-
-const PatientView = (props) => {
-
+const Components = (props) => {
   const [switch1, setSwitch1] = useState(true);
   const [switch2, setSwitch2] = useState(false);
 
-  const toggleSwitch = switchId => {
-    if (switchId == 'switch1')
-    {
-      setSwitch1(!switch1);
-    }
-    if (switchId == 'switch2')
-    {
-      setSwitch2(!switch2);
-    }
+  const renderPatient = (item, index) => {
+    const { navigation } = props;
+
+    return (
+      <TouchableWithoutFeedback
+        style={{ zIndex: 3 }}
+        key={`product-${item.title}`}
+        onPress={() => navigation.navigate("Pro", { product: item })}
+      >
+        <Block center style={styles.productItem}>
+          <Block style={[styles.productRounded]}>
+            <Image
+              resizeMode="cover"
+              style={styles.productImage}
+              source={{ uri: item.image }}
+            />
+          </Block>
+          <Block center>
+            <Text center size={10}>
+              {item.title}
+            </Text>
+          </Block>
+        </Block>
+      </TouchableWithoutFeedback>
+    );
   };
 
   const renderSort = (item, index) => {
@@ -94,24 +82,29 @@ const PatientView = (props) => {
       <TouchableWithoutFeedback
         style={{ zIndex: 3 }}
         key={`product-${item.title}`}
-        onPress={() => navigation.navigate('Pro', { product: item })}>
+        onPress={() => navigation.navigate("Pro", { product: item })}
+      >
         <LinearGradient
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 0.25, y: 1.1 }}
-                  locations={[0.2, 1]}
-                  colors={['#EFEFEF', '#FFF']} style={styles.sortItem}>
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0.25, y: 1.1 }}
+          locations={[0.2, 1]}
+          colors={["#EFEFEF", "#FFF"]}
+          style={styles.sortItem}
+        >
           <Block center>
-              <Text center size={15} fontWeight="semiBold">{item.title}</Text>
+            <Text center size={15} fontWeight="semiBold">
+              {item.title}
+            </Text>
           </Block>
         </LinearGradient>
       </TouchableWithoutFeedback>
-    )
+    );
   };
- 
-  const renderSorts = () => {
+
+  const renderPatients = () => {
     return (
       <Block flex>
-        <Block flex>          
+        <Block flex>
           <Block flex style={{ marginTop: theme.SIZES.BASE / 2 }}>
             <ScrollView
               horizontal={true}
@@ -119,62 +112,92 @@ const PatientView = (props) => {
               decelerationRate={0}
               scrollEventThrottle={16}
               snapToAlignment="center"
-              style={{width}}
+              style={{ width }}
               showsHorizontalScrollIndicator={false}
-              snapToInterval={cardWidth + (theme.SIZES.BASE * 0.375)}
-              contentContainerStyle={{ paddingHorizontal: theme.SIZES.BASE / 2 }}
+              snapToInterval={cardWidth + theme.SIZES.BASE * 0.375}
+              contentContainerStyle={{
+                paddingHorizontal: theme.SIZES.BASE / 2,
+              }}
             >
-              {sortCategories && sortCategories.map((item, index) => renderSort(item, index))}
+              {categories &&
+                categories.map((item, index) => renderPatient(item, index))}
             </ScrollView>
           </Block>
         </Block>
       </Block>
-    )
-  }
+    );
+  };
+
+  const renderSorts = () => {
+    return (
+      <Block flex>
+        <Block flex>
+          <Block flex style={{ marginTop: theme.SIZES.BASE / 2 }}>
+            <ScrollView
+              horizontal={true}
+              pagingEnabled={true}
+              decelerationRate={0}
+              scrollEventThrottle={16}
+              snapToAlignment="center"
+              style={{ width }}
+              showsHorizontalScrollIndicator={false}
+              snapToInterval={cardWidth + theme.SIZES.BASE * 0.375}
+              contentContainerStyle={{
+                paddingHorizontal: theme.SIZES.BASE / 2,
+              }}
+            >
+              {sortCategories &&
+                sortCategories.map((item, index) => renderSort(item, index))}
+            </ScrollView>
+          </Block>
+        </Block>
+      </Block>
+    );
+  };
 
   const renderPatientsList = () => {
-      return(
-        <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
-            <ScrollView vertical={true} showsVerticalScrollIndicator={false} style={{marginBottom: theme.SIZES.BASE * 3}}>
-                <ListItem product={products[0]} horizontal />
-                <ListItem product={products[1]} horizontal />
-                <ListItem product={products[2]} horizontal />
-                <ListItem product={products[3]} horizontal />
-                <ListItem product={products[4]} horizontal />
-                <ListItem product={products[0]} horizontal />
-                <ListItem product={products[1]} horizontal />
-                <ListItem product={products[2]} horizontal />
-                <ListItem product={products[3]} horizontal />
-                <ListItem product={products[4]} horizontal />
-                <ListItem product={products[0]} horizontal /> 
-            </ScrollView>    
-        </Block>
-      )
-  }
-
+    return (
+      <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
+        <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
+          <ListItem product={products[0]} horizontal role="agentPatinet" />
+          <ListItem product={products[1]} horizontal role="agentPatinet" />
+          <ListItem product={products[2]} horizontal role="agentPatinet" />
+          <ListItem product={products[3]} horizontal role="agentPatinet" />
+          <ListItem product={products[4]} horizontal role="agentPatinet" />
+          <ListItem product={products[0]} horizontal role="agentPatinet" />
+          <ListItem product={products[1]} horizontal role="agentPatinet" />
+          <ListItem product={products[2]} horizontal role="agentPatinet" />
+          <ListItem product={products[3]} horizontal role="agentPatinet" />
+          <ListItem product={products[4]} horizontal role="agentPatinet" />
+        </ScrollView>
+      </Block>
+    );
+  };
 
   return (
     <Block flex>
       <ScrollView
         style={styles.components}
-        showsVerticalScrollIndicator={false}>
-        {/* {navbar()} */}
+        showsVerticalScrollIndicator={false}
+      >
+        <TouchableOpacity onPress={() => navigation.navigate("AddPatient")} style={{width:60}}>
+          <Image source={require("../assets/images/createCase.png")} />
+        </TouchableOpacity> 
+        <Text size={10} style={{left: 26}}>
+          Add
+        </Text>
         {renderSorts()}
         {renderPatientsList()}
+        {/* {renderAlbum()} */}
       </ScrollView>
     </Block>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  sortBox: {
-    borderTopWidth:2,
-    borderColor: 'white',
-    margin: theme.SIZES.BASE,
-    marginBottom: 0
-  },
   components: {
-    backgroundColor: "#FFF",
+    paddingTop: theme.SIZES.BASE,
+    backgroundColor: "#F8F8F8",
   },
   title: {
     paddingVertical: theme.SIZES.BASE,
@@ -184,7 +207,7 @@ const styles = StyleSheet.create({
     paddingTop: theme.SIZES.BASE * 3.75,
   },
   shadow: {
-    shadowColor: 'black',
+    shadowColor: "black",
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
     shadowOpacity: 0.2,
@@ -192,81 +215,106 @@ const styles = StyleSheet.create({
   },
   button: {
     marginBottom: theme.SIZES.BASE,
-    width: width - (theme.SIZES.BASE * 3),
+    width: width - theme.SIZES.BASE * 3,
   },
   options: {
     paddingHorizontal: theme.SIZES.BASE / 2,
   },
   optionsText: {
     fontSize: theme.SIZES.BASE * 0.75,
-    color: '#4a4a4a',
+    color: "#4a4a4a",
     fontWeight: "normal",
     fontStyle: "normal",
     letterSpacing: -0.29,
   },
   optionsButton: {
-    width: 'auto',
+    width: "auto",
     height: 34,
     paddingHorizontal: theme.SIZES.BASE,
     paddingVertical: 10,
   },
+  imageBlock: {
+    overflow: "hidden",
+    borderRadius: 4,
+  },
+  rows: {
+    height: theme.SIZES.BASE * 2,
+  },
+  social: {
+    width: theme.SIZES.BASE * 3.5,
+    height: theme.SIZES.BASE * 3.5,
+    borderRadius: theme.SIZES.BASE * 1.75,
+    justifyContent: "center",
+  },
+  category: {
+    backgroundColor: theme.COLORS.WHITE,
+    marginVertical: theme.SIZES.BASE / 2,
+    borderWidth: 0,
+  },
+  categoryTitle: {
+    height: "100%",
+    paddingHorizontal: theme.SIZES.BASE,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
   sortItem: {
     borderWidth: 2,
-    borderRadius : 1000,
-    borderColor: 'white',
-    marginVertical: 4,
-    paddingVertical: 6,
-    paddingHorizontal: 25,
-    marginHorizontal: theme.SIZES.BASE / 4,
-    shadowColor: 'black',
+    borderRadius: 1000,
+    borderColor: "#FFF",
+    paddingVertical: 8,
+    paddingHorizontal: width * 0.03,
+    marginHorizontal: theme.SIZES.BASE * 0.5,
+    shadowColor: "black",
     shadowOffset: { width: -3, height: -3 },
     shadowRadius: 10,
     shadowOpacity: 0.2,
     elevation: 2,
+    margin: 2,
   },
   productItem: {
     width: cardWidth - theme.SIZES.BASE * 2,
     marginHorizontal: theme.SIZES.BASE,
-    shadowColor: 'black',
+    shadowColor: "black",
     shadowOffset: { width: 0, height: 7 },
     shadowRadius: 10,
     shadowOpacity: 0.2,
   },
   productRounded: {
     borderWidth: 2,
-    borderRadius : 1000,
-    borderColor: '#DDDDDD',
+    borderRadius: 1000,
+    borderColor: "#DDDDDD",
     padding: 3,
-    shadowColor: 'black',
+    shadowColor: "black",
     shadowOffset: { width: 2, height: 2 },
     shadowRadius: 4,
     shadowOpacity: 0.2,
   },
   productImage: {
     borderWidth: 1,
-    borderRadius : 1000,
+    borderRadius: 1000,
     padding: 5,
     width: cardWidth - theme.SIZES.BASE,
     height: cardWidth - theme.SIZES.BASE,
   },
   searchBtn: {
-    position: 'absolute',
+    position: "absolute",
     right: theme.SIZES.BASE,
     borderRadius: 1000,
-    borderWidth:1,
-    borderColor: '#DDD',
+    borderWidth: 1,
+    borderColor: "#DDD",
     backgroundColor: "#FFF",
     width: theme.SIZES.BASE * 2,
     height: theme.SIZES.BASE * 2,
-    marginLeft: 5
+    paddingLeft: 5,
   },
   greyGradient: {
-    shadowColor: 'black',
+    shadowColor: "black",
     shadowOffset: { width: 2, height: 2 },
     shadowRadius: 2,
     shadowOpacity: 0.2,
     elevation: 2,
-  }
+  },
 });
 
-export default PatientView;
+export default Components;

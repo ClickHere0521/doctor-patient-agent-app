@@ -122,22 +122,6 @@ const AddInsurance = (props) => {
             heading: "Insurance Adjuster",
             content: "James Hilton",
           })}
-        </Block>
-        <Block style={styles.userInfo}>
-          <Block style-st>
-            <Block row style={styles.location}>
-              <Icon name="map-marker" family="font-awesome" color="#1CA2CC" />
-              <Text size={12}>
-                92/6, 3rd Floor, Outer Ring Road, Chandra Layout
-              </Text>
-            </Block>
-            <Image
-              source={require("../assets/images/map.png")}
-              style={styles.map}
-            />
-          </Block>
-        </Block>
-        <Block style={styles.userDetail}>
           {renderUserDetail({
             heading: "Address",
             content: "California,US",

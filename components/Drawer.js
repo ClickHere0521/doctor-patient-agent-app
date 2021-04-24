@@ -56,7 +56,7 @@ const DrawerItem = (props) => {
             color={focused ? "white" : materialTheme.COLORS.MUTED}
           />
         );
-      case "Patient View":
+      case "Patients":
         return (
           <Icon
             size={15}
@@ -65,7 +65,7 @@ const DrawerItem = (props) => {
             color={focused ? "white" : materialTheme.COLORS.MUTED}
           />
         );
-      case "Case View":
+      case "Cases":
         return (
           <Icon
             size={15}
@@ -74,7 +74,7 @@ const DrawerItem = (props) => {
             color={focused ? "white" : materialTheme.COLORS.MUTED}
           />
         );
-      case "Primary Care Doctor View":
+      case "Doctors":
         return (
           <Icon
             size={15}
@@ -83,7 +83,7 @@ const DrawerItem = (props) => {
             color={focused ? "white" : materialTheme.COLORS.MUTED}
           />
         );
-      case "Schedule View":
+      case "Schedules":
         return (
           <Icon
             size={15}

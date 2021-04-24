@@ -55,7 +55,7 @@ const SECTIONS = [
 ];
 const PrimaryCareDoctorView = (props) => {
   const { navigation } = props;
-  const [activeSections, setActiveSections] = useState([ 0, ]);
+  const [activeSections, setActiveSections] = useState([0]);
 
   const _renderSectionTitle = (section) => {
     return <View style={styles.content}></View>;
@@ -134,7 +134,7 @@ const PrimaryCareDoctorView = (props) => {
   };
 
   const onChangeHandle = (event) => {
-    console.log(event)
+    console.log(event);
     setActiveSections(event);
   };
 

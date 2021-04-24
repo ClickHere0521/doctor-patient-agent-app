@@ -80,14 +80,11 @@ const Components = (props) => {
         style={styles.components}
         showsVerticalScrollIndicator={false}
       >
-        <TouchableOpacity 
+        <TouchableOpacity
           onPress={() => navigation.goBack()}
           style={styles.backIcon}
         >
-          <Icon
-            name="chevron-left"
-            family="font-awesome"            
-          />
+          <Icon name="chevron-left" family="font-awesome" />
         </TouchableOpacity>
         <Block center>
           <Image
@@ -324,10 +321,9 @@ const styles = StyleSheet.create({
     marginTop: theme.SIZES.BASE * 4,
   },
   backIcon: {
-    position: 'absolute', 
-    marginLeft: theme.SIZES.BASE * 2
-  }
+    position: "absolute",
+    marginLeft: theme.SIZES.BASE * 2,
+  },
 });
 
 export default Components;
-  

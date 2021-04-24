@@ -11,6 +11,7 @@ import Icon from "./Icon";
 import Button from "./Button";
 import { useSelector } from "react-redux";
 import { IMLocalized } from "../src/localization/IMLocalization";
+import { set } from "react-native-reanimated";
 
 const { width } = Dimensions.get("screen");
 
@@ -26,14 +27,77 @@ const ListItem = (props) => {
     time,
     unReaden,
     weekday,
+    role,
   } = props;
-  
+
   const imageStyles = [
     styles.image,
     full ? styles.fullImage : styles.horizontalImage,
     imageStyle,
   ];
-  const userRole = useSelector(state => state.user.role)
+  const userRole = useSelector((state) => state.user.role);
+
+  const showCheck = (role) => {
+    switch (role) {
+      case "agentPatient": {
+        return <></>;
+        break;
+      }
+
+      case "agentDashboard":
+        return (
+          <Block
+            center
+            middle
+            style={{
+              borderRadius: 50,
+              backgroundColor: "#06D81E",
+              width: theme.SIZES.BASE * 1.3,
+              height: theme.SIZES.BASE * 1.3,
+              position: "absolute",
+              right: -5,
+              top: -5,
+            }}
+          >
+            <Icon
+              name="check"
+              family="font-awesome"
+              color={theme.COLORS.WHITE}
+              size={theme.SIZES.BASE}
+              style={{ paddingLeft: 3, paddingTop: 0 }}
+            >
+              {" "}
+            </Icon>
+          </Block>
+        );
+      case "agentCases":
+        return (
+          <Block
+            center
+            middle
+            style={{
+              borderRadius: 50,
+              backgroundColor: "#06D81E",
+              width: theme.SIZES.BASE * 1.3,
+              height: theme.SIZES.BASE * 1.3,
+              position: "absolute",
+              right: -5,
+              top: -5,
+            }}
+          >
+            <Icon
+              name="check"
+              family="font-awesome"
+              color={theme.COLORS.WHITE}
+              size={theme.SIZES.BASE}
+              style={{ paddingLeft: 3, paddingTop: 0 }}
+            >
+              {" "}
+            </Icon>
+          </Block>
+        );
+    }
+  };
 
   return (
     <Block
@@ -49,45 +113,61 @@ const ListItem = (props) => {
           <Image source={{ uri: product.image }} style={imageStyles} />
         </Block>
       </TouchableWithoutFeedback>
-      <TouchableWithoutFeedback
-        onPress={() => console.log("Patient Pressed")}
-      >
-        <Block flex={3}>
+      <TouchableWithoutFeedback onPress={() => console.log("Patient Pressed")}>
+        <Block flex={2}>
           <Text size={16} style={styles.userName}>
             {product.title}
           </Text>
           <Block flexDirection={"row"}>
-            <Icon
-              name="photo"
-              family="font-awesome"
-              color={theme.COLORS.MUTED}
-              size={theme.SIZES.BASE}
-              style={styles.icons}
+            <Text
+              size={16}
+              muted={!priceColor}
+              color={priceColor}
+              style={styles.content}
             >
-              {" "}
-            </Icon>
-            <Icon
-              name="check"
-              family="font-awesome"
-              color={theme.COLORS.MUTED}
-              size={theme.SIZES.BASE}
-              style={styles.icons}
-            >
-              {" "}
-            </Icon>
-            <Text size={16} muted={!priceColor} color={priceColor}>
-              ${product.price}
+              {product.content}
             </Text>
           </Block>
         </Block>
       </TouchableWithoutFeedback>
-      <TouchableWithoutFeedback
-        onPress={() => console.log("Patient Pressed")}
-      >
+      <TouchableWithoutFeedback onPress={() => console.log("Patient Pressed")}>
         <Block flex={1}>
           <Text size={12} style={styles.times} color={"#06D81E"}>
             {product.time}
           </Text>
+          {role == "agentPatinet" && (
+            <Button
+              shadowless
+              color={"#06D81E"}
+              style={[styles.createBtn, styles.shadow]}
+              size={12}
+              onPress={() => {
+                switch (userRole) {
+                  case "agent": {
+                    navigation.navigate("CreateCase");
+                    break;
+                  }
+                  case "doctor": {
+                    navigation.navigate("DoctorCaseDetail");
+                    break;
+                  }
+                  default:
+                    break;
+                }
+              }}
+            >
+              <Text
+                size={12}
+                center
+                bold
+                style={{ justifyContent: "center", alignItems: "center" }}
+                color={"#FFF"}
+                fontWeight={"semiBold"}
+              >
+                Create
+              </Text>
+            </Button>
+          )}
 
           <Button
             shadowless
@@ -96,23 +176,21 @@ const ListItem = (props) => {
             size={12}
             onPress={() => {
               switch (userRole) {
-                case "agent":
-                  {
-                    navigation.navigate("AgentCaseDetail");
-                    break;
-                  }
-                case "doctor":
-                  {
-                    navigation.navigate("DoctorCaseDetail");
-                    break;
-                  }                  
+                case "agent": {
+                  navigation.navigate("AgentCaseDetail");
+                  break;
+                }
+                case "doctor": {
+                  navigation.navigate("DoctorCaseDetail");
+                  break;
+                }
                 default:
                   break;
-              }              
+              }
             }}
           >
             <Text
-              size={13}
+              size={12}
               center
               bold
               style={{ justifyContent: "center", alignItems: "center" }}
@@ -124,29 +202,7 @@ const ListItem = (props) => {
           </Button>
         </Block>
       </TouchableWithoutFeedback>
-      <Block
-        center
-        middle
-        style={{
-          borderRadius: 50,
-          backgroundColor: "#06D81E",
-          width: theme.SIZES.BASE * 1.3,
-          height: theme.SIZES.BASE * 1.3,
-          position: "absolute",
-          right: -5,
-          top: -5,
-        }}
-      >
-        <Icon
-          name="check"
-          family="font-awesome"
-          color={theme.COLORS.WHITE}
-          size={theme.SIZES.BASE}
-          style={{ paddingLeft: 3, paddingTop: 0 }}
-        >
-          {" "}
-        </Icon>
-      </Block>
+      {showCheck(role)}
     </Block>
   );
 };
@@ -201,18 +257,31 @@ const styles = StyleSheet.create({
     padding: theme.SIZES.BASE / 2,
     paddingBottom: theme.SIZES.BASE / 2,
   },
+  content: {
+    padding: theme.SIZES.BASE / 2,
+    paddingBottom: theme.SIZES.BASE / 2,
+  },
   icons: {
     paddingTop: 2,
     paddingRight: 2,
   },
   button: {
     marginBottom: theme.SIZES.BASE,
-    width: theme.SIZES.BASE * 5,
-    height: theme.SIZES.BASE * 1.5,
+    width: theme.SIZES.BASE * 3,
+    height: theme.SIZES.BASE * 1.3,
     position: "absolute",
-    right: theme.SIZES.BASE / 2,
+    right: theme.SIZES.BASE / 4,
     borderRadius: 40,
-    bottom: 0,    
+    bottom: 0,
+  },
+  createBtn: {
+    marginBottom: theme.SIZES.BASE,
+    width: theme.SIZES.BASE * 3,
+    height: theme.SIZES.BASE * 1.3,
+    position: "absolute",
+    right: theme.SIZES.BASE * 4,
+    borderRadius: 40,
+    bottom: 0,
   },
 });
 

@@ -1,20 +1,27 @@
-import React from 'react';
-import { StyleSheet, Dimensions, ScrollView, Image, Platform, Animated } from 'react-native';
+import React from "react";
+import {
+  StyleSheet,
+  Dimensions,
+  ScrollView,
+  Image,
+  Platform,
+  Animated,
+} from "react-native";
 // import Animated from 'react-native-reanimated';
 
-import { Block, theme } from 'galio-framework';
+import { Block, theme } from "galio-framework";
 import { HeaderHeight } from "../constants/utils";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 const Gallery = (props) => {
-  scrollX = new Animated.Value(0)
+  scrollX = new Animated.Value(0);
 
   const renderGallery = () => {
     const { navigation, route } = props;
     // const { params } = navigation && navigation.state;
 
-    const { images, index } = route.params;;
+    const { images, index } = route.params;
 
     return (
       <ScrollView
@@ -23,7 +30,10 @@ const Gallery = (props) => {
         decelerationRate={0}
         scrollEventThrottle={16}
         showsHorizontalScrollIndicator={false}
-        onScroll={Animated.event([{ nativeEvent: { contentOffset: { x: scrollX } } }], {useNativeDriver: false})}
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+          { useNativeDriver: false }
+        )}
       >
         {images.map((image, key) => (
           <Image
@@ -34,8 +44,8 @@ const Gallery = (props) => {
           />
         ))}
       </ScrollView>
-    )
-  }
+    );
+  };
 
   const renderProgress = () => {
     const { navigation, route } = props;
@@ -49,27 +59,27 @@ const Gallery = (props) => {
           const opacity = position.interpolate({
             inputRange: [i - 1, i, i + 1],
             outputRange: [0.5, 1, 0.5],
-            extrapolate: 'clamp'
+            extrapolate: "clamp",
           });
-          
+
           const width = position.interpolate({
             inputRange: [i - 1, i, i + 1],
             outputRange: [8, 18, 8],
-            extrapolate: 'clamp'
+            extrapolate: "clamp",
           });
 
-          return <Animated.View key={i} style={[styles.dots, {opacity, width}]} />;
+          return (
+            <Animated.View key={i} style={[styles.dots, { opacity, width }]} />
+          );
         })}
       </Block>
-    )
-  }
+    );
+  };
 
   return (
     <Block flex style={styles.gallery}>
-      <Block flex middle style={{ position: 'relative' }}>
-        <Block style={styles.galleryImage}>
-          {renderGallery()}
-        </Block>
+      <Block flex middle style={{ position: "relative" }}>
+        <Block style={styles.galleryImage}>{renderGallery()}</Block>
 
         <Block center style={styles.dotsContainer}>
           {renderProgress()}
@@ -77,28 +87,28 @@ const Gallery = (props) => {
       </Block>
     </Block>
   );
-}
+};
 
 const styles = StyleSheet.create({
   gallery: {
     backgroundColor: theme.COLORS.BLACK,
-    marginTop: Platform.OS === 'android' ? -HeaderHeight : 0,
+    marginTop: Platform.OS === "android" ? -HeaderHeight : 0,
   },
   galleryImage: {
     width: width,
-    height: 'auto'
+    height: "auto",
   },
   dots: {
     height: 8,
     margin: 8,
     borderRadius: 4,
-    backgroundColor: 'white'
+    backgroundColor: "white",
   },
   dotsContainer: {
-    position: 'absolute',
+    position: "absolute",
     bottom: theme.SIZES.BASE * 3,
     left: 0,
-    right: 0
+    right: 0,
   },
 });
 

@@ -11,43 +11,45 @@ import { Images, materialTheme } from "../constants/";
 import { useDispatch, useSelector } from "react-redux";
 
 // screens
-import DashboardAgentScreen from "../screens/DashboardAgent";
+import AboutScreen from "../screens/About";
+import AgreementScreen from "../screens/Agreement";
+import AgentInfoScreen from "../screens/AgentInfo";
+import AgentCaseDetailScreen from "../screens/AgentCaseDetail";
+import BookDoctorScreen from "../screens/BookDoctor";
+import CaseHistoryScreen from "../screens/CaseHistory";
 import ChatScreen from "../screens/Chat";
 import CartScreen from "../screens/Cart";
-import SignInScreen from "../screens/SignIn";
-import SignUpScreen from "../screens/SignUp";
-import ProfileScreen from "../screens/Profile";
-import SettingsScreen from "../screens/Settings";
-import NotificationsScreen from "../screens/Notifications";
-import PrivacyScreen from "../screens/Privacy";
-import AboutScreen from "../screens/About";
-import LanguageScreen from "../screens/Language";
-import AgreementScreen from "../screens/Agreement";
-import UserSelectScreen from "../screens/UserSelect";
-import PatientInfoScreen from "../screens/PatientInfo";
-import DoctorScheduleDetailScreen from "../screens/DoctorScheduleDetail";
-import AgentInfoScreen from "../screens/AgentInfo";
-import ScheduleDetailScreen from "../screens/ScheduleDetail";
-import PatientScheduleDetailScreen from "../screens/PatientScheduleDetail";
-import CaseHistoryScreen from "../screens/CaseHistory";
-import PatientViewScreen from "../screens/PatientView";
-import PrimaryCareDoctorViewScreen from "../screens/PrimaryCareDoctorView";
-import BookDoctorScreen from "../screens/BookDoctor";
 import CaseViewScreen from "../screens/CaseView";
-import DoctorCaseViewScreen from "../screens/DoctorCaseView";
-import ScheduleViewScreen from "../screens/ScheduleView";
+import CustomDrawerContent from "./Menu";
+import DoctorScheduleDetailScreen from "../screens/DoctorScheduleDetail";
 import DashboardPatientScreen from "../screens/DashboardPatient";
 import DashboardDoctorScreen from "../screens/DashboardDoctor";
-import CustomDrawerContent from "./Menu";
-import TimeSlotScreen from "../screens/TimeSlot";
+import DashboardAgentScreen from "../screens/DashboardAgent";
+import DoctorCaseViewScreen from "../screens/DoctorCaseView";
 import DoctorDetailScreen from "../screens/DoctorDetail";
-import NotificationScreen from "../screens/Notification";
 import DoctorInfoScreen from "../screens/DoctorInfo";
-import AgentCaseDetailScreen from "../screens/AgentCaseDetail";
 import DoctorCaseDetailScreen from "../screens/DoctorCaseDetail";
+import LanguageScreen from "../screens/Language";
+import NotificationsScreen from "../screens/Notifications";
+import NotificationScreen from "../screens/Notification";
+import ProfileScreen from "../screens/Profile";
+import PrivacyScreen from "../screens/Privacy";
+import PatientScheduleDetailScreen from "../screens/PatientScheduleDetail";
+import PatientViewScreen from "../screens/PatientView";
+import PrimaryCareDoctorViewScreen from "../screens/PrimaryCareDoctorView";
 import PatientCaseDetailScreen from "../screens/PatientCaseDetail";
 import PatientTimeSlotScreen from "../screens/PatientTimeSlot";
-import AgentReviewScreen from "../screens/AgentTreatmentReview";
+import PatientInfoScreen from "../screens/PatientInfo";
+import SignInScreen from "../screens/SignIn";
+import SignUpScreen from "../screens/SignUp";
+import ForgotPasswordScreen from "../screens/ForgotPassword";
+import SettingsScreen from "../screens/Settings";
+import ScheduleDetailScreen from "../screens/ScheduleDetail";
+import ScheduleViewScreen from "../screens/ScheduleView";
+import TimeSlotScreen from "../screens/TimeSlot";
+import UserSelectScreen from "../screens/UserSelect";
+import InsuranceInfoScreen from "../screens/InsuranceInfo";
+import AgentFinalReviewScreen from "../screens/AgentFinalReview";
 import DoctorReviewScreen from "../screens/DoctorTreatmentReview";
 import CreateCaseScreen from "../screens/CreateCase";
 import AddPatientScreen from "../screens/AddPatient";
@@ -61,58 +63,6 @@ const { width } = Dimensions.get("screen");
 
 const Stack = createStackNavigator();
 const Drawer = createDrawerNavigator();
-
-const profile = {
-  avatar: Images.Profile,
-  name: "Workforce Agent",
-  type: "Agent",
-  plan: "Workforce",
-};
-
-const ProfileStack = (props) => {
-  return (
-    <Stack.Navigator initialRouteName="Profile" mode="card" headerMode="screen">
-      <Stack.Screen
-        name="Agent Info"
-        component={ProfileScreen}
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header
-              transparent
-              title="Agent Info"
-              scene={scene}
-              navigation={navigation}
-            />
-          ),
-          headerTransparent: true,
-        }}
-      />
-      <Stack.Screen
-        name="Chat"
-        component={ChatScreen}
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header
-              back
-              title="Rachel Brown"
-              scene={scene}
-              navigation={navigation}
-            />
-          ),
-        }}
-      />
-      <Stack.Screen
-        name="Cart"
-        component={CartScreen}
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header back title="Cart" scene={scene} navigation={navigation} />
-          ),
-        }}
-      />
-    </Stack.Navigator>
-  );
-};
 
 const SettingsStack = (props) => {
   return (
@@ -277,6 +227,36 @@ const DoctorInfoStack = (props) => {
 const AppStack = (props) => {
   const userRole = useSelector((state) => state.user.role);
 
+  let profile = {};
+  switch (userRole) {
+    case "agent":
+      profile = {
+        avatar: Images.Profile,
+        name: "Agent",
+        type: "Agent",
+        plan: "Workforce",
+      };
+      break;
+    case "patient":
+      profile = {
+        avatar: Images.Profile,
+        name: "Patient",
+        type: "Patient",
+        plan: "Workforce",
+      };
+      break;
+    case "doctor":
+      profile = {
+        avatar: Images.Profile,
+        name: "Doctor",
+        type: "Doctor",
+        plan: "Workforce",
+      };
+      break;
+    default:
+      break;
+  }
+
   switch (userRole) {
     case "agent":
       return (
@@ -338,7 +318,7 @@ const AppStack = (props) => {
             }}
           />
           <Drawer.Screen
-            name="Patient View"
+            name="Patients"
             component={PatientViewStack}
             options={{
               drawerIcon: ({ focused }) => (
@@ -352,7 +332,7 @@ const AppStack = (props) => {
             }}
           />
           <Drawer.Screen
-            name="Case View"
+            name="Cases"
             component={CaseViewStack}
             options={{
               drawerIcon: ({ focused }) => (
@@ -366,7 +346,7 @@ const AppStack = (props) => {
             }}
           />
           <Drawer.Screen
-            name="Primary Care Doctor View"
+            name="Doctors"
             component={PrimaryCareDoctorViewStack}
             options={{
               drawerIcon: ({ focused }) => (
@@ -380,7 +360,7 @@ const AppStack = (props) => {
             }}
           />
           <Drawer.Screen
-            name="Schedule View"
+            name="Schedules"
             component={ScheduleViewStack}
             options={{
               drawerIcon: ({ focused }) => (
@@ -450,7 +430,7 @@ const AppStack = (props) => {
           />
           <Stack.Screen
             name="AgentReview"
-            component={AgentReviewScreen}
+            component={AgentFinalReviewScreen}
             options={{
               headerTransparent: true,
             }}
@@ -709,327 +689,6 @@ const AppStack = (props) => {
     default:
       break;
   }
-  // return (
-  //   <Drawer.Navigator
-  //     style={{ flex: 1 }}
-  //     drawerContent={props => (
-  //       <CustomDrawerContent {...props} profile={profile} />
-  //     )}
-  //     drawerStyle={{
-  //       backgroundColor: "white",
-  //       width: width * 0.8
-  //     }}
-  //     drawerContentOptions={{
-  //       activeTintColor: "white",
-  //       inactiveTintColor: "#000",
-  //       activeBackgroundColor: materialTheme.COLORS.ACTIVE,
-  //       inactiveBackgroundColor: "transparent",
-  //       itemStyle: {
-  //         width: width * 0.74,
-  //         paddingHorizontal: 12,
-  //         justifyContent: "center",
-  //         alignContent: "center",
-  //         overflow: "hidden"
-  //       },
-  //       labelStyle: {
-  //         fontSize: 48,
-  //         fontWeight: "normal"
-  //       }
-  //     }}
-  //     initialRouteName="Home"
-  //   >
-  //     <Drawer.Screen
-  //       name="Dashboard"
-  //       component={DashboardAgentStack}
-  //       options={{
-  //         drawerIcon: ({ focused }) => (
-  //           <Icon
-  //             size={16}
-  //             name="md-woman"
-  //             family="ionicon"
-  //             color={focused ? "white" : materialTheme.COLORS.MUTED}
-  //             style={{ marginLeft: 4, marginRight: 4 }}
-  //           />
-  //         )
-  //       }}
-  //     />
-  //     <Drawer.Screen
-  //       name="Profile Info"
-  //       component={ProfileInfoStack}
-  //       options={{
-  //         drawerIcon: ({ focused }) => (
-  //           <Icon
-  //             size={16}
-  //             name="md-woman"
-  //             family="ionicon"
-  //             color={focused ? "white" : materialTheme.COLORS.MUTED}
-  //             style={{ marginLeft: 4, marginRight: 4 }}
-  //           />
-  //         )
-  //       }}
-  //     />
-  //     <Drawer.Screen
-  //       name="Agent Info"
-  //       component={ProfileStack}
-  //       options={{
-  //         drawerIcon: ({ focused }) => (
-  //           <Icon
-  //             size={16}
-  //             name="shop"
-  //             family="GalioExtra"
-  //             color={focused ? "white" : materialTheme.COLORS.MUTED}
-  //           />
-  //         )
-  //       }}
-  //     />
-  //     <Drawer.Screen
-  //       name="Patient View"
-  //       component={PatientViewStack}
-  //       options={{
-  //         drawerIcon: ({ focused }) => (
-  //           <Icon
-  //             size={16}
-  //             name="user"
-  //             family="font-awesome"
-  //             color={focused ? "white" : materialTheme.COLORS.MUTED}
-  //           />
-  //         )
-  //       }}
-  //     />
-  //     <Drawer.Screen
-  //       name="Case View"
-  //       component={CaseViewStack}
-  //       options={{
-  //         drawerIcon: ({ focused }) => (
-  //           <Icon
-  //             size={16}
-  //             name="id-badge"
-  //             family="font-awesome"
-  //             color={focused ? "white" : materialTheme.COLORS.MUTED}
-  //           />
-  //         )
-  //       }}
-  //     />
-  //     <Drawer.Screen
-  //       name="Primary Care Doctor View"
-  //       component={PrimaryCareDoctorViewStack}
-  //       options={{
-  //         drawerIcon: ({ focused }) => (
-  //           <Icon
-  //             size={16}
-  //             name="briefcase-medical"
-  //             family="font-awesome"
-  //             color={focused ? "white" : materialTheme.COLORS.MUTED}
-  //           />
-  //         )
-  //       }}
-  //     />
-  //     <Drawer.Screen
-  //       name="Schedule View"
-  //       component={ProfileStack}
-  //       options={{
-  //         drawerIcon: ({ focused }) => (
-  //           <Icon
-  //             size={16}
-  //             name="calender"
-  //             family="font-awesome"
-  //             color={focused ? "white" : materialTheme.COLORS.MUTED}
-  //           />
-  //         )
-  //       }}
-  //     />
-  //     <Drawer.Screen
-  //       name="Settings"
-  //       component={SettingsStack}
-  //       options={{
-  //         drawerIcon: ({ focused }) => (
-  //           <Icon
-  //             size={16}
-  //             name="gears"
-  //             family="font-awesome"
-  //             color={focused ? "white" : materialTheme.COLORS.MUTED}
-  //             style={{ marginRight: -3 }}
-  //           />
-  //         )
-  //       }}
-  //     />
-  //     <Drawer.Screen
-  //       name="Components"
-  //       component={ComponentsStack}
-  //       options={{
-  //         drawerIcon: ({ focused }) => (
-  //           <Icon
-  //             size={16}
-  //             name="md-switch"
-  //             family="ionicon"
-  //             color={focused ? "white" : materialTheme.COLORS.MUTED}
-  //             style={{ marginRight: 2, marginLeft: 2 }}
-  //           />
-  //         )
-  //       }}
-  //     />
-  //     <Drawer.Screen
-  //       name="Patient Info"
-  //       component={PatientInfoStack}
-  //       options={{
-  //         drawerIcon: ({ focused }) => (
-  //           <Icon
-  //             size={16}
-  //             name="md-woman"
-  //             family="ionicon"
-  //             color={focused ? "white" : materialTheme.COLORS.MUTED}
-  //             style={{ marginLeft: 4, marginRight: 4 }}
-  //           />
-  //         )
-  //       }}
-  //     />
-  //     <Drawer.Screen
-  //       name="Doctor Schedule Detail"
-  //       component={DoctorScheduleDetailStack}
-  //       options={{
-  //         drawerIcon: ({ focused }) => (
-  //           <Icon
-  //             size={16}
-  //             name="md-woman"
-  //             family="ionicon"
-  //             color={focused ? "white" : materialTheme.COLORS.MUTED}
-  //             style={{ marginLeft: 4, marginRight: 4 }}
-  //           />
-  //         )
-  //       }}
-  //     />
-  //     <Drawer.Screen
-  //       name="Agent Info"
-  //       component={AgentInfoStack}
-  //       options={{
-  //         drawerIcon: ({ focused }) => (
-  //           <Icon
-  //             size={16}
-  //             name="md-woman"
-  //             family="ionicon"
-  //             color={focused ? "white" : materialTheme.COLORS.MUTED}
-  //             style={{ marginLeft: 4, marginRight: 4 }}
-  //           />
-  //         )
-  //       }}
-  //     />
-  //     <Drawer.Screen
-  //       name="Schedule Detail"
-  //       component={ScheduleDetailStack}
-  //       options={{
-  //         drawerIcon: ({ focused }) => (
-  //           <Icon
-  //             size={16}
-  //             name="md-woman"
-  //             family="ionicon"
-  //             color={focused ? "white" : materialTheme.COLORS.MUTED}
-  //             style={{ marginLeft: 4, marginRight: 4 }}
-  //           />
-  //         )
-  //       }}
-  //     />
-  //     <Drawer.Screen
-  //       name="CaseHistory"
-  //       component={CaseHistoryStack}
-  //       options={{
-  //         drawerIcon: ({ focused }) => (
-  //           <Icon
-  //             size={16}
-  //             name="md-woman"
-  //             family="ionicon"
-  //             color={focused ? "white" : materialTheme.COLORS.MUTED}
-  //             style={{ marginLeft: 4, marginRight: 4 }}
-  //           />
-  //         )
-  //       }}
-  //     />
-  //     <Drawer.Screen
-  //       name="Notification"
-  //       component={NotificationStack}
-  //       options={{
-  //         drawerIcon: ({ focused }) => (
-  //           <Icon
-  //             size={16}
-  //             name="md-woman"
-  //             family="ionicon"
-  //             color={focused ? "white" : materialTheme.COLORS.MUTED}
-  //             style={{ marginLeft: 4, marginRight: 4 }}
-  //           />
-  //         )
-  //       }}
-  //     />
-  //     <Drawer.Screen
-  //       name="BookDoctor"
-  //       component={BookDoctorScreen}
-  //       options={{
-  //         drawerIcon: ({ focused }) => (
-  //           <Icon
-  //             size={16}
-  //             name="md-person-add"
-  //             family="ionicon"
-  //             color={focused ? "white" : materialTheme.COLORS.MUTED}
-  //           />
-  //         )
-  //       }}
-  //     />
-  //     <Drawer.Screen
-  //       name="Time Slot"
-  //       component={TimeSlotStack}
-  //       options={{
-  //         drawerIcon: ({ focused }) => (
-  //           <Icon
-  //             size={16}
-  //             name="briefcase-medical"
-  //             family="font-awesome"
-  //             color={focused ? "white" : materialTheme.COLORS.MUTED}
-  //           />
-  //         )
-  //       }}
-  //     />
-  //     <Drawer.Screen
-  //       name="Doctor Detail"
-  //       component={DoctorDetailStack}
-  //       options={{
-  //         drawerIcon: ({ focused }) => (
-  //           <Icon
-  //             size={16}
-  //             name="briefcase-medical"
-  //             family="font-awesome"
-  //             color={focused ? "white" : materialTheme.COLORS.MUTED}
-  //           />
-  //         )
-  //       }}
-  //     />
-  //     <Drawer.Screen
-  //       name="Sign In"
-  //       component={SignInScreen}
-  //       options={{
-  //         drawerIcon: ({ focused }) => (
-  //           <Icon
-  //             size={16}
-  //             name="ios-log-in"
-  //             family="ionicon"
-  //             color={focused ? "white" : materialTheme.COLORS.MUTED}
-  //           />
-  //         )
-  //       }}
-  //     />
-  //     <Drawer.Screen
-  //       name="Sign Up"
-  //       component={SignUpScreen}
-  //       options={{
-  //         drawerIcon: ({ focused }) => (
-  //           <Icon
-  //             size={16}
-  //             name="md-person-add"
-  //             family="ionicon"
-  //             color={focused ? "white" : materialTheme.COLORS.MUTED}
-  //           />
-  //         )
-  //       }}
-  //     />
-  //   </Drawer.Navigator>
-  // );
 };
 
 const UserSelectStack = (props) => {
@@ -1070,6 +729,34 @@ const UserSelectStack = (props) => {
           ),
         }}
       />
+      <Drawer.Screen
+        name="ForgotPassword"
+        component={ForgotPasswordScreen}
+        options={{
+          drawerIcon: ({ focused }) => (
+            <Icon
+              size={16}
+              name="md-person-add"
+              family="ionicon"
+              color={focused ? "white" : materialTheme.COLORS.MUTED}
+            />
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="InsuranceInfo"
+        component={InsuranceInfoScreen}
+        options={{
+          headerTransparent: true,
+        }}
+      />
+      <Stack.Screen
+        name="AddNotes"
+        component={AddNotesScreen}
+        options={{
+          headerTransparent: true,
+        }}
+      />
       <Stack.Screen name="App" component={AppStack} />
     </Stack.Navigator>
   );
@@ -1095,11 +782,11 @@ const PatientViewStack = (props) => {
   return (
     <Stack.Navigator mode="card" headerMode="screen">
       <Stack.Screen
-        name="Patient View"
+        name="Patients"
         component={PatientViewScreen}
         options={{
           header: ({ navigation, scene }) => (
-            <Header home title="Patient View" navigation={props.navigation} />
+            <Header home title="Patients" navigation={props.navigation} />
           ),
         }}
       />
@@ -1111,11 +798,11 @@ const CaseViewStack = (props) => {
   return (
     <Stack.Navigator mode="card" headerMode="screen">
       <Stack.Screen
-        name="Case View"
+        name="Cases"
         component={CaseViewScreen}
         options={{
           header: ({ navigation, scene }) => (
-            <Header home title="Case View" navigation={props.navigation} />
+            <Header home title="Cases" navigation={props.navigation} />
           ),
         }}
       />
@@ -1193,15 +880,11 @@ const PrimaryCareDoctorViewStack = (props) => {
   return (
     <Stack.Navigator mode="card" headerMode="screen">
       <Stack.Screen
-        name="Primary Care Doctor View"
+        name="Doctors"
         component={PrimaryCareDoctorViewScreen}
         options={{
           header: ({ navigation, scene }) => (
-            <Header
-              home
-              title="Primary Care Doctor View"
-              navigation={props.navigation}
-            />
+            <Header home title="Doctors" navigation={props.navigation} />
           ),
         }}
       />
@@ -1222,11 +905,11 @@ const ScheduleViewStack = (props) => {
   return (
     <Stack.Navigator mode="card" headerMode="screen">
       <Stack.Screen
-        name="Schedule View"
+        name="Schedules"
         component={ScheduleViewScreen}
         options={{
           header: ({ navigation, scene }) => (
-            <Header home title="Schedule View" navigation={props.navigation} />
+            <Header home title="Schedules" navigation={props.navigation} />
           ),
         }}
       />

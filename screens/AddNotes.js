@@ -141,7 +141,7 @@ const AddNotes = (props) => {
             style={styles.save}
             onPress={() => console.log("save")}
           >
-            <Text color={"#3A58FC"} size={16} style={{alignSelf: 'center'}}>
+            <Text color={"#3A58FC"} size={14} style={{alignSelf: 'center'}}>
               Save
             </Text>
           </TouchableOpacity>
@@ -149,7 +149,7 @@ const AddNotes = (props) => {
             style={styles.save}
             onPress={() => console.log("cancel")}
           >
-            <Text color={"#3A58FC"} size={16} style={{alignSelf: 'center'}}>
+            <Text color={"#3A58FC"} size={14} style={{alignSelf: 'center'}}>
               Cancel
             </Text>
           </TouchableOpacity>
@@ -321,11 +321,12 @@ const styles = StyleSheet.create({
   },
   save: {
     backgroundColor: "white",
-    borderRadius: 30,
+    borderRadius: 20,
     borderColor: '#C7C7C7',
-    paddingVertical: 10,
-    paddingHorizontal: 10,
-    width: 70,
+    borderWidth: 1,
+    paddingVertical: 4,
+    paddingHorizontal: 6,
+    width: 90,
     marginBottom: 10,
     marginHorizontal: 10,        
   },

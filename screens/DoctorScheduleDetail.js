@@ -32,7 +32,7 @@ const DoctorScheduleDetail = (props) => {
           style={{
             position: "absolute",
             right: -4,
-            top: -4
+            top: -4,
           }}
         />
         <Text size={18}>{heading}</Text>
@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
   },
   backIcon: {
-    marginLeft: theme.SIZES.BASE,    
+    marginLeft: theme.SIZES.BASE,
   },
 });
 

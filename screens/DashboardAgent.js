@@ -10,7 +10,9 @@ import {
 } from "react-native";
 import { Block, Text, theme } from "galio-framework";
 import { LinearGradient } from "expo-linear-gradient";
-import { materialTheme, products } from "../constants";
+
+import products from "../constants/images/home";
+import { materialTheme } from "../constants";
 import { HeaderHeight } from "../constants/utils";
 import { useDispatch, useSelector } from "react-redux";
 import { IMLocalized } from "../src/localization/IMLocalization";
@@ -20,54 +22,6 @@ import SvgUri from "expo-svg-uri";
 
 const { width } = Dimensions.get("screen");
 const cardWidth = theme.SIZES.BASE * 4;
-
-const categories = [
-  {
-    title: "Eddie",
-    image:
-      "https://images.unsplash.com/photo-1507290439931-a861b5a38200?fit=crop&w=840&q=80",
-  },
-  {
-    title: "Julia",
-    image:
-      "https://images.unsplash.com/photo-1540555700478-4be289fbecef?fit=crop&w=840&q=80",
-  },
-  {
-    title: "Frank",
-    image:
-      "https://images.unsplash.com/photo-1536942338469-91c7022e55a7?fit=crop&w=840&q=80",
-  },
-  {
-    title: "Sam",
-    image:
-      "https://images.unsplash.com/photo-1507290439931-a861b5a38200?fit=crop&w=840&q=80",
-  },
-  {
-    title: "Yan",
-    image:
-      "https://images.unsplash.com/photo-1540555700478-4be289fbecef?fit=crop&w=840&q=80",
-  },
-  {
-    title: "John",
-    image:
-      "https://images.unsplash.com/photo-1536942338469-91c7022e55a7?fit=crop&w=840&q=80",
-  },
-  {
-    title: "Nick",
-    image:
-      "https://images.unsplash.com/photo-1507290439931-a861b5a38200?fit=crop&w=840&q=80",
-  },
-  {
-    title: "Power",
-    image:
-      "https://images.unsplash.com/photo-1540555700478-4be289fbecef?fit=crop&w=840&q=80",
-  },
-  {
-    title: "Sarah",
-    image:
-      "https://images.unsplash.com/photo-1536942338469-91c7022e55a7?fit=crop&w=840&q=80",
-  },
-];
 
 const sortCategories = [
   {
@@ -137,8 +91,7 @@ const DashboardAgent = (props) => {
     );
   };
 
-  const renderSort = (item, index) => {    
-
+  const renderSort = (item, index) => {
     return (
       <TouchableWithoutFeedback
         style={{ zIndex: 3 }}
@@ -166,16 +119,16 @@ const DashboardAgent = (props) => {
     return (
       <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
         <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
-          <ListItem product={products[0]} horizontal />
-          <ListItem product={products[1]} horizontal />
-          <ListItem product={products[2]} horizontal />
-          <ListItem product={products[3]} horizontal />
-          <ListItem product={products[4]} horizontal />
-          <ListItem product={products[0]} horizontal />
-          <ListItem product={products[1]} horizontal />
-          <ListItem product={products[2]} horizontal />
-          <ListItem product={products[3]} horizontal />
-          <ListItem product={products[4]} horizontal />
+          <ListItem product={products[0]} horizontal role="agentDashboard" />
+          <ListItem product={products[1]} horizontal role="agentDashboard" />
+          <ListItem product={products[2]} horizontal role="agentDashboard" />
+          <ListItem product={products[3]} horizontal role="agentDashboard" />
+          <ListItem product={products[4]} horizontal role="agentDashboard" />
+          <ListItem product={products[0]} horizontal role="agentDashboard" />
+          <ListItem product={products[1]} horizontal role="agentDashboard" />
+          <ListItem product={products[2]} horizontal role="agentDashboard" />
+          <ListItem product={products[3]} horizontal role="agentDashboard" />
+          <ListItem product={products[4]} horizontal role="agentDashboard" />
         </ScrollView>
       </Block>
     );
@@ -209,7 +162,7 @@ const DashboardAgent = (props) => {
           eventContent: 3000,
         })}
         {renderEvents({
-          eventHeading: IMLocalized("This year"),
+          eventHeading: IMLocalized("This year"), 
           eventContent: 700,
         })}
         {renderEvents({

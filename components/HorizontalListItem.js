@@ -1,35 +1,61 @@
-import React from 'react';
-import { withNavigation } from '@react-navigation/compat';
-import { StyleSheet, Dimensions, Image, TouchableWithoutFeedback } from 'react-native';
-import { Block, Text, theme } from 'galio-framework';
-import { Icon, Drawer as DrawerCustomItem } from "../components/Icon";
+import React from "react";
+import { withNavigation } from "@react-navigation/compat";
+import {
+  StyleSheet,
+  Dimensions,
+  Image,
+  TouchableWithoutFeedback,
+} from "react-native";
+import { Block, Text, theme } from "galio-framework";
+import Icon from "./Icon";
+const { width } = Dimensions.get("screen");
 
-const { width } = Dimensions.get('screen');
-
-const Product = props => {
-  const { navigation, product, horizontal, full, style, priceColor, imageStyle, time, unReaden } = props;
-  const imageStyles = [styles.image, full ? styles.fullImage : styles.horizontalImage];
+const HorizontalList = (props) => {
+  const {
+    navigation,
+    product,
+    horizontal,
+    full,
+    style,
+    priceColor,
+    imageStyle,
+    time,
+    unReaden,
+  } = props;
+  const imageStyles = [
+    styles.image,
+    full ? styles.fullImage : styles.horizontalImage,
+    imageStyle,
+  ];
 
   return (
     <Block row={horizontal} card flex style={[styles.product, styles.shadow]}>
-      <TouchableWithoutFeedback onPress={() => navigation.navigate('Product', { product: product })}>
+      <TouchableWithoutFeedback
+        onPress={() => navigation.navigate("PatientTimeSlot")}
+      >
         <Block flex middle style={[styles.imageContainer, styles.shadow]}>
           <Image source={{ uri: product.image }} style={imageStyles} />
         </Block>
       </TouchableWithoutFeedback>
-      <TouchableWithoutFeedback onPress={() => navigation.navigate('Product', { product: product })}>
+      <TouchableWithoutFeedback
+        onPress={() => navigation.navigate("PatientTimeSlot")}
+      >
         <Block flex space="between" style={styles.productDescription}>
-          <Text size={14} style={styles.productTitle}>Doctor Name</Text>
-          <Text size={14} style={styles.productTitle}>{product.title}</Text>
+          <Text size={14} style={styles.productTitle}>
+            Doctor Name
+          </Text>
+          <Text size={14} style={styles.productTitle}>
+            {product.title}
+          </Text>
           <Block flex flexDirection="row" middle>
             <Icon name="shape-star" family="GalioExtra" size={14} />
-            <Text size={14} >{product.price}</Text>
+            <Text size={14}>{product.price}</Text>
           </Block>
         </Block>
       </TouchableWithoutFeedback>
     </Block>
   );
-}
+};
 
 const styles = StyleSheet.create({
   product: {
@@ -43,7 +69,7 @@ const styles = StyleSheet.create({
   },
   productTitle: {
     flex: 1,
-    flexWrap: 'wrap',
+    flexWrap: "wrap",
     paddingBottom: 6,
   },
   productDescription: {
@@ -67,7 +93,7 @@ const styles = StyleSheet.create({
     width: width - theme.SIZES.BASE * 3,
   },
   shadow: {
-    shadowColor: 'black',
+    shadowColor: "black",
     shadowOffset: { width: 4, height: 4 },
     shadowRadius: 4,
     shadowOpacity: 0.4,
@@ -75,4 +101,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withNavigation(Product);
+export default withNavigation(HorizontalList);

@@ -9,7 +9,6 @@ import {
 import { Block, Text, theme } from "galio-framework";
 import { Icon } from "../components";
 import SvgUri from "expo-svg-uri";
-import { faBell } from "@fortawesome/free-solid-svg-icons";
 
 const { width, height } = Dimensions.get("screen");
 
@@ -78,7 +77,7 @@ const CreateCase = (props) => {
                 style={{ fontFamily: "Inter-Black" }}
                 bold
               >
-                Dr.Adila Tahir
+                Create Case
               </Text>
             </Block>
           </Block>
@@ -90,9 +89,22 @@ const CreateCase = (props) => {
         showsVerticalScrollIndicator={false}
         style={{ top: height * 0.16 }}
       >
-        <TouchableOpacity onPress={() => navigation.navigate("AddPatient")}>
+        <TouchableOpacity onPress={() => navigation.navigate("AddPatient")} style={{width:60}}>
           <Image source={require("../assets/images/createCase.png")} />
         </TouchableOpacity>
+        <Block row>
+          <Text size={10} style={{ left: theme.SIZES.BASE * 1.8 }}>
+            Add
+          </Text>       
+          <TouchableOpacity style={{position: "absolute", right: 20}}>
+          <Text size={10} style={{ textDecorationLine: 'underline' }} 
+            onPress={() => navigation.navigate("Cases")}
+          >
+            Choose from current case
+          </Text>
+          </TouchableOpacity>   
+        </Block>
+
         <Block row center style={styles.patientHeading}>
           <Image source={require("../assets/images/avatar.png")} />
           <Block column>
@@ -110,7 +122,7 @@ const CreateCase = (props) => {
             <SvgUri
               width="20"
               height="20"
-              source={require("../assets/icons/edit.svg")}
+              source={require("../assets/icons/editGreen.svg")}
               style={{
                 right: -theme.SIZES.BASE * 2,
                 paddingTop: theme.SIZES.BASE,
@@ -128,43 +140,22 @@ const CreateCase = (props) => {
               paddingLeft: theme.SIZES.BASE,
             }}
           >
-            {" "}
-            Case Info{" "}
+            Case Info
           </Text>
           {renderDetils({
-            heading: "Status: New Case",
+            heading: "Created time:2022.2.14",
             action: "",
             link: "",
           })}
           {renderDetils({
-            heading: "Warning",
-            action: "add",
-            link: "",
-          })}
-          {renderDetils({
-            heading: "Created time:2022.2.14",
-            action: "edit",
-            link: "",
-          })}
-          {renderDetils({
-            heading: "Agent:",
-            action: "add",
-            link: "",
-          })}
-          {renderDetils({
-            heading: "Patient Info:",
-            action: "add",
-            link: "AddPatient",
-          })}
-          {renderDetils({
             heading: "Date of Injury:2022.2.10",
-            action: "edit",
+            action: "",
             link: "",
           })}
           {renderDetils({
             heading: "Attorney Info",
             action: "add",
-            link: "AddAttorney"
+            link: "AddAttorney",
           })}
           {renderDetils({
             heading: "Insurance Info",
@@ -177,39 +168,25 @@ const CreateCase = (props) => {
             link: "AddNotes",
           })}
           {renderDetils({
-            heading: "Schedule Info",
-            action: "add",
-            link: "",
-          })}
-          {renderDetils({
             heading: "Case Files",
-            action: "add",
-            link: "",
-          })}
-          {renderDetils({
-            heading: "Patient Upload Files",
-            action: "add",
-          })}
-          {renderDetils({
-            heading: "Case Bills",
-            action: "add",
+            action: "",
             link: "",
           })}
         </Block>
-        <Block row style={{marginBottom: 100}} center>
+        <Block row style={{ marginBottom: 100 }} center>
           <TouchableOpacity
             style={styles.save}
-            onPress={() => console.log('save')}
+            onPress={() => console.log("save")}
           >
-            <Text color={'white'} size={16}>
-              Save
+            <Text color={"white"} size={16}>
+              Save and send notification
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.save}
-            onPress={() => console.log('cancel')}
+            onPress={() => console.log("cancel")}
           >
-            <Text color={'white'} size={16}>
+            <Text color={"white"} size={16}>
               Cancel
             </Text>
           </TouchableOpacity>
@@ -321,13 +298,13 @@ const styles = StyleSheet.create({
     marginBottom: theme.SIZES.BASE,
   },
   save: {
-    backgroundColor: '#00CE30',
+    backgroundColor: "#00CE30",
     borderRadius: 15,
     paddingVertical: 10,
-    paddingHorizontal: 50,
+    paddingHorizontal: 20,
     marginBottom: 80,
-    marginHorizontal: 20
-  }
+    marginHorizontal: 20,
+  },
 });
 
 export default CreateCase;

@@ -31,10 +31,10 @@ const CustomDrawerContent = ({
       screens = [
         "Dashboard",
         "Agent Info",
-        "Patient View",
-        "Case View",
-        "Primary Care Doctor View",
-        "Schedule View",
+        "Patients",
+        "Cases",
+        "Doctors",
+        "Schedules",
         "Settings",
       ];
       break;

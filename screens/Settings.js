@@ -1,8 +1,15 @@
-import React, { useState } from 'react';
-import { StyleSheet, Switch, FlatList, Platform, TouchableOpacity, View } from "react-native";
+import React, { useState } from "react";
+import {
+  StyleSheet,
+  Switch,
+  FlatList,
+  Platform,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { Block, Text, theme, Icon } from "galio-framework";
 import { IMLocalized } from "../src/localization/IMLocalization";
-import materialTheme from '../constants/Theme';
+import materialTheme from "../constants/Theme";
 
 const Settings = (props) => {
   const language = [
@@ -17,50 +24,65 @@ const Settings = (props) => {
 
   const [itemID, setItemID] = useState({});
 
-  const toggleSwitch = switchNumber => setItemID({ [switchNumber]: !itemID[switchNumber] });
+  const toggleSwitch = (switchNumber) =>
+    setItemID({ [switchNumber]: !itemID[switchNumber] });
 
   const renderItem = ({ item }) => {
-    const {navigate} = props.navigation;
+    const { navigate } = props.navigation;
 
-    switch(item.type) {
-      case 'switch': 
+    switch (item.type) {
+      case "switch":
         return (
           <Block row middle space="between" style={styles.rows}>
             <Text size={14}>{item.title}</Text>
             <Switch
               onValueChange={() => toggleSwitch(item.id)}
               ios_backgroundColor={materialTheme.COLORS.SWITCH_OFF}
-              thumbColor={Platform.OS === 'android' ? materialTheme.COLORS.SWITCH_OFF : null}
-              trackColor={{ false: materialTheme.COLORS.SWITCH_OFF, true: materialTheme.COLORS.SWITCH_ON }}
+              thumbColor={
+                Platform.OS === "android"
+                  ? materialTheme.COLORS.SWITCH_OFF
+                  : null
+              }
+              trackColor={{
+                false: materialTheme.COLORS.SWITCH_OFF,
+                true: materialTheme.COLORS.SWITCH_ON,
+              }}
               value={itemID[item.id]}
             />
           </Block>
         );
-      case 'button': 
+      case "button":
         return (
           <Block style={styles.rows}>
-            <TouchableOpacity onPress={() => (item.id !== 'Payment' && item.id !== 'gift') && navigate(item.id)}>
-              <Block row middle space="between" style={{paddingTop:7}}>
+            <TouchableOpacity
+              onPress={() =>
+                item.id !== "Payment" && item.id !== "gift" && navigate(item.id)
+              }
+            >
+              <Block row middle space="between" style={{ paddingTop: 7 }}>
                 <Text size={14}>{item.title}</Text>
-                <Icon name="angle-right" family="font-awesome" style={{ paddingRight: 5 }} />
+                <Icon
+                  name="angle-right"
+                  family="font-awesome"
+                  style={{ paddingRight: 5 }}
+                />
               </Block>
             </TouchableOpacity>
-          </Block>);
+          </Block>
+        );
       default:
         break;
     }
-  }
+  };
 
   return (
-    <View        
-      style={styles.settings}>
-
+    <View style={styles.settings}>
       <Block center style={styles.title}>
         <Text bold size={theme.SIZES.BASE} style={{ paddingBottom: 5 }}>
-          {IMLocalized('languageSettings')}
+          {IMLocalized("languageSettings")}
         </Text>
         <Text size={12} color={materialTheme.COLORS.CAPTION}>
-          {IMLocalized('canChangeLang')}
+          {IMLocalized("canChangeLang")}
         </Text>
       </Block>
 
@@ -84,10 +106,9 @@ const Settings = (props) => {
         keyExtractor={(item, index) => item.id}
         renderItem={renderItem}
       />
-
-    </View>      
+    </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   settings: {
@@ -101,7 +122,7 @@ const styles = StyleSheet.create({
     height: theme.SIZES.BASE * 2,
     paddingHorizontal: theme.SIZES.BASE,
     marginBottom: theme.SIZES.BASE / 2,
-  }
+  },
 });
 
 export default Settings;

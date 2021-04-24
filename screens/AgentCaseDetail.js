@@ -7,6 +7,7 @@ import {
   Image,
   ImageBackground,
   Dimensions,
+  Touchable,
 } from "react-native";
 import { Button, Block, Text, Input, theme } from "galio-framework";
 import { materialTheme, products, Images, tabs } from "../constants/";
@@ -27,11 +28,6 @@ const { width, height } = Dimensions.get("screen");
 
 const Components = (props) => {
   const { navigation } = props;
-  // const [ imageSource, setImageSource ] = useState([
-  //   "https://source.unsplash.com/1024x768/?nature",
-  //   "https://source.unsplash.com/1024x768/?water",
-  //   "https://source.unsplash.com/1024x768/?tree",
-  // ]);
   const [imageSource, setImageSource] = useState(null);
   const options = {
     title: "Load Photo",
@@ -45,146 +41,201 @@ const Components = (props) => {
     },
   };
 
-  const showCamera = () => {
-    launchCamera(options, (response) => {
-      if (response.error) {
-        console.log("LaunchCamera Error: ", response.error);
-      } else {
-        setImageSource(response.uri);
-      }
-    });
+  const weekBar = () => {
+    return (
+      <ScrollView
+        horizontal={true}
+        pagingEnabled={true}
+        decelerationRate={0}
+        scrollEventThrottle={16}
+        snapToAlignment="center"
+        showsHorizontalScrollIndicator={false}
+        snapToInterval={theme.SIZES.BASE * 0.375}
+        style={styles.weekScrollView}
+      >
+        <TouchableOpacity style={styles.dateActive}>
+          <Text size={16} color={"white"}>
+            WED
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.dateInActive}>
+          <Text size={16} style={{ paddingLeft: 3 }}>
+            THU
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.dateInActive}>
+          <Text size={16} style={{ paddingLeft: 8 }}>
+            FRI
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.dateInActive}>
+          <Text size={16} style={{ paddingLeft: 6 }}>
+            SAT
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.dateInActive}>
+          <Text size={16} style={{ paddingLeft: 4 }}>
+            SUN
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.dateInActive}>
+          <Text size={16}>MON</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.dateInActive}>
+          <Text size={16} style={{ paddingLeft: 4 }}>
+            THE
+          </Text>
+        </TouchableOpacity>
+      </ScrollView>
+    );
   };
 
-  // const showImagePicker = () => {
-  //   ImagePicker.showImagePicker(options, (response) => {
-  //     console.log("Response = ", response);
+  const renderNotes = (notes) => {
+    let { author, date, content } = notes;
+    return (
+      <Block row center style={styles.patientHeading}>
+        <Block>
+          <Image
+            source={require("../assets/images/grayscale-photo-of-man2.png")}
+            style={{ width: 60, height: 60 }}
+          />
+          <Image
+            source={require("../assets/images/ok.png")}
+            style={{ position: "absolute", right: 0 }}
+          />
+        </Block>
 
-  //     if (response.didCancel) {
-  //       console.log("User cancelled image picker");
-  //     } else if (response.error) {
-  //       console.log("ImagePicker Error: ", response.error);
-  //     } else if (response.customButton) {
-  //       console.log("User tapped custom button: ", response.customButton);
-  //       Alert.alert(response.customButton);
-  //     } else {
-  //       // You can also display the image using data:
-  //       // const source = { uri: 'data:image/jpeg;base64,' + response.data };
-  //       setImageSource(response.uri);
-  //     }
-  //   });
-  // };
+        <Block column style={{ paddingLeft: 10, width: width * 0.7 }}>
+          <Text bold size={16}>
+            {author}
+          </Text>
+          <Text
+            color={"#909CA1"}
+            style={{ paddingTop: theme.SIZES.BASE * 0.5 }}
+          >
+            {date}
+          </Text>
+          <Text
+            color={"#909CA1"}
+            style={{ paddingTop: theme.SIZES.BASE * 0.5 }}
+          >
+            {content}
+          </Text>
+        </Block>
+      </Block>
+    );
+  };
 
   return (
-    <Block flex>
+    <Block flex style={styles.agentCaseDetail}>
+      <Block style={styles.roundBlock}>
+        <Block row style={styles.heading}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Icon
+              size={16}
+              name="chevron-left"
+              family="font-awesome"
+              color={"white"}
+              style={{ padding: 7 }}
+            />
+          </TouchableOpacity>
+          <Block>
+            <Text
+              color="white"
+              size={20}
+              style={{ fontFamily: "Inter-Black" }}
+              bold
+            >
+              Case Details
+            </Text>
+          </Block>
+        </Block>
+      </Block>
       <ScrollView
         style={styles.components}
         showsVerticalScrollIndicator={false}
       >
-        <TouchableOpacity 
-          onPress={() => navigation.goBack()}
-          style={styles.backIcon}
-        >
-          <Icon
-            name="chevron-left"
-            family="font-awesome"            
-          />
-        </TouchableOpacity>
-        <Block center>
+        <Text bold size={18} style={{ paddingLeft: width * 0.05 }}>
+          Patient
+        </Text>
+        <Block row center style={styles.patientHeading}>
           <Image
             source={require("../assets/images/patient1.png")}
-            alt=""
-            style={styles.patientImage}
+            style={{ width: 60, height: 60 }}
           />
-          <Image
-            source={require("../assets/images/ok.png")}
-            alt=""
-            style={styles.statusImage}
-          />
-        </Block>
-        <Block center>
-          <Text size={24}>Zain Haider</Text>
-          <Block row>
-            <Text size={14}>ui/ux/interaction designer</Text>
+          <Block column style={{ paddingLeft: 10, width: width * 0.55 }}>
+            <Text bold size={16}>
+              Edie Sparks Turie
+            </Text>
+            <Text
+              color={"#909CA1"}
+              style={{ paddingTop: theme.SIZES.BASE * 0.5 }}
+            >
+              1993/04/29
+            </Text>
+          </Block>
+          <Block column>
+            <Text style={{ alignSelf: "flex-end" }} color={"#06D81E"}></Text>
             <SvgUri
               width="20"
               height="20"
-              source={require("../assets/icons/edit.svg")}
-              style={{ position: "absolute", right: -30 }}
+              source={require("../assets/icons/editGreen.svg")}
+              style={{
+                right: -theme.SIZES.BASE * 2,
+                paddingTop: theme.SIZES.BASE,
+              }}
             />
           </Block>
-          {imageSource ? (
-            <Block center style={styles.slider}>
-              <SliderBox
-                images={imageSource}
-                dotColor="#FFEE58"
-                inactiveDotColor="#90A4AE"
-                // sliderBoxHeight={200}
-                // sliderBoxWidth={200}
-                parentWidth={250}
-                ImageComponentStyle={{ borderRadius: 15, width: "100%" }}
-                dotStyle={{
-                  width: 15,
-                  height: 15,
-                  borderRadius: 15,
-                  marginHorizontal: 10,
-                  padding: 0,
-                  margin: 0,
-                }}
-                onCurrentImagePressed={(index) =>
-                  console.warn(`image ${index} pressed`)
-                }
-                currentImageEmitter={(index) =>
-                  console.warn(`current pos is: ${index}`)
-                }
-              />
-            </Block>
-          ) : (
-            <Block style={styles.camera}>
-              <SvgUri
-                width="65"
-                height="65"
-                source={require("../assets/icons/camera_plus.svg")}
-                style={{ position: "absolute", top: 90, left: 94 }}
-              />
-            </Block>
-          )}
-          {/* <TouchableOpacity onPress={() => showCamera()} style={styles.takePhoto}>
-            <Text>Take Photo</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => showImagePicker()} style={styles.takePhoto}>
-            <Text>Load Photo</Text>
-          </TouchableOpacity> */}
         </Block>
-        <Block center row style={styles.doctor}>
-          <Block center style={(styles.doctorItem, { paddingLeft: 30 })}>
+
+        <Text bold size={18} style={{ paddingLeft: width * 0.05 }}>
+          Doctor
+        </Text>
+        <Block row center style={styles.patientHeading}>
+          <Block>
             <Image
               source={require("../assets/images/grayscale-photo-of-man2.png")}
-              alt=""
-              style={styles.patientImage}
+              style={{ width: 60, height: 60 }}
             />
             <Image
               source={require("../assets/images/ok.png")}
-              alt=""
-              style={styles.statusImage}
+              style={{ position: "absolute", right: 0 }}
             />
           </Block>
-          <Block style={styles.doctorItem}>
-            <Text size={24}>Dr. Adila Tahir</Text>
-            <Text size={14}>M.B.B.S, F.C.P.S. (Gynecology)</Text>
-          </Block>
-          <Block style={(styles.doctorItem, { paddingRight: 16 })}>
-            <TouchableOpacity 
-              style={styles.profileBtn}
-              onPress={() => navigation.navigate("DoctorDetail")}  
+
+          <Block column style={{ paddingLeft: 10, width: width * 0.55 }}>
+            <Text bold size={16}>
+              Edie Sparks
+            </Text>
+            <Text
+              color={"#909CA1"}
+              style={{ paddingTop: theme.SIZES.BASE * 0.5 }}
             >
-              <Text color={"white"}>Profile</Text>
-            </TouchableOpacity>
+              1993/04/29
+            </Text>
+          </Block>
+          <Block column>
+            <Text style={{ alignSelf: "flex-end" }} color={"#06D81E"}></Text>
+            <SvgUri
+              width="20"
+              height="20"
+              source={require("../assets/icons/editGreen.svg")}
+              style={{
+                right: -theme.SIZES.BASE * 2,
+                paddingTop: theme.SIZES.BASE,
+              }}
+            />
           </Block>
         </Block>
-        <Block center>
-          <Text size={16} style={styles.text}>
+        <Block style={styles.interval}>
+          <Text bold size={18} style={{ paddingLeft: width * 0.05 }}>
+            Status
+          </Text>
+          <Text size={16} style={styles.startTimeRight}>
             Case start time：2020.09.23
           </Text>
+        </Block>
+        <Block center>
           <Block row>
             <Block style={{ marginLeft: 30 }}>
               <Block row>
@@ -260,9 +311,13 @@ const Components = (props) => {
                     marginTop: 6,
                   }}
                 />
-                <Text size={16} style={styles.text}>
-                  Dashboard
-                </Text>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("AgentReview")}
+                >
+                  <Text color={"#6E78F7"} size={16} style={styles.text}>
+                    Case final review
+                  </Text>
+                </TouchableOpacity>
               </Block>
               <Block row>
                 <SvgUri
@@ -275,17 +330,100 @@ const Components = (props) => {
                     marginTop: 6,
                   }}
                 />
-                <TouchableOpacity
-                  onPress={() => navigation.navigate("AgentReview")}
-                >
-                  <Text color={"#6E78F7"} size={16} style={styles.text}>
-                    Treatment Review
-                  </Text>
-                </TouchableOpacity>
+                <Text color={"black"} size={16} style={styles.text}>
+                  Discharged
+                </Text>
               </Block>
             </Block>
           </Block>
         </Block>
+        <Block style={styles.interval}>
+          <Text bold size={18} style={{ paddingLeft: width * 0.05 }}>
+            Date of Injury
+          </Text>
+          <Text size={16} style={styles.startTime}>
+            23.09.2020
+          </Text>
+        </Block>
+        <Block row style={styles.interval}>
+          <Text bold size={18} color={"black"} style={{ paddingLeft: width * 0.05 }}>
+            Attorney Info
+          </Text>
+          <TouchableOpacity onPress={() => navigation.navigate("AddAfforney")}>
+            <Text size={16} color={"#6E78F7"} style={styles.startTimeDetail, {marginLeft: width * 0.2}}>
+              Detail
+            </Text>
+          </TouchableOpacity>
+        </Block>
+        <Block row style={styles.interval}>
+          <Text bold size={18} color={"black"} style={{ paddingLeft: width * 0.05 }}>
+            Insurance Info
+          </Text>
+          <TouchableOpacity onPress={() => navigation.navigate("AddInsurance")}>
+            <Text size={16} color={"#6E78F7"} style={styles.startTimeDetail, {marginLeft: width * 0.18}}>
+              Detail
+            </Text>
+          </TouchableOpacity>
+        </Block>
+        <Block style={styles.interval}>
+          <Text bold size={18} style={{ paddingLeft: width * 0.05 }}>
+            Schedule
+          </Text>
+        </Block>
+        {weekBar()}
+        <Block center row style={{ marginBottom: 10 }}>
+          <Text style={{ marginRight: width * 0.3 }}>9.00-11.00</Text>
+          <Text>Dr.Ronald</Text>
+        </Block>
+        <Block row center>
+          <TouchableOpacity
+            style={styles.save}
+            onPress={() => console.log("save")}
+          >
+            <Text color={"white"} size={16}>
+              Case file
+            </Text>
+          </TouchableOpacity>
+        </Block>
+        <Block style={styles.bar}></Block>
+        <Block style={styles.interval}>
+          <Text bold size={18} style={{ paddingLeft: width * 0.05 }}>
+            Notes
+          </Text>
+          <TouchableOpacity
+            style={{
+              right: theme.SIZES.BASE * 1,
+              top: theme.SIZES.BASE * 0.3,
+              position: "absolute",
+              zIndex: 10,
+            }}
+            onPress={() => navigation.navigate("CreateCase")}
+          >
+            <Text color={"white"}>
+              <SvgUri
+                width="16"
+                height="16"
+                source={require("../assets/icons/add.svg")}
+              />
+            </Text>
+          </TouchableOpacity>
+        </Block>
+        {renderNotes({
+          author: "DR.Adila Tahir",
+          date: "21/02/2021",
+          content: "Please don't say that...",
+        })}
+        {renderNotes({
+          author: "DR.Adila Tahir",
+          date: "21/02/2021",
+          content: "Please don't say that...",
+        })}
+        {renderNotes({
+          author: "DR.Adila Tahir",
+          date: "21/02/2021",
+          content: "Please don't say that...",
+        })}
+        <Block style={{ marginBottom: 50 }}></Block>
       </ScrollView>
     </Block>
   );
@@ -293,7 +431,7 @@ const Components = (props) => {
 
 const styles = StyleSheet.create({
   components: {
-    paddingTop: theme.SIZES.BASE * 6,
+    paddingTop: theme.SIZES.BASE,
     backgroundColor: "white",
   },
   patientImage: {
@@ -337,6 +475,16 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     marginVertical: 10,
   },
+  startTime: {
+    marginHorizontal: 10,
+    position: "absolute",
+    left: width * 0.5,
+  },
+  startTimeRight: {
+    marginHorizontal: 10,
+    position: "absolute",
+    right: 16,
+  },
   camera: {
     backgroundColor: "#E7F0FF",
     borderRadius: 30,
@@ -350,9 +498,90 @@ const styles = StyleSheet.create({
     marginTop: theme.SIZES.BASE * 4,
   },
   backIcon: {
-    position: 'absolute', 
-    marginLeft: theme.SIZES.BASE * 2
-  }
+    position: "absolute",
+    marginLeft: theme.SIZES.BASE * 2,
+  },
+  roundBlock: {
+    borderBottomLeftRadius: 34,
+    borderBottomRightRadius: 34,
+    backgroundColor: "rgba(100, 120, 247, 0.84)",
+    height: height * 0.16,
+    width: width,
+    top: -10,
+    zIndex: 2,
+  },
+  heading: {
+    marginTop: height * 0.08,
+    paddingHorizontal: theme.SIZES.BASE * 0.5,
+    zIndex: 1,
+  },
+  agentCaseDetail: {
+    backgroundColor: "white",
+  },
+  patientHeading: {
+    width: width * 0.92,
+    borderColor: "#F1F1F1",
+    borderRadius: 20,
+    shadowColor: "grey",
+    shadowOpacity: 0.2,
+    shadowOpacity: 5,
+    elevation: 2,
+    backgroundColor: "#FEFEFE",
+    padding: 10,
+    marginVertical: 5,
+  },
+  interval: {
+    marginTop: 14,
+  },
+  weekScrollView: {
+    marginVertical: theme.SIZES.BASE,
+    padding: theme.SIZES.BASE,
+    paddingTop: 0,
+  },
+  dateActive: {
+    backgroundColor: "#00CE30",
+    borderRadius: theme.SIZES.BASE * 1.5,
+    paddingHorizontal: 8,
+    paddingVertical: 20,
+    marginRight: theme.SIZES.BASE,
+    width: theme.SIZES.BASE * 4,
+    height: theme.SIZES.BASE * 5,
+    alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "center",
+  },
+  dateInActive: {
+    borderWidth: 1,
+    borderColor: "#EDEDED",
+    borderRadius: theme.SIZES.BASE * 1.5,
+    paddingHorizontal: 4,
+    paddingVertical: 20,
+    marginRight: theme.SIZES.BASE,
+    width: theme.SIZES.BASE * 4,
+    height: theme.SIZES.BASE * 5,
+    alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "center",
+  },
+  save: {
+    backgroundColor: "#00CE30",
+    borderRadius: 15,
+    paddingVertical: 10,
+    paddingHorizontal: 50,
+    marginBottom: 10,
+    marginHorizontal: 20,
+  },
+  bar: {
+    alignSelf: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: "#EDEDED",
+    paddingTop: 20,
+    width: width * 0.8,
+  },
+  startTimeDetail: {
+    textDecorationLine: "underline",
+    marginHorizontal: 10,
+  },
 });
 
 export default Components;

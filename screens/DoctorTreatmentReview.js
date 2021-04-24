@@ -6,7 +6,7 @@ import {
   Image,
   ImageBackground,
   Platform,
-  TouchableOpacity
+  TouchableOpacity,
 } from "react-native";
 import { Button, Block, Text, theme, Input, Icon } from "galio-framework";
 
@@ -24,15 +24,17 @@ const DoctorReview = (props) => {
     <Block center flex style={styles.review}>
       <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
         <Block row style={styles.title}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-          >
-            <Icon name="chevron-left" family="font-awesome"  style={styles.backIcon} />
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Icon
+              name="chevron-left"
+              family="font-awesome"
+              style={styles.backIcon}
+            />
           </TouchableOpacity>
-          <Text size={22}>Treatment Review</Text>          
+          <Text size={22}>Treatment Review</Text>
           <TouchableOpacity style={styles.editBtn}>
-            <Icon name="edit" family="font-awesome" size={20}  />
-          </TouchableOpacity>          
+            <Icon name="edit" family="font-awesome" size={20} />
+          </TouchableOpacity>
         </Block>
         <Block style={styles.reviewHeading}>
           <Text size={22}>Well, well, well, how the turntables</Text>
@@ -41,17 +43,16 @@ const DoctorReview = (props) => {
           <Text size={17}>
             Wikipedia is the best thing ever. Anyone in the world can write
             anything they want about any subject. So you know you are getting
-            the best possible information. 
-            And I knew exactly what to do. But in
+            the best possible information. And I knew exactly what to do. But in
             a much more real sense, I had no idea what to do. Okay, too many
             different words from coming at me from too many different sentences.
           </Text>
         </Block>
         <Block center style={styles.saveBtn}>
-          <TouchableOpacity
-            onPress={() => console.log("saved")}
-          >
-            <Text bold color={'white'} size={16} >Save</Text>
+          <TouchableOpacity onPress={() => console.log("saved")}>
+            <Text bold color={"white"} size={16}>
+              Save
+            </Text>
           </TouchableOpacity>
         </Block>
       </ScrollView>
@@ -94,7 +95,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
     elevation: 5,
     marginVertical: 5,
-    marginHorizontal: 5,    
+    marginHorizontal: 5,
   },
   title: {
     marginTop: theme.SIZES.BASE * 4,
@@ -102,7 +103,7 @@ const styles = StyleSheet.create({
     marginHorizontal: width * 0.01,
   },
   backIcon: {
-    padding: 8
+    padding: 8,
   },
   saveBtn: {
     backgroundColor: "#6E78F7",
@@ -113,11 +114,11 @@ const styles = StyleSheet.create({
   },
   editBtn: {
     width: 30,
-    height: 'auto',
-    position: 'absolute',
-    right: 0,    
-    top: theme.SIZES.BASE * 0.5    
-  }
+    height: "auto",
+    position: "absolute",
+    right: 0,
+    top: theme.SIZES.BASE * 0.5,
+  },
 });
 
 export default DoctorReview;

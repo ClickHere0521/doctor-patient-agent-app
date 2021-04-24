@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="37" height="37" viewBox="0 0 37 37">
+  <g id="Group_3381" data-name="Group 3381" transform="translate(0.873 0.817)">
+    <g id="baseline-person-24px" transform="translate(0)">
+      <path id="Path_2203" data-name="Path 2203" d="M15.788,15.788A5.894,5.894,0,1,0,9.894,9.894,5.893,5.893,0,0,0,15.788,15.788Zm0,2.947C11.854,18.736,4,20.71,4,24.63v2.947H27.577V24.63C27.577,20.71,19.723,18.736,15.788,18.736Z" transform="translate(1.894 1.894)" fill="#fff"/>
+      <path id="Path_2204" data-name="Path 2204" d="M0,0H35.365V35.365H0Z" fill="none"/>
+    </g>
+    <g id="Group_3377" data-name="Group 3377" transform="translate(0)">
+      <line id="Line_36" data-name="Line 36" x2="9" transform="translate(-0.373 -0.317)" fill="none" stroke="#fff" stroke-linecap="square" stroke-width="1"/>
+      <line id="Line_37" data-name="Line 37" y2="9" transform="translate(-0.373 -0.317)" fill="none" stroke="#fff" stroke-linecap="square" stroke-width="1"/>
+    </g>
+    <g id="Group_3380" data-name="Group 3380" transform="translate(0 26.524)">
+      <line id="Line_36-2" data-name="Line 36" x2="9" transform="translate(-0.373 9.159)" fill="none" stroke="#fff" stroke-linecap="square" stroke-width="1"/>
+      <line id="Line_37-2" data-name="Line 37" y1="9" transform="translate(-0.373 0.159)" fill="none" stroke="#fff" stroke-linecap="square" stroke-width="1"/>
+    </g>
+    <g id="Group_3378" data-name="Group 3378" transform="translate(26.524)">
+      <line id="Line_36-3" data-name="Line 36" x1="9" transform="translate(0.103 -0.317)" fill="none" stroke="#fff" stroke-linecap="square" stroke-width="1"/>
+      <line id="Line_37-3" data-name="Line 37" y2="9" transform="translate(9.103 -0.317)" fill="none" stroke="#fff" stroke-linecap="square" stroke-width="1"/>
+    </g>
+    <g id="Group_3379" data-name="Group 3379" transform="translate(26.524 26.524)">
+      <line id="Line_36-4" data-name="Line 36" x1="9" transform="translate(0.103 9.159)" fill="none" stroke="#fff" stroke-linecap="square" stroke-width="1"/>
+      <line id="Line_37-4" data-name="Line 37" y1="9" transform="translate(9.103 0.159)" fill="none" stroke="#fff" stroke-linecap="square" stroke-width="1"/>
+    </g>
+  </g>
+</svg>

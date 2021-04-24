@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { Button, Block, Text, Input, theme } from "galio-framework";
 
-import { materialTheme, products, Images, tabs } from "../constants/";
+import products from "../constants/images/home";
 import {
   Select,
   Icon,

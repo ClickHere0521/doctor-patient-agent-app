@@ -173,4 +173,31 @@
             }
         }
     }
+},
+
+{
+    "Name": "Elif",
+    "Phone": "",
+    "Address": "",
+    "City/State": "",
+    "geoLocation": "",
+    "Email": "",
+    "Avatar": "",
+    "DOB": "",
+    "SSN": "",
+    "ScheduleRelatedID": "",
+    "Device_token": {
+        "0": {
+            "Token": "",
+            "Type": "",
+        }
+    }
+}
+
+{
+    "0": {
+        "CaseID": "",
+        "Case Status": "",
+        "CaseReference": "",
+    }
 }

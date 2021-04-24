@@ -140,25 +140,7 @@ const AddAttorney = (props) => {
             activeFontColor="#fff"
           />
         </Block>
-        <Block style={styles.userInfo}>
-          <Block style-st>
-            <Block>
-              <Text style={styles.label}>
-                Geo Location <Text color={"red"}>*</Text>
-              </Text>
-            </Block>
-            <Block row style={styles.location}>
-              <Icon name="map-marker" family="font-awesome" color="#1CA2CC" />
-              <Text size={12}>
-                92/6, 3rd Floor, Outer Ring Road, Chandra Layout
-              </Text>
-            </Block>
-            <Image
-              source={require("../assets/images/map.png")}
-              style={styles.map}
-            />
-          </Block>
-        </Block>
+
         <Block style={styles.userDetail}>
           {renderUserDetail({
             heading: "Full Name",
@@ -187,10 +169,6 @@ const AddAttorney = (props) => {
           {renderUserDetail({
             heading: "Fax",
             content: "090834",
-          })}
-          {renderUserDetail({
-            heading: "reference",
-            content: "...............................",
           })}
         </Block>
         <Block row center>

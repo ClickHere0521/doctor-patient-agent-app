@@ -164,26 +164,9 @@ const AddPatient = (props) => {
               ]}
             />
           </Block>
-          <Block style-st>
-            <Block>
-              <Text style={styles.label}>
-                Geo Location <Text color={"red"}>*</Text>
-              </Text>
-            </Block>
-            <Block row style={styles.location}>
-              <Icon name="map-marker" family="font-awesome" color="#1CA2CC" />
-              <Text size={12}>
-                92/6, 3rd Floor, Outer Ring Road, Chandra Layout
-              </Text>
-            </Block>
-            <Image
-              source={require("../assets/images/map.png")}
-              style={styles.map}
-            />
-          </Block>
           <Block row style-st>
             <Text style={styles.label}>
-              Tel <Text color={"red"}>*</Text>
+              City/State <Text color={"red"}>*</Text>
             </Text>
             <Input
               borderless
@@ -196,7 +179,45 @@ const AddPatient = (props) => {
               style={[
                 styles.inputPassword,
                 vals.password ? styles.inputActive : null,
-                { marginLeft: theme.SIZES.BASE * 6 },
+                { marginLeft: theme.SIZES.BASE * 3 },
+              ]}
+            />
+          </Block>
+          <Block row style-st>
+            <Text style={styles.label}>
+              Email <Text color={"red"}>*</Text>
+            </Text>
+            <Input
+              borderless
+              color="black"
+              iconColor="white"
+              placeholder="***********"
+              bgColor="transparent"
+              placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
+              onChangeText={(text) => handleChange("password", text)}
+              style={[
+                styles.inputPassword,
+                vals.password ? styles.inputActive : null,
+                { marginLeft: theme.SIZES.BASE * 5 },
+              ]}
+            />
+          </Block>
+          <Block row style-st>
+            <Text style={styles.label}>
+              SSN <Text color={"red"}>*</Text>
+            </Text>
+            <Input
+              borderless
+              color="black"
+              iconColor="white"
+              placeholder="***********"
+              bgColor="transparent"
+              placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
+              onChangeText={(text) => handleChange("password", text)}
+              style={[
+                styles.inputPassword,
+                vals.password ? styles.inputActive : null,
+                { marginLeft: theme.SIZES.BASE * 5.6 },
               ]}
             />
           </Block>
@@ -424,7 +445,8 @@ const styles = StyleSheet.create({
     borderColor: "grey",
     padding: 10,
     width: width * 0.8,
-    margin: 10,
+    height: height * 0.2,
+    margin: 10,    
   },
 });
 

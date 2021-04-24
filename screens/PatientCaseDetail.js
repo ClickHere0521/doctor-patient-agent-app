@@ -1,357 +1,369 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import { materialTheme } from "../constants";
+import SwitchButton from "switch-button-react-native";
+import SvgUri from "expo-svg-uri";
+import { Button, Block, Text, theme, Icon } from "galio-framework";
+import { Products, Images } from "../constants";
+import { Product, HorizontalListItem } from "../components";
+import { IMLocalized } from "../src/localization/IMLocalization";
+import { SliderBox } from "react-native-image-slider-box";
+
 import {
   ScrollView,
   StyleSheet,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
   Image,
   ImageBackground,
-  Dimensions
-} from 'react-native';
-import { Button, Block, Text, Input, theme } from 'galio-framework';
+  Dimensions,
+  Platform,
+  TouchableOpacity,
+  TouchableOpacityComponent,
+} from "react-native";
 
-import { materialTheme, products, Images, tabs } from '../constants/';
-import { Select, Icon, Header, Product, Switch, Tabs, ListItem } from '../components/';
-import { LinearGradient } from 'expo-linear-gradient';
-
-
-const { width } = Dimensions.get('screen');
-
+const { width, height } = Dimensions.get("screen");
 const thumbMeasure = (width - 48 - 32) / 3;
-const cardWidth = theme.SIZES.BASE * 4;
-const categories = [
-  {
-    title: 'Eddie',
-    image: 'https://images.unsplash.com/photo-1507290439931-a861b5a38200?fit=crop&w=840&q=80'
-  },
-  {
-    title: 'Julia',
-    image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?fit=crop&w=840&q=80'
-  },
-  {
-    title: 'Frank',
-    image: 'https://images.unsplash.com/photo-1536942338469-91c7022e55a7?fit=crop&w=840&q=80'
-  },
-  {
-    title: 'Sam',
-    image: 'https://images.unsplash.com/photo-1507290439931-a861b5a38200?fit=crop&w=840&q=80'
-  },
-  {
-    title: 'Yan',
-    image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?fit=crop&w=840&q=80'
-  },
-  {
-    title: 'John',
-    image: 'https://images.unsplash.com/photo-1536942338469-91c7022e55a7?fit=crop&w=840&q=80'
-  },
-  {
-    title: 'Nick',
-    image: 'https://images.unsplash.com/photo-1507290439931-a861b5a38200?fit=crop&w=840&q=80'
-  },
-  {
-    title: 'Power',
-    image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?fit=crop&w=840&q=80'
-  },
-  {
-    title: 'Sarah',
-    image: 'https://images.unsplash.com/photo-1536942338469-91c7022e55a7?fit=crop&w=840&q=80'
-  },
-];
 
-const sortCategories = [
-    {
-      title: 'Case'
-    },
-    {
-      title: 'Date'
-    },
-    {
-      title: 'Current Status'
-    },
-  ];
-
-const Components = (props) => {
-
-  const [switch1, setSwitch1] = useState(true);
-  const [switch2, setSwitch2] = useState(false);
-
-  const toggleSwitch = switchId => {
-    if (switchId == 'switch1')
-    {
-      setSwitch1(!switch1);
-    }
-    if (switchId == 'switch2')
-    {
-      setSwitch2(!switch2);
-    }
-  };
-
-  const renderPatient = (item, index) => {
-    const { navigation } = props;
+const DoctorScheduleDetail = (props) => {
+  const { navigation } = props;
+  const [activeSwitch, setActiveSwitch] = useState(1);
+  const [images, setImages] = useState([
+    "https://source.unsplash.com/900x900/?tree",
+    "https://source.unsplash.com/700x700/?enjoy",
+    "https://source.unsplash.com/1024x768/?general",
+    "https://source.unsplash.com/500x500/?gun=161", // Network image
+  ]);
+  const renderDetails = (details) => {
+    let { heading, doctor, symptom, appointment, medication } = { ...details };
 
     return (
-      <TouchableWithoutFeedback
-        style={{ zIndex: 3 }}
-        key={`product-${item.title}`}
-        onPress={() => navigation.navigate('Pro', { product: item })}>
-        <Block center style={styles.productItem}>
-          <Block style={[styles.productRounded]}>
-            <Image resizeMode='cover' style={styles.productImage} source={{ uri: item.image }} />
-          </Block>
-          <Block center>
-            <Text center size={10}>{item.title}</Text>
-          </Block>
-        </Block>
-      </TouchableWithoutFeedback>
-    )
-  };
-
-  
-  const renderSort = (item, index) => {
-    const { navigation } = props;
-
-    return (
-      <TouchableWithoutFeedback
-        style={{ zIndex: 3 }}
-        key={`product-${item.title}`}
-        onPress={() => navigation.navigate('Pro', { product: item })}>
-        <LinearGradient
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 0.25, y: 1.1 }}
-                  locations={[0.2, 1]}
-                  colors={['#EFEFEF', '#FFF']} style={styles.sortItem}>
-          <Block center>
-              <Text center size={15} fontWeight="semiBold">{item.title}</Text>
-          </Block>
-        </LinearGradient>
-      </TouchableWithoutFeedback>
-    )
-  };
-
-  const onclick = () => {
-      
-  }
-
-  const navbar = () => {
-    return (
-        <Block flex flexDirection='row' style={{padding: 10}}>
-            <Block left>
-                <Image source={require('../assets/icons/PatientIcon.png')} style={{ height:theme.SIZES.BASE * 3, width: theme.SIZES.BASE * 3, marginRight: theme.SIZES.BASE}}/>
-            </Block>
-            <Block center>
-                <Text h6 center middle>Patient View</Text>
-            </Block>
-            <TouchableWithoutFeedback onclick={onclick()}>
-                <Block center middle style={[styles.searchBtn, styles.greyGradient]}>
-                    <Icon name="search" family="font-awesome" color={theme.COLORS.MUTED} size={theme.SIZES.BASE}> </Icon>
-                </Block>
-            </TouchableWithoutFeedback>
-        </Block>
-    )
-  }
-  
-  const renderPatients = () => {
-    return (
-      <Block flex>
-        <Block flex>          
-          <Block flex style={{ marginTop: theme.SIZES.BASE / 2 }}>
-            <ScrollView
-              horizontal={true}
-              pagingEnabled={true}
-              decelerationRate={0}
-              scrollEventThrottle={16}
-              snapToAlignment="center"
-              style={{width}}
-              showsHorizontalScrollIndicator={false}
-              snapToInterval={cardWidth + (theme.SIZES.BASE * 0.375)}
-              contentContainerStyle={{ paddingHorizontal: theme.SIZES.BASE / 2 }}
-            >
-              {categories && categories.map((item, index) => renderPatient(item, index))}
-            </ScrollView>
-          </Block>
-        </Block>
+      <Block style={styles.scheduleDetail}>
+        <Text size={18}>{heading}</Text>
+        <Text size={12}>{doctor}</Text>
+        <Text style={{ marginTop: 10 }}>{symptom}</Text>
+        <Text>{appointment}</Text>
+        <Text bold style={{ marginTop: 10 }}>
+          Medication{" "}
+        </Text>
+        <Text>{medication}</Text>
+        <TouchableOpacity
+          style={styles.edit}
+          onPress={() => navigation.navigate("TimeSlot")}
+        >
+          <Text color="#00CE30">Edit</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={{ position: "absolute", top: -10, right: -10 }}
+        >
+          <SvgUri
+            width="20"
+            height="20"
+            source={require("../assets/icons/topGreeenStatus.svg")}
+            style={{ paddingLeft: 15 }}
+          />
+        </TouchableOpacity>
       </Block>
-    )
-  }
-
-  const renderSorts = () => {
-    return (
-      <Block flex >
-        <Block flex>          
-          <Block flex style={{ marginTop: theme.SIZES.BASE / 2}}>
-            <ScrollView
-              horizontal={true}
-              pagingEnabled={true}
-              decelerationRate={0}
-              scrollEventThrottle={16}
-              snapToAlignment="center"
-              style={{width}}
-              showsHorizontalScrollIndicator={false}
-              snapToInterval={cardWidth + (theme.SIZES.BASE * 0.375)}
-              contentContainerStyle={{ paddingHorizontal: theme.SIZES.BASE / 2 }}
-            >
-              {sortCategories && sortCategories.map((item, index) => renderSort(item, index))}
-            </ScrollView>
-          </Block>
-        </Block>
-      </Block>
-    )
-  }
-
-  const renderPatientsList = () => {
-      return(
-        <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
-            <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
-                <ListItem product={products[0]} horizontal />
-                <ListItem product={products[1]} horizontal />
-                <ListItem product={products[2]} horizontal />
-                <ListItem product={products[3]} horizontal />
-                <ListItem product={products[4]} horizontal />
-                <ListItem product={products[0]} horizontal />
-                <ListItem product={products[1]} horizontal />
-                <ListItem product={products[2]} horizontal />
-                <ListItem product={products[3]} horizontal />
-                <ListItem product={products[4]} horizontal />
-            </ScrollView>    
-        </Block>
-      )
-  }
+    );
+  };
 
   return (
-    <Block flex>
-      <ScrollView
-        style={styles.components}
-        showsVerticalScrollIndicator={false}>
-        {renderPatients()}
-        {renderSorts()}
-        {renderPatientsList()}
-        {/* {renderAlbum()} */}
+    <Block flex style={styles.patientInfo}>
+      <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
+        <Block
+          flex
+          center
+          style={{ margin: 10, marginTop: theme.SIZES.BASE * 2 }}
+        >
+          <Image
+            source={require("../assets/images/grayscale-photo-of-man2.png")}
+            style={styles.imageStyle}
+          ></Image>
+          <Text size={20}>Dr. Ronald Joseph</Text>
+          <Block flex flexDirection="row" center>
+            <Text>neurosergion specialist</Text>
+            <SvgUri
+              width="20"
+              height="20"
+              source={require("../assets/icons/editGreen.svg")}
+              style={{ paddingLeft: 15 }}
+            />
+          </Block>
+        </Block>
+        <Block flex flexDirection="row" style={{ margin: theme.SIZES.BASE }}>
+          <Block flex={1}>
+            <SliderBox
+              images={images}
+              parentWidth={width / 2 - 20}
+              ImageComponentStyle={{ borderRadius: 15, width: "100%" }}
+              onCurrentImagePressed={(index) =>
+                console.warn(`image ${index} pressed`)
+              }
+            />
+          </Block>
+          <Block
+            flex={1}
+            flexDirection="column"
+            style={{
+              paddingLeft: theme.SIZES.BASE,
+              paddingTop: theme.SIZES.BASE / 2,
+            }}
+          >
+            <Block flex flexDirection="row">
+              <Icon name="angle-down" family="font-awesome" size={20} />
+              <Text style={{ paddingLeft: 14 }}>New case</Text>
+            </Block>
+            <Block flex flexDirection="row">
+              <Icon name="angle-down" family="font-awesome" size={20} />
+              <Text style={{ paddingLeft: 14 }}>Waiting schedule</Text>
+            </Block>
+            <Block flex flexDirection="row">
+              <Icon name="angle-down" family="font-awesome" size={20} />
+              <Text style={{ paddingLeft: 14 }}>Scheduled</Text>
+            </Block>
+            <Block flex flexDirection="row">
+              <Icon name="angle-down" family="font-awesome" size={20} />
+              <Text style={{ paddingLeft: 14 }}>Treatment</Text>
+            </Block>
+            <Block flex flexDirection="row">
+              <Icon name="angle-down" family="font-awesome" size={20} />
+              <Text style={{ paddingLeft: 14 }}>Treatment review</Text>
+            </Block>
+            <Block flex flexDirection="row">
+              <Icon name="angle-down" family="font-awesome" size={20} />
+              <Text style={{ paddingLeft: 14 }}>Discharged</Text>
+            </Block>
+          </Block>
+        </Block>
+        <Block style={styles.Container}>
+          <Text style={styles.schedules} size={14}>
+            Planned Remainders
+          </Text>
+        </Block>
+        <ScrollView
+          horizontal={true}
+          pagingEnabled={true}
+          decelerationRate={0}
+          scrollEventThrottle={16}
+          snapToAlignment="center"
+          showsHorizontalScrollIndicator={false}
+          snapToInterval={theme.SIZES.BASE * 0.375}
+          contentContainerStyle={{ paddingHorizontal: theme.SIZES.BASE / 2 }}
+        >
+          <TouchableOpacity style={styles.dateActive}>
+            <Text size={16} color={"white"}>
+              WED
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.dateInActive}>
+            <Text size={16} style={{ paddingLeft: 3 }}>
+              THU
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.dateInActive}>
+            <Text size={16} style={{ paddingLeft: 8 }}>
+              FRI
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.dateInActive}>
+            <Text size={16} style={{ paddingLeft: 6 }}>
+              SAT
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.dateInActive}>
+            <Text size={16} style={{ paddingLeft: 4 }}>
+              SUN
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.dateInActive}>
+            <Text size={16} style={{ paddingLeft: 4 }}>
+              MON
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.dateInActive}>
+            <Text size={16} style={{ paddingLeft: 4 }}>
+              THE
+            </Text>
+          </TouchableOpacity>
+        </ScrollView>
+        {renderDetails({
+          heading: "Sevre Pain",
+          doctor: "Dr. Naveed Baloch",
+          symptom: "Symptoms: Headache",
+          appointment: "Appointment Date: 23, November 2020",
+          medication: "Esso 20g, Amastan 5/80g, Cipronxin 500g",
+        })}
+        {renderDetails({
+          heading: "Sevre Pain",
+          doctor: "Dr. Naveed Baloch",
+          symptom: "Symptoms: Headache",
+          appointment: "Appointment Date: 23, November 2020",
+          medication: "Esso 20g, Amastan 5/80g, Cipronxin 500g",
+        })}
+        {renderDetails({
+          heading: "Sevre Pain",
+          doctor: "Dr. Naveed Baloch",
+          symptom: "Symptoms: Headache",
+          appointment: "Appointment Date: 23, November 2020",
+          medication: "Esso 20g, Amastan 5/80g, Cipronxin 500g",
+        })}
+        {renderDetails({
+          heading: "Sevre Pain",
+          doctor: "Dr. Naveed Baloch",
+          symptom: "Symptoms: Headache",
+          appointment: "Appointment Date: 23, November 2020",
+          medication: "Esso 20g, Amastan 5/80g, Cipronxin 500g",
+        })}
       </ScrollView>
     </Block>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  components: {
-    paddingTop: theme.SIZES.BASE ,
-    backgroundColor: "#F8F8F8",
+  dateActive: {
+    backgroundColor: "#00CE30",
+    borderRadius: 18,
+    paddingHorizontal: 10,
+    paddingVertical: 20,
+    marginHorizontal: 10,
+    width: theme.SIZES.BASE * 3.5,
+    height: theme.SIZES.BASE * 5,
+    alignSelf: "center",
+    justifyContent: "center",
   },
-  title: {
-    paddingVertical: theme.SIZES.BASE,
+  dateInActive: {
+    backgroundColor: "#EdEdEd",
+    borderRadius: 18,
+    paddingHorizontal: 10,
+    paddingVertical: 20,
+    marginHorizontal: 10,
+    width: theme.SIZES.BASE * 3.5,
+    height: theme.SIZES.BASE * 5,
+    alignSelf: "center",
+    justifyContent: "center",
+  },
+  imageStyle: {
+    width: 80,
+    height: 80,
+    margin: 5,
+  },
+  centerBlock: {
+    marginTop: 30,
+  },
+  scheduleDetail: {
+    borderWidth: 1,
+    borderColor: "#EDEDED",
+    borderRadius: 10,
+    padding: 10,
+    margin: 8,
+  },
+  edit: {
+    padding: 4,
+    paddingLeft: 12,
+    borderWidth: 1,
+    borderRadius: 10,
+    width: 50,
+    position: "absolute",
+    top: height * 0.03,
+    right: width * 0.03,
+    borderColor: "#00CE30",
+  },
+  patientInfo: {
+    marginTop: Platform.OS === "android" ? height * 0.03 : height * 0.03,
+    backgroundColor: "white",
+  },
+  profileImage: {
+    width: width * 1.1,
+    height: "auto",
+  },
+  Container: {
+    width: width,
+    height: "auto",
+    flex: 1,
+    paddingHorizontal: 30,
+    paddingVertical: 20,
+  },
+  profileDetails: {
+    paddingTop: theme.SIZES.BASE * 4,
+    justifyContent: "flex-end",
+    position: "relative",
+  },
+  profileTexts: {
     paddingHorizontal: theme.SIZES.BASE * 2,
+    paddingVertical: theme.SIZES.BASE * 2,
+    zIndex: 2,
   },
-  group: {
-    paddingTop: theme.SIZES.BASE * 3.75,
+  pro: {
+    backgroundColor: materialTheme.COLORS.LABEL,
+    paddingHorizontal: 6,
+    marginRight: theme.SIZES.BASE / 2,
+    borderRadius: 4,
+    height: 19,
+    width: 90,
   },
-  shadow: {
-    shadowColor: 'black',
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    shadowOpacity: 0.2,
-    elevation: 2,
-  },
-  button: {
-    marginBottom: theme.SIZES.BASE,
-    width: width - (theme.SIZES.BASE * 3),
+  seller: {
+    marginRight: theme.SIZES.BASE / 2,
   },
   options: {
-    paddingHorizontal: theme.SIZES.BASE / 2,
+    position: "relative",
+    marginHorizontal: theme.SIZES.BASE,
+    marginTop: -theme.SIZES.BASE,
+    marginBottom: 0,
+    paddingTop: height * 0.02,
+    borderTopLeftRadius: 13,
+    borderTopRightRadius: 13,
+    borderBottomLeftRadius: 13,
+    borderBottomRightRadius: 13,
+    elevation: 3,
+    backgroundColor: theme.COLORS.WHITE,
+    shadowColor: "black",
+    shadowOffset: { width: 10, height: 10 },
+    shadowRadius: 8,
+    shadowOpacity: 0.8,
+    zIndex: 2,
   },
-  optionsText: {
-    fontSize: theme.SIZES.BASE * 0.75,
-    color: '#4a4a4a',
-    fontWeight: "normal",
-    fontStyle: "normal",
-    letterSpacing: -0.29,
-  },
-  optionsButton: {
-    width: 'auto',
-    height: 34,
-    paddingHorizontal: theme.SIZES.BASE,
-    paddingVertical: 10,
-  },
-  imageBlock: {
-    overflow: 'hidden',
+  thumb: {
     borderRadius: 4,
+    marginVertical: 4,
+    alignSelf: "center",
+    width: thumbMeasure,
+    height: thumbMeasure,
   },
-  rows: {
-    height: theme.SIZES.BASE * 2,
+  gradient: {
+    zIndex: 1,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: "30%",
+    position: "absolute",
   },
-  social: {
-    width: theme.SIZES.BASE * 3.5,
-    height: theme.SIZES.BASE * 3.5,
-    borderRadius: theme.SIZES.BASE * 1.75,
-    justifyContent: 'center',
+  past: {
+    borderRadius: 10,
+    paddingHorizontal: 44,
+    paddingVertical: 6,
+    backgroundColor: "#3B3E51",
   },
+  schedules: {
+    alignContent: "flex-start",
+    alignSelf: "flex-start",
+  },
+
   category: {
     backgroundColor: theme.COLORS.WHITE,
     marginVertical: theme.SIZES.BASE / 2,
     borderWidth: 0,
+    paddingRight: theme.SIZES.BASE,
   },
   categoryTitle: {
-    height: '100%',
+    height: "100%",
     paddingHorizontal: theme.SIZES.BASE,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
-  sortItem: {
-    borderWidth: 2,
-    borderRadius : 1000,
-    borderColor: '#FFF',
-    paddingVertical: 8,
-    paddingHorizontal: 25,
-    marginHorizontal: theme.SIZES.BASE ,
-    shadowColor: 'black',
-    shadowOffset: { width: -3, height: -3 },
-    shadowRadius: 10,
-    shadowOpacity: 0.2,
-    elevation: 2,
-    margin: 2,
+  imageBlock: {
+    width: width / 2 - theme.SIZES.BASE * 2,
+    height: 200,
+    overflow: "hidden",
+    borderRadius: 4,
   },
-  productItem: {
-    width: cardWidth - theme.SIZES.BASE * 2,
-    marginHorizontal: theme.SIZES.BASE,
-    shadowColor: 'black',
-    shadowOffset: { width: 0, height: 7 },
-    shadowRadius: 10,
-    shadowOpacity: 0.2,
-  },
-  productRounded: {
-    borderWidth: 2,
-    borderRadius : 1000,
-    borderColor: '#DDDDDD',
-    padding: 3,
-    shadowColor: 'black',
-    shadowOffset: { width: 2, height: 2 },
-    shadowRadius: 4,
-    shadowOpacity: 0.2,
-  },
-  productImage: {
-    borderWidth: 1,
-    borderRadius : 1000,
-    padding: 5,
-    width: cardWidth - theme.SIZES.BASE,
-    height: cardWidth - theme.SIZES.BASE,
-  },
-  searchBtn: {
-      position: 'absolute',
-      right: theme.SIZES.BASE,
-      borderRadius: 1000,
-      borderWidth:1,
-      borderColor: '#DDD',
-      backgroundColor: "#FFF",
-      width: theme.SIZES.BASE * 2,
-      height: theme.SIZES.BASE * 2,
-      paddingLeft: 5
-  },
-  greyGradient: {
-    shadowColor: 'black',
-    shadowOffset: { width: 2, height: 2 },
-    shadowRadius: 2,
-    shadowOpacity: 0.2,
-    elevation: 2,
-  }
 });
 
-export default Components;
+export default DoctorScheduleDetail;
