@@ -11,7 +11,7 @@ import {
   Component,
 } from "react-native";
 import { Button, Block, Text, Input, theme } from "galio-framework";
-
+import { IMLocalized } from "../src/localization/IMLocalization";
 import { materialTheme, products, Images, tabs } from "../constants/";
 import {
   Select,
@@ -24,7 +24,7 @@ import {
 } from "../components/";
 import Accordion from "react-native-collapsible/Accordion";
 
-const { width } = Dimensions.get("screen");
+const { width, height } = Dimensions.get("screen");
 
 const SECTIONS = [
   {
@@ -202,8 +202,38 @@ const ScheduleView = (props) => {
     );
   };
 
+  const navbar = () => {
+    return (
+      <Block>
+        <Block row style={styles.navbar} center>
+          <TouchableOpacity
+            onPress={() => navigation.openDrawer()}
+          >
+            <Icon
+              name="align-justify"
+              family="font-awesome"
+              color="black"
+              size={16}
+              style={styles.chevronLeft}
+            />
+          </TouchableOpacity>
+          <Text
+            color="black"
+            style={{ paddingLeft: theme.SIZES.BASE }}
+            size={22}
+            fontWeight="semiBold"
+          >
+            {IMLocalized("Schedules")}
+          </Text>
+        </Block>
+        <Block style={{ borderTopWidth: 1, borderColor: "white" }}></Block>
+      </Block>
+    );
+  };
+
   return (
     <Block flex>
+      {navbar()}
       <ScrollView
         style={styles.components}
         showsVerticalScrollIndicator={false}
@@ -338,6 +368,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     alignSelf: "center",
+  },
+  navbar: {
+    backgroundColor: "white",
+    width: width,
+    height: height * 0.16,
+    paddingTop: theme.SIZES.BASE * 2,
+    paddingLeft: theme.SIZES.BASE,
+    borderBottomWidth: 1,
+    borderColor: "rgba(112, 112, 112, 0.1)",
   },
 });
 

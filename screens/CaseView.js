@@ -24,7 +24,7 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { IMLocalized } from "../src/localization/IMLocalization";
 
-const { width } = Dimensions.get("screen");
+const { width, height } = Dimensions.get("screen");
 
 const thumbMeasure = (width - 48 - 32) / 3;
 const cardWidth = theme.SIZES.BASE * 4;
@@ -42,6 +42,7 @@ const sortCategories = [
 ];
 
 const Components = (props) => {
+  const { navigation } = props;
   const [switch1, setSwitch1] = useState(true);
   const [switch2, setSwitch2] = useState(false);
 
@@ -104,42 +105,6 @@ const Components = (props) => {
           </Block>
         </LinearGradient>
       </TouchableWithoutFeedback>
-    );
-  };
-
-  const onclick = () => {};
-
-  const navbar = () => {
-    return (
-      <Block flex flexDirection="row" style={{ padding: 10 }}>
-        <Block left>
-          <Image
-            source={require("../assets/icons/PatientIcon.png")}
-            style={{
-              height: theme.SIZES.BASE * 3,
-              width: theme.SIZES.BASE * 3,
-              marginRight: theme.SIZES.BASE,
-            }}
-          />
-        </Block>
-        <Block center>
-          <Text h6 center middle>
-            Patient View
-          </Text>
-        </Block>
-        <TouchableWithoutFeedback onclick={onclick()}>
-          <Block center middle style={[styles.searchBtn, styles.greyGradient]}>
-            <Icon
-              name="search"
-              family="font-awesome"
-              color={theme.COLORS.MUTED}
-              size={theme.SIZES.BASE}
-            >
-              {" "}
-            </Icon>
-          </Block>
-        </TouchableWithoutFeedback>
-      </Block>
     );
   };
 
@@ -216,8 +181,38 @@ const Components = (props) => {
     );
   };
 
+  const navbar = () => {
+    return (
+      <Block>
+        <Block row style={styles.navbar} center>
+          <TouchableOpacity
+            onPress={() => navigation.openDrawer()}
+          >
+            <Icon
+              name="align-justify"
+              family="font-awesome"
+              color="black"
+              size={16}
+              style={styles.chevronLeft}
+            />
+          </TouchableOpacity>
+          <Text
+            color="black"
+            style={{ paddingLeft: theme.SIZES.BASE }}
+            size={22}
+            fontWeight="semiBold"
+          >
+            {IMLocalized("Cases")}
+          </Text>
+        </Block>
+        <Block style={{ borderTopWidth: 1, borderColor: "white" }}></Block>
+      </Block>
+    );
+  };
+
   return (
     <Block flex>
+      {navbar()}
       <ScrollView
         style={styles.components}
         showsVerticalScrollIndicator={false}
@@ -356,6 +351,15 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     shadowOpacity: 0.2,
     elevation: 2,
+  },
+  navbar: {
+    backgroundColor: "white",
+    width: width,
+    height: height * 0.16,
+    paddingTop: theme.SIZES.BASE * 2,
+    paddingLeft: theme.SIZES.BASE,
+    borderBottomWidth: 1,
+    borderColor: "rgba(112, 112, 112, 0.1)",
   },
 });
 

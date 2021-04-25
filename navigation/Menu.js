@@ -51,7 +51,7 @@ const CustomDrawerContent = ({
       screens = [
         "Dashboard",
         "Profile Info",
-        "Case View",
+        "Case History",
         "Settings"
       ]  
     default: 

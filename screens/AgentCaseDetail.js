@@ -23,6 +23,7 @@ import {
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 import { SliderBox } from "react-native-image-slider-box";
 import SvgUri from "expo-svg-uri";
+import { CheckBox } from "react-native-elements";
 
 const { width, height } = Dimensions.get("screen");
 
@@ -94,63 +95,70 @@ const Components = (props) => {
     let { author, date, content } = notes;
     return (
       <Block row center style={styles.patientHeading}>
-        <Block>
-          <Image
-            source={require("../assets/images/grayscale-photo-of-man2.png")}
-            style={{ width: 60, height: 60 }}
-          />
-          <Image
-            source={require("../assets/images/ok.png")}
-            style={{ position: "absolute", right: 0 }}
-          />
-        </Block>
 
-        <Block column style={{ paddingLeft: 10, width: width * 0.7 }}>
-          <Text bold size={16}>
-            {author}
-          </Text>
-          <Text
-            color={"#909CA1"}
-            style={{ paddingTop: theme.SIZES.BASE * 0.5 }}
-          >
-            {date}
-          </Text>
-          <Text
-            color={"#909CA1"}
-            style={{ paddingTop: theme.SIZES.BASE * 0.5 }}
-          >
-            {content}
-          </Text>
-        </Block>
+          <Block>
+            <Image
+              source={require("../assets/images/grayscale-photo-of-man2.png")}
+              style={{ width: 60, height: 60 }}
+            />
+            <Image
+              source={require("../assets/images/ok.png")}
+              style={{ position: "absolute", right: 0 }}
+            />
+          </Block>
+          <TouchableOpacity
+          onPress={() => navigation.navigate("Note")}
+        >
+          <Block column style={{ paddingLeft: 10, width: width * 0.7 }}>
+            <Text bold size={16}>
+              {author}
+            </Text>
+            <Text
+              color={"#909CA1"}
+              style={{ paddingTop: theme.SIZES.BASE * 0.5 }}
+            >
+              {date}
+            </Text>
+            <Text
+              color={"#909CA1"}
+              style={{ paddingTop: theme.SIZES.BASE * 0.5 }}
+            >
+              {content}
+            </Text>
+          </Block>
+
+        </TouchableOpacity>
+      </Block>
+    );
+  };
+
+  const navbar = () => {
+    return (
+      <Block row style={styles.navbar} center>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Icon
+            name="arrow-left"
+            family="font-awesome"
+            color="white"
+            size={16}
+            style={styles.chevronLeft}
+          />
+        </TouchableOpacity>
+        <Text
+          color="white"
+          style={{ paddingLeft: theme.SIZES.BASE }}
+          size={17}
+          bold
+        >
+          Case Detail
+        </Text>
       </Block>
     );
   };
 
   return (
     <Block flex style={styles.agentCaseDetail}>
-      <Block style={styles.roundBlock}>
-        <Block row style={styles.heading}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Icon
-              size={16}
-              name="chevron-left"
-              family="font-awesome"
-              color={"white"}
-              style={{ padding: 7 }}
-            />
-          </TouchableOpacity>
-          <Block>
-            <Text
-              color="white"
-              size={20}
-              style={{ fontFamily: "Inter-Black" }}
-              bold
-            >
-              Case Details
-            </Text>
-          </Block>
-        </Block>
-      </Block>
+      {navbar()}
       <ScrollView
         style={styles.components}
         showsVerticalScrollIndicator={false}
@@ -237,82 +245,46 @@ const Components = (props) => {
         </Block>
         <Block center>
           <Block row>
-            <Block style={{ marginLeft: 30 }}>
+            <Block>
               <Block row>
-                <SvgUri
-                  width="25"
-                  height="25"
-                  source={require("../assets/icons/rect_check.svg")}
-                  style={{
-                    position: "absolute",
-                    marginLeft: -16,
-                    marginTop: 6,
-                  }}
-                />
-                <Text size={16} style={styles.text}>
-                  New case
-                </Text>
+                <CheckBox checked={true} />
+                <Block style={styles.textCenter}>
+                  <Text size={16} style={styles.text}>
+                    New case
+                  </Text>
+                </Block>
               </Block>
               <Block row>
-                <SvgUri
-                  width="25"
-                  height="25"
-                  source={require("../assets/icons/rect_check.svg")}
-                  style={{
-                    position: "absolute",
-                    marginLeft: -16,
-                    marginTop: 6,
-                  }}
-                />
-                <Text size={16} style={styles.text}>
-                  Waiting schedule
-                </Text>
+                <CheckBox checked={true} />
+                <Block style={styles.textCenter}>
+                  <Text size={16} style={styles.text}>
+                    Waiting Schedule
+                  </Text>
+                </Block>
               </Block>
               <Block row>
-                <SvgUri
-                  width="25"
-                  height="25"
-                  source={require("../assets/icons/rect_check.svg")}
-                  style={{
-                    position: "absolute",
-                    marginLeft: -16,
-                    marginTop: 6,
-                  }}
-                />
-                <Text size={16} style={styles.text}>
-                  Scheduled
-                </Text>
+                <CheckBox checked={true} />
+                <Block style={styles.textCenter}>
+                  <Text size={16} style={styles.text}>
+                    Schedules
+                  </Text>
+                </Block>
               </Block>
             </Block>
-            <Block style={{ marginLeft: 30 }}>
+            <Block>
               <Block row>
-                <SvgUri
-                  width="25"
-                  height="25"
-                  source={require("../assets/icons/rect_check.svg")}
-                  style={{
-                    position: "absolute",
-                    marginLeft: -16,
-                    marginTop: 6,
-                  }}
-                />
-                <Text size={16} style={styles.text}>
-                  Treatment
-                </Text>
+                <CheckBox checked={true} />
+                <Block style={styles.textCenter}>
+                  <Text size={16} style={styles.text}>
+                    Treatment
+                  </Text>
+                </Block>
               </Block>
               <Block row>
-                <SvgUri
-                  width="25"
-                  height="25"
-                  source={require("../assets/icons/rect_check.svg")}
-                  style={{
-                    position: "absolute",
-                    marginLeft: -16,
-                    marginTop: 6,
-                  }}
-                />
+                <CheckBox checked={true} />
                 <TouchableOpacity
                   onPress={() => navigation.navigate("AgentReview")}
+                  style={styles.textCenter}
                 >
                   <Text color={"#6E78F7"} size={16} style={styles.text}>
                     Case final review
@@ -320,19 +292,12 @@ const Components = (props) => {
                 </TouchableOpacity>
               </Block>
               <Block row>
-                <SvgUri
-                  width="25"
-                  height="25"
-                  source={require("../assets/icons/rect_check.svg")}
-                  style={{
-                    position: "absolute",
-                    marginLeft: -16,
-                    marginTop: 6,
-                  }}
-                />
-                <Text color={"black"} size={16} style={styles.text}>
-                  Discharged
-                </Text>
+                <CheckBox checked={true} />
+                <Block style={styles.textCenter}>
+                  <Text color="black" size={16} style={styles.text}>
+                    Discharged
+                  </Text>
+                </Block>
               </Block>
             </Block>
           </Block>
@@ -346,21 +311,43 @@ const Components = (props) => {
           </Text>
         </Block>
         <Block row style={styles.interval}>
-          <Text bold size={18} color={"black"} style={{ paddingLeft: width * 0.05 }}>
+          <Text
+            bold
+            size={18}
+            color={"black"}
+            style={{ paddingLeft: width * 0.05 }}
+          >
             Attorney Info
           </Text>
           <TouchableOpacity onPress={() => navigation.navigate("AddAfforney")}>
-            <Text size={16} color={"#6E78F7"} style={styles.startTimeDetail, {marginLeft: width * 0.2}}>
+            <Text
+              size={16}
+              color={"#6E78F7"}
+              style={
+                (styles.startTimeDetail, { marginLeft: theme.SIZES.BASE * 5 })
+              }
+            >
               Detail
             </Text>
           </TouchableOpacity>
         </Block>
         <Block row style={styles.interval}>
-          <Text bold size={18} color={"black"} style={{ paddingLeft: width * 0.05 }}>
+          <Text
+            bold
+            size={18}
+            color={"black"}
+            style={{ paddingLeft: width * 0.05 }}
+          >
             Insurance Info
           </Text>
           <TouchableOpacity onPress={() => navigation.navigate("AddInsurance")}>
-            <Text size={16} color={"#6E78F7"} style={styles.startTimeDetail, {marginLeft: width * 0.18}}>
+            <Text
+              size={16}
+              color={"#6E78F7"}
+              style={
+                (styles.startTimeDetail, { marginLeft: theme.SIZES.BASE * 4.4 })
+              }
+            >
               Detail
             </Text>
           </TouchableOpacity>
@@ -378,7 +365,7 @@ const Components = (props) => {
         <Block row center>
           <TouchableOpacity
             style={styles.save}
-            onPress={() => console.log("save")}
+            onPress={() => navigation.navigate("PatientCaseFile")}
           >
             <Text color={"white"} size={16}>
               Case file
@@ -397,7 +384,7 @@ const Components = (props) => {
               position: "absolute",
               zIndex: 10,
             }}
-            onPress={() => navigation.navigate("CreateCase")}
+            onPress={() => navigation.navigate("AddNotes")}
           >
             <Text color={"white"}>
               <SvgUri
@@ -472,7 +459,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   text: {
-    marginHorizontal: 10,
     marginVertical: 10,
   },
   startTime: {
@@ -581,6 +567,19 @@ const styles = StyleSheet.create({
   startTimeDetail: {
     textDecorationLine: "underline",
     marginHorizontal: 10,
+  },
+  navbar: {
+    backgroundColor: "#6E78F7",
+    borderBottomRightRadius: 24,
+    borderBottomLeftRadius: 24,
+    width: width,
+    height: height * 0.16,
+    paddingTop: theme.SIZES.BASE * 2,
+    paddingLeft: theme.SIZES.BASE,
+  },
+  textCenter: {
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

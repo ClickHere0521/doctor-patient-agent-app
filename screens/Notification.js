@@ -1,121 +1,144 @@
 import React, { useState } from "react";
-import { StyleSheet, Dimensions, ScrollView, Image, TouchableOpacity } from "react-native";
-import { Block, Text, theme } from "galio-framework";
+import {
+  StyleSheet,
+  Dimensions,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+} from "react-native";
+import { Block, Text, theme, Button } from "galio-framework";
 
-import materialTheme from '../constants/Theme';
-import { Icon } from '../components'
+import materialTheme from "../constants/Theme";
+import { Icon } from "../components";
+import { IMLocalized } from "../src/localization/IMLocalization";
 
-const { width, height } = Dimensions.get('screen');
+const { width, height } = Dimensions.get("screen");
 
-const Notification = (props) => {  
+const CaseHistory = (props) => {
+  const { navigation } = props;
+  
+  const navbar = () => {
+    return (
+      <Block>
+        <Block row style={styles.navbar} center>
+          <TouchableOpacity
+            onPress={() => navigation.openDrawer()}
+          >
+            <Icon
+              name="align-justify"
+              family="font-awesome"
+              color="black"
+              size={16}
+              style={styles.chevronLeft}
+            />
+          </TouchableOpacity>
+          <Text
+            color="black"
+            style={{ paddingLeft: theme.SIZES.BASE }}
+            size={22}
+            fontWeight="semiBold"
+          >
+            {IMLocalized("notification")}
+          </Text>
+        </Block>
+        <Block style={{ borderTopWidth: 1, borderColor: "white" }}></Block>
+      </Block>
+    );
+  };
 
   const renderCases = (cases) => {
-    
     let { heading, subHeading1, subHeading2, subHeading3, date } = cases;
-    
+
     return (
-      <Block style={styles.schedule}>        
-        <Block row>            
-          <Block middle style={styles.padTop10}>              
-            <Text bold size={18} style={styles.caseTitle}>{heading}</Text>
+      <Block style={styles.schedule}>
+        <Block row>
+          <Block middle style={styles.padTop10}>
+            <Text bold size={18} style={styles.caseTitle}>
+              {heading}
+            </Text>
             <Block style={styles.blockText}>
               <Text style={styles.marBtm5}>{subHeading1}</Text>
               <Text style={styles.marBtm5}>{subHeading2}</Text>
-              <Text style={styles.marBtm5}>{subHeading3}</Text>
-              <Block row style={styles.padVrt1}>
-              <Block middle>
-                <Icon name="map-marker" family="font-awesome" color={theme.COLORS.MUTED} size={16}> </Icon>  
-              </Block>
-              <Block middle style={styles.marRight40}>
-                <Text>{date}</Text>                  
-              </Block>   
             </Block>
+            <Block style={{marginLeft: width * 0.5}}>
+              <Button color="white" style={styles.modalButton} onPress={() => navigation.navigate('PatientCaseDetail')}><Text size={14} color="#3A58FC">Detail</Text></Button>
             </Block>
           </Block>
         </Block>
-      </Block> 
+      </Block>
     );
-  }
+  };
 
   return (
     <Block flex style={styles.notification}>
-      <ScrollView
-        horizontal={true}
-        pagingEnabled={true}
-        decelerationRate={0}
-        scrollEventThrottle={16}
-        snapToAlignment="center"          
-        showsHorizontalScrollIndicator={false}
-        snapToInterval={(theme.SIZES.BASE * 0.375)}
-        contentContainerStyle={{ paddingHorizontal: theme.SIZES.BASE / 2 }}
-        style={{marginTop: 4, zIndex: 4}}
-      >
-            
-        <TouchableOpacity           
-          style={styles.dateActive}
-        >              
-          <Text size={16} color={'white'} style={{paddingLeft: 10}} >Incoming</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.dateInActive}
-        >
-          <Text size={16} style={{paddingLeft: 20}}>Missing</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.dateInActive}
-        >
-          <Text size={16} style={{paddingLeft: 10}}>Reschedule</Text>
-        </TouchableOpacity>
-      </ScrollView>             
+      {navbar()}
       <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
         {renderCases({
-          heading: 'Get 50% off on complete medical checkup',
-          subHeading1: 'MBBS,DOMS,MS - Ophthalmology',
-          subHeading2: 'Ophthalmologist',
-          subHeading3: '26 years of experience',
-          date: '02/16/2021'
+          heading: "Get 50% off on complete medical checkup",
+          subHeading1: "MBBS,DOMS,MS - Ophthalmology",
+          subHeading2: "Ophthalmologist",
+          subHeading3: "26 years of experience",
+          date: "02/16/2021",
         })}
         {renderCases({
-          heading: 'Get 50% off on complete medical checkup',
-          subHeading1: 'MBBS,DOMS,MS - Ophthalmology',
-          subHeading2: 'Ophthalmologist',
-          subHeading3: '26 years of experience',
-          date: '02/16/2021'
+          heading: "Get 50% off on complete medical checkup",
+          subHeading1: "MBBS,DOMS,MS - Ophthalmology",
+          subHeading2: "Ophthalmologist",
+          subHeading3: "26 years of experience",
+          date: "02/16/2021",
         })}
         {renderCases({
-          heading: 'Get 50% off on complete medical checkup',
-          subHeading1: 'MBBS,DOMS,MS - Ophthalmology',
-          subHeading2: 'Ophthalmologist',
-          subHeading3: '26 years of experience',
-          date: '02/16/2021'
+          heading: "Get 50% off on complete medical checkup",
+          subHeading1: "MBBS,DOMS,MS - Ophthalmology",
+          subHeading2: "Ophthalmologist",
+          subHeading3: "26 years of experience",
+          date: "02/16/2021",
         })}
         {renderCases({
-          heading: 'Get 50% off on complete medical checkup',
-          subHeading1: 'MBBS,DOMS,MS - Ophthalmology',
-          subHeading2: 'Ophthalmologist',
-          subHeading3: '26 years of experience',
-          date: '02/16/2021'
-        })}    
-      </ScrollView>      
+          heading: "Get 50% off on complete medical checkup",
+          subHeading1: "MBBS,DOMS,MS - Ophthalmology",
+          subHeading2: "Ophthalmologist",
+          subHeading3: "26 years of experience",
+          date: "02/16/2021",
+        })}
+      </ScrollView>
     </Block>
   );
-}
+};
 
 const styles = StyleSheet.create({
+  navbar: {
+    backgroundColor: "white",
+    width: width,
+    height: height * 0.16,
+    paddingTop: theme.SIZES.BASE * 2,
+    paddingLeft: theme.SIZES.BASE,
+    borderBottomWidth: 1,
+    borderColor: "rgba(112, 112, 112, 0.1)",
+  },
+  modalButton: {
+    width: width * 0.25,
+    height: theme .SIZES.BASE * 2,
+    borderRadius: 17,
+    borderWidth: 0.5,
+    borderColor: "#C7C7C7",
+    marginTop: theme.SIZES.BASE
+  },
   notification: {
     paddingVertical: theme.SIZES.BASE / 3,
-  },  
+  },
   caseTitle: {
-    alignSelf: 'flex-start',
-    paddingVertical: 5
+    alignSelf: "flex-start",
+    paddingVertical: 5,
   },
   schedule: {
     paddingHorizontal: width * 0.05,
-    marginTop: height * 0.02,
-    marginHorizontal: width * 0.04,    
+    marginTop: height * 0.03,
+    marginBottom: height * 0.01,
+    marginHorizontal: width * 0.04,
     borderRadius: 13,
     backgroundColor: theme.COLORS.WHITE,
-    shadowColor: 'black',
+    shadowColor: "black",
     shadowOffset: { width: 0, height: 0 },
     shadowRadius: 8,
     shadowOpacity: 0.2,
@@ -127,51 +150,56 @@ const styles = StyleSheet.create({
     paddingBottom: theme.SIZES.BASE * 1.5,
   },
   blockText: {
-    borderWidth: 1, 
-    borderRadius: 5, 
-    borderColor: theme.COLORS.GREY, 
-    padding: 8, 
-    marginBottom:12, 
-    width: width * 0.82
+    color: 'grey',
+    borderRadius: 5,
+    borderColor: theme.COLORS.GREY,
+    padding: 8,
+    paddingBottom: 0,
+    width: width * 0.82,
   },
   padTop10: {
-    paddingTop: 10
+    paddingTop: 10,
   },
   marBtm5: {
-    marginBottom: 5
+    marginBottom: 5,
+    color: 'grey'
   },
   padVrt1: {
-    paddingVertical: 1
+    paddingVertical: 1,
   },
   marRight40: {
-    marginRight: 40
+    marginRight: 40,
   },
   dateActive: {
-    backgroundColor: '#00CE30', 
-    borderRadius: 18, 
-    paddingHorizontal: 8, 
-    paddingVertical: 5, 
-    marginRight: 4,
-    width: width * 0.3,
+    backgroundColor: "#00CE30",
+    borderRadius: 18,
+    width: 130,
     height: 34,
-    marginBottom: 4
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+    zIndex: 5,
+    top: -theme.SIZES.BASE,
+    left: width * 0.1
   },
   dateInActive: {
-    borderWidth: 1,
-    borderColor: 'white', 
-    borderRadius: 18,  
-    paddingHorizontal: 4,
-    paddingVertical: 5, 
-    marginRight: 4,     
-    width: width * 0.3,       
+    backgroundColor: "white",
+    borderRadius: 18,
+    width: 130,
     height: 34,
-    backgroundColor: 'white',
-    shadowColor: 'black',
+    shadowColor: "black",
     shadowOffset: { width: 0, height: 0 },
     shadowRadius: 8,
     shadowOpacity: 0.2,
     elevation: 3,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+    zIndex: 5,
+    zIndex: 5,
+    top: -theme.SIZES.BASE,
+    left: width * 0.6
   },
 });
 
-export default Notification;
+export default CaseHistory;

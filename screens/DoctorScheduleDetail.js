@@ -8,7 +8,7 @@ import {
   Platform,
   TouchableOpacity,
 } from "react-native";
-import { Block, Text, theme, Icon } from "galio-framework";
+import { Block, Text, theme, Icon, NavBar } from "galio-framework";
 import { materialTheme } from "../constants";
 import SwitchButton from "switch-button-react-native";
 import SvgUri from "expo-svg-uri";
@@ -20,66 +20,208 @@ const DoctorScheduleDetail = (props) => {
   const { navigation } = props;
   const [activeSwitch, setActiveSwitch] = useState(1);
 
-  const renderDetails = (details) => {
-    let { heading, doctor, symptom, appointment, medication } = { ...details };
-
+  const weekBar = () => {
     return (
-      <Block style={styles.scheduleDetail}>
-        <SvgUri
-          width="24 "
-          height="24"
-          source={require("../assets/icons/check.svg")}
-          style={{
-            position: "absolute",
-            right: -4,
-            top: -4,
-          }}
-        />
-        <Text size={18}>{heading}</Text>
-        <Text size={12}>{doctor}</Text>
-        <Text style={{ marginTop: 10 }}>{symptom}</Text>
-        <Text>{appointment}</Text>
-        <Text bold style={{ marginTop: 10 }}>
-          Medication{" "}
-        </Text>
-        <Text>{medication}</Text>
-        <TouchableOpacity
-          style={styles.edit}
-          onPress={() => navigation.navigate("TimeSlot")}
-        >
-          <Text color="#00CE30">Edit</Text>
+      <ScrollView
+        horizontal={true}
+        pagingEnabled={true}
+        decelerationRate={0}
+        scrollEventThrottle={16}
+        snapToAlignment="center"
+        showsHorizontalScrollIndicator={false}
+        snapToInterval={theme.SIZES.BASE * 0.375}
+        style={styles.weekScrollView}
+      >
+        <TouchableOpacity style={styles.dateActive}>
+          <Text size={16} color={"white"}>
+            WED
+          </Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.dateInActive}>
+          <Text size={16} style={{ paddingLeft: 3 }}>
+            THU
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.dateInActive}>
+          <Text size={16} style={{ paddingLeft: 8 }}>
+            FRI
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.dateInActive}>
+          <Text size={16} style={{ paddingLeft: 6 }}>
+            SAT
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.dateInActive}>
+          <Text size={16} style={{ paddingLeft: 4 }}>
+            SUN
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.dateInActive}>
+          <Text size={16}>MON</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.dateInActive}>
+          <Text size={16} style={{ paddingLeft: 4 }}>
+            THE
+          </Text>
+        </TouchableOpacity>
+      </ScrollView>
+    );
+  };
+
+  const renderStatus = (status) => {
+    switch (status) {
+      case "income": {
+        return (
+          <SvgUri
+            width="24 "
+            height="24"
+            source={require("../assets/icons/check.svg")}
+            style={{
+              position: "absolute",
+              right: -4,
+              top: -4,
+            }}
+          />
+        );
+      }
+      case "miss": {
+        return (
+          <SvgUri
+            width="24 "
+            height="24"
+            source={require("../assets/icons/redCheck.svg")}
+            style={{
+              position: "absolute",
+              right: -4,
+              top: -4,
+            }}
+          />
+        );
+      }
+      case "complete": {
+        return <></>;
+      }
+    }
+  };
+
+  const renderDetails = (details) => {
+    let { caseName, time, patient, reminder, status } = { ...details };
+    if (status == "income") {
+      return (
+        <Block
+          style={{
+            borderWidth: 1,
+            borderRadius: 10,
+            padding: 20,
+            margin: 8,
+            borderColor: "#06D81E",
+          }}
+        >
+          {renderStatus(status)}
+          <Block flex flexDirection="row">
+            <Block flex={1}>
+              <Text size={18}>{caseName}</Text>
+              <Text>{time}</Text>
+            </Block>
+            <Block flex={1}>
+              <Text>Patient:{patient}</Text>
+              {reminder ? (
+                <TouchableOpacity style={styles.sendReminder}>
+                  <Text color={"white"}>Send reminder</Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity>
+                  <Text></Text>
+                </TouchableOpacity>
+              )}
+            </Block>
+          </Block>
+        </Block>
+      );
+    } else {
+      return (
+        <Block
+          style={{
+            borderWidth: 1,
+            borderRadius: 10,
+            padding: 20,
+            margin: 8,
+            borderColor: "grey",
+          }}
+        >
+          {renderStatus(status)}
+          <Block flex flexDirection="row">
+            <Block flex={1}>
+              <Text size={18}>{caseName}</Text>
+              <Text>{time}</Text>
+            </Block>
+            <Block flex={1}>
+              <Text>Patient:{patient}</Text>
+              {reminder ? (
+                <TouchableOpacity style={styles.sendReminder}>
+                  <Text color={"white"}>Send reminder</Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity>
+                  <Text></Text>
+                </TouchableOpacity>
+              )}
+            </Block>
+          </Block>
+        </Block>
+      );
+    }
+  };
+
+  const navbar = () => {
+    return (
+      <Block row style={styles.navbar} center>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Icon
+            name="arrow-left"
+            family="font-awesome"
+            color="white"
+            size={16}
+            style={styles.chevronLeft}
+          />
+        </TouchableOpacity>
+        <Text
+          color="white"
+          style={{ paddingLeft: theme.SIZES.BASE }}
+          size={17}
+          bold
+        >
+          Schedule View
+        </Text>
       </Block>
     );
   };
 
   return (
-    <Block flex style={styles.patientInfo}>
+    <Block flex style={styles.notification}>
+      {navbar()}
       <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Icon
-            name="chevron-left"
-            family="font-awesome"
-            style={styles.backIcon}
-          />
-        </TouchableOpacity>
         <Block center style={{ paddingTop: 10 }}>
-          <Image
-            source={require("../assets/images/grayscale-photo-of-man2.png")}
-            style={styles.imageStyle}
-          ></Image>
+          <Block>
+            <Image
+              source={require("../assets/images/grayscale-photo-of-man2.png")}
+              style={styles.imageStyle}
+            ></Image>
+            <SvgUri
+              width="20"
+              height="20"
+              source={require("../assets/icons/dot.svg")}
+              style={{
+                position: "absolute",
+                right: 0,
+                top: 0,
+              }}
+            />
+          </Block>
           <Text size={20}>Dr. Ronald Joseph</Text>
           <Text>neurosergion specialist</Text>
-          <SvgUri
-            width="20"
-            height="20"
-            source={require("../assets/icons/edit.svg")}
-            style={{
-              position: "absolute",
-              right: -30,
-              top: theme.SIZES.BASE * 6,
-            }}
-          />
+
           <Block center style={styles.centerBlock}>
             <SwitchButton
               onValueChange={(val) => setActiveSwitch(val)}
@@ -99,88 +241,72 @@ const DoctorScheduleDetail = (props) => {
             />
           </Block>
         </Block>
-        <Block style={styles.Container}>
+        <Block row style={styles.Container}>
           <Text style={styles.schedules}>Schedules</Text>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Calendar")}
+          >
+            <Text style={styles.calendar}>Calendar</Text>
+          </TouchableOpacity>
         </Block>
-        <ScrollView
-          horizontal={true}
-          pagingEnabled={true}
-          decelerationRate={0}
-          scrollEventThrottle={16}
-          snapToAlignment="center"
-          showsHorizontalScrollIndicator={false}
-          snapToInterval={theme.SIZES.BASE * 0.375}
-          contentContainerStyle={{ paddingHorizontal: theme.SIZES.BASE / 2 }}
-        >
-          <TouchableOpacity style={styles.dateActive}>
-            <Text size={16} color={"white"}>
-              WED
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.dateInActive}>
-            <Text size={16} style={{ paddingLeft: 3 }}>
-              THU
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.dateInActive}>
-            <Text size={16} style={{ paddingLeft: 8 }}>
-              FRI
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.dateInActive}>
-            <Text size={16} style={{ paddingLeft: 6 }}>
-              SAT
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.dateInActive}>
-            <Text size={16} style={{ paddingLeft: 4 }}>
-              SUN
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.dateInActive}>
-            <Text size={16}>MON</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.dateInActive}>
-            <Text size={16} style={{ paddingLeft: 4 }}>
-              THE
-            </Text>
-          </TouchableOpacity>
-        </ScrollView>
-        {renderDetails({
-          heading: "Sevre Pain",
-          doctor: "Dr. Naveed Baloch",
-          symptom: "Symptoms: Headache",
-          appointment: "Appointment Date: 23, November 2020",
-          medication: "Esso 20g, Amastan 5/80g, Cipronxin 500g",
-        })}
-        {renderDetails({
-          heading: "Sevre Pain",
-          doctor: "Dr. Naveed Baloch",
-          symptom: "Symptoms: Headache",
-          appointment: "Appointment Date: 23, November 2020",
-          medication: "Esso 20g, Amastan 5/80g, Cipronxin 500g",
-        })}
+        {weekBar()}
+        <Block style={styles.renderDetails}>
+          {renderDetails({
+            caseName: "Heart Pain",
+            time: "9.00-11.00 am",
+            patient: "James Hilton",
+            reminder: false,
+            status: "income",
+          })}
+          {renderDetails({
+            caseName: "Heart Pain",
+            time: "9.00-11.00 am",
+            patient: "James Hilton",
+            reminder: true,
+            status: "miss",
+          })}
+          {renderDetails({
+            caseName: "Heart Pain",
+            time: "9.00-11.00 am",
+            patient: "James Hilton",
+            reminder: false,
+            status: "complete",
+          })}
+        </Block>
       </ScrollView>
     </Block>
   );
 };
 
 const styles = StyleSheet.create({
+  weekScrollView: {
+    paddingTop: 0,
+    paddingLeft: 10,
+  },
   dateActive: {
     backgroundColor: "#00CE30",
-    borderRadius: 18,
+    borderRadius: theme.SIZES.BASE * 1.5,
     paddingHorizontal: 8,
     paddingVertical: 20,
-    marginRight: 4,
+    marginRight: theme.SIZES.BASE,
+    width: theme.SIZES.BASE * 4,
+    height: theme.SIZES.BASE * 5,
+    alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "center",
   },
   dateInActive: {
     borderWidth: 1,
     borderColor: "#EDEDED",
-    borderRadius: 18,
+    borderRadius: theme.SIZES.BASE * 1.5,
     paddingHorizontal: 4,
     paddingVertical: 20,
-    marginRight: 4,
-    width: 50,
+    marginRight: theme.SIZES.BASE,
+    width: theme.SIZES.BASE * 4,
+    height: theme.SIZES.BASE * 5,
+    alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "center",
   },
   imageStyle: {
     width: 80,
@@ -188,13 +314,6 @@ const styles = StyleSheet.create({
   },
   centerBlock: {
     marginTop: 30,
-  },
-  scheduleDetail: {
-    borderWidth: 1,
-    borderColor: "#EDEDED",
-    borderRadius: 10,
-    padding: 20,
-    margin: 8,
   },
   edit: {
     padding: 4,
@@ -207,18 +326,8 @@ const styles = StyleSheet.create({
     borderColor: "#00CE30",
     alignItems: "center",
   },
-  patientInfo: {
-    paddingTop: Platform.OS === "android" ? height * 0.1 : height * 0.1,
-    paddingHorizontal: width * 0.02,
-    // paddingTop: height * 0.1,
-    // marginHorizontal: width * 0.04,
-    backgroundColor: "white",
-    // shadowColor: 'black',
-    // shadowOffset: { width: 10, height: 10 },
-    // shadowRadius: 8,
-    // shadowOpacity: 0.8,
-    // elevation: 3,
-    // borderRadius: 10
+  notification: {
+    backgroundColor: theme.COLORS.WHITE,
   },
   profileImage: {
     width: width * 1.1,
@@ -227,9 +336,8 @@ const styles = StyleSheet.create({
   Container: {
     width: width,
     height: "auto",
-    flex: 1,
     paddingHorizontal: 30,
-    paddingVertical: 20,
+    paddingVertical: 14,
   },
   profileDetails: {
     paddingTop: theme.SIZES.BASE * 4,
@@ -297,6 +405,49 @@ const styles = StyleSheet.create({
   },
   backIcon: {
     marginLeft: theme.SIZES.BASE,
+  },
+  roundBlock: {
+    borderBottomLeftRadius: 34,
+    borderBottomRightRadius: 34,
+    position: "absolute",
+    backgroundColor: "rgba(100, 120, 247, 0.84)",
+    height: height * 0.16,
+    width: width,
+    top: -10,
+    zIndex: 2,
+  },
+  heading: {
+    marginTop: height * 0.08,
+    paddingHorizontal: theme.SIZES.BASE * 0.5,
+    position: "absolute",
+    zIndex: 1,
+  },
+  sendReminder: {
+    borderRadius: 20,
+    backgroundColor: "#06D81E",
+    justifyContent: "center",
+    alignItems: "center",
+    width: 120,
+    height: 24,
+    marginTop: 6,
+    left: 40,
+  },
+  renderDetails: {
+    marginTop: 20,
+    marginBottom: height * 0.2,
+  },
+  calendar: {
+    color: "#06D81E",
+    paddingLeft: width * 0.5,
+  },
+  navbar: {
+    backgroundColor: "#6E78F7",
+    borderBottomRightRadius: 24,
+    borderBottomLeftRadius: 24,
+    width: width,
+    height: height * 0.16,
+    paddingTop: theme.SIZES.BASE * 2,
+    paddingLeft: theme.SIZES.BASE,
   },
 });
 

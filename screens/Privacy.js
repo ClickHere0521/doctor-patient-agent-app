@@ -1,14 +1,48 @@
 import React from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 
 import { LinearGradient } from 'expo-linear-gradient';
-import { Block, Button, Text, theme } from 'galio-framework';
-
+import { Block, Button, Text, theme, Icon } from 'galio-framework';
+import { IMLocalized, init } from "../src/localization/IMLocalization";
 import materialTheme from '../constants/Theme';
 
+const { width, height } = Dimensions.get("screen");
+
 const Privacy = (props) => {
+
+  const { navigation } = props;
+
+  const navbar = () => {
+    return (
+      <Block>
+        <Block row style={styles.navbar} center>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Icon
+              name="arrow-left"
+              family="font-awesome"
+              color="black"
+              size={16}
+              style={styles.chevronLeft}
+            />
+          </TouchableOpacity>
+          <Text
+            color="black"
+            style={{ paddingLeft: theme.SIZES.BASE }}
+            size={22}
+            fontWeight="semiBold"
+          >
+            {IMLocalized("Privacy")}
+          </Text>
+        </Block>
+        <Block style={{ borderTopWidth: 1, borderColor: "white" }}></Block>
+      </Block>
+    );
+  };
+  
+
   return (
-    <Block flex>
+    <Block flex style={styles.page}>
+      {navbar()}
       <ScrollView
         overScrollMode='always'
         showsVerticalScrollIndicator={false}
@@ -28,18 +62,18 @@ const Privacy = (props) => {
           At a board meeting for the Information Technology Industry Council in May, Joel Kaplan, Facebook’s top lobbyist, warned that an early proposal for privacy in California posed a threat to the industry and that the trade group needed to make the issue of privacy a priority, according to two people briefed on the meeting, who were not authorized to speak publicly.
         </Text>
       </ScrollView>
-      <Block flex row space="between" style={styles.buttonsWrapper}>
-        <Button color={materialTheme.COLORS.BUTTON_COLOR} style={styles.privacyButton}>ACCEPT</Button>
-        <Button color={theme.COLORS.WHITE} textStyle={{ color: theme.COLORS.MUTED }} style={styles.privacyButton}>DECLINE</Button>
-      </Block>
       <LinearGradient colors={['rgba(255,255,255,0)', 'rgba(255,255,255,1)']} style={styles.gradient} />
     </Block>
   );
 }
 
 const styles = StyleSheet.create({
+  page: {
+    backgroundColor: 'white'
+  },
   privacy: {
-    padding: theme.SIZES.BASE,
+    paddingVertical: theme.SIZES.BASE,
+    paddingHorizontal: theme.SIZES.BASE * 2,
     paddingBottom: theme.SIZES.BASE * 5,
   },
   buttonsWrapper: {
@@ -68,6 +102,15 @@ const styles = StyleSheet.create({
     right: 0,
     height: '30%',
   },
+  navbar: {
+    backgroundColor: "white",
+    width: width,
+    height: height * 0.16,
+    paddingTop: theme.SIZES.BASE * 2,
+    paddingLeft: theme.SIZES.BASE,
+    borderBottomWidth: 1,
+    borderColor: "rgba(112, 112, 112, 0.1)",
+  },  
 });
 
 export default Privacy;

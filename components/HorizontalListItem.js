@@ -4,10 +4,11 @@ import {
   StyleSheet,
   Dimensions,
   Image,
-  TouchableWithoutFeedback,
+  TouchableOpacity
 } from "react-native";
 import { Block, Text, theme } from "galio-framework";
 import Icon from "./Icon";
+import SvgUri from "expo-svg-uri";
 const { width } = Dimensions.get("screen");
 
 const HorizontalList = (props) => {
@@ -30,15 +31,15 @@ const HorizontalList = (props) => {
 
   return (
     <Block row={horizontal} card flex style={[styles.product, styles.shadow]}>
-      <TouchableWithoutFeedback
-        onPress={() => navigation.navigate("PatientTimeSlot")}
+      <TouchableOpacity
+        onPress={() => navigation.navigate("BookDoctor")}
       >
         <Block flex middle style={[styles.imageContainer, styles.shadow]}>
           <Image source={{ uri: product.image }} style={imageStyles} />
         </Block>
-      </TouchableWithoutFeedback>
-      <TouchableWithoutFeedback
-        onPress={() => navigation.navigate("PatientTimeSlot")}
+      </TouchableOpacity>
+      <TouchableOpacity
+        onPress={() => navigation.navigate("BookDoctor")}
       >
         <Block flex space="between" style={styles.productDescription}>
           <Text size={14} style={styles.productTitle}>
@@ -48,11 +49,15 @@ const HorizontalList = (props) => {
             {product.title}
           </Text>
           <Block flex flexDirection="row" middle>
-            <Icon name="shape-star" family="GalioExtra" size={14} />
+              <SvgUri
+                width="20"
+                height="20"
+                source={require("../assets/icons/star.svg")}
+              />
             <Text size={14}>{product.price}</Text>
           </Block>
         </Block>
-      </TouchableWithoutFeedback>
+      </TouchableOpacity>
     </Block>
   );
 };

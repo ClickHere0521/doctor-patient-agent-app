@@ -1,183 +1,378 @@
-import React from "react";
+import React, { useState } from "react";
 import {
+  Modal,
+  Image,
+  View,
   StyleSheet,
   Dimensions,
-  ImageBackground,
-  Platform,
+  TouchableOpacity,
+  TouchableHighlight,
 } from "react-native";
-import { Block, Text, theme } from "galio-framework";
-import { LinearGradient } from "expo-linear-gradient";
+import { Block, Button, Text, theme, Input } from "galio-framework";
 
-import { materialTheme } from "../constants";
-import { HeaderHeight } from "../constants/utils";
-import { IMLocalized } from "../src/localization/IMLocalization";
+const { height, width } = Dimensions.get("screen");
+import SwitchButton from "switch-button-react-native";
+import materialTheme from "../constants/Theme";
+import { IMLocalized, init } from "../src/localization/IMLocalization";
+import { Icon } from "../components/";
+import { ScrollView } from "react-native-gesture-handler";
+import * as ImagePicker from "expo-image-picker";
 
-const { width, height } = Dimensions.get("screen");
+const AgentDoctorDetail = (props) => {
+  const { navigation } = props;
+  const [modalVisible, setModalVisible] = useState(0);
+  const [imageUri, setImageUri] = useState(null);
+  const [activeSwitch, setActiveSwitch] = useState(1);
 
-const ProfileInfo = (props) => {
-  const renderEvents = (events) => {
-    let { eventHeading, eventContent } = { ...events };
+  const handleAvatar = (val) => {
+    setActiveSwitch(val);
+    if (val == 2) pickImage();
+    else setImageUri(null);
+  };
 
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [3, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.cancelled) {
+      setImageUri(result.uri);
+    }
+  };
+
+  const navbar = () => {
     return (
-      <Block style={styles.options}>
-        <Block column space="between" style={styles.events}>
-          <Block row style={styles.marginLB10}>
-            <Block>
-              <Text color={"grey"} size={14}>
-                {IMLocalized(eventHeading)}
-              </Text>
-            </Block>
-            <Block>
-              <Text color={"red"}>*</Text>
-            </Block>
-          </Block>
-          <Block style={styles.marginL10}>
-            <Text size={16} color={"black"}>
-              {eventContent}
-            </Text>
-          </Block>
-        </Block>
+      <Block row style={styles.navbar} center>
+        <TouchableOpacity
+            onPress={() => navigation.openDrawer()}
+          >
+            <Icon
+              name="align-justify"
+              family="font-awesome"
+              color="white"
+              size={16}
+              style={styles.chevronLeft}
+            />
+          </TouchableOpacity>
+        <Text
+          color="white"
+          style={{ paddingLeft: theme.SIZES.BASE }}
+          size={17}
+          bold
+        >
+          Profile Info
+        </Text>
+        <TouchableOpacity>
+          <Image
+            source={require("../assets/icons/editHeaderWhite.png")}
+            alt=""
+            style={{ marginLeft: width * 0.54 }}
+          />
+        </TouchableOpacity>
       </Block>
     );
   };
 
   return (
-    <Block flex style={styles.profile}>
-      <ImageBackground
-        source={require("../assets/images/doctor2.png")}
-        style={styles.profileContainer}
-        imageStyle={styles.profileImage}
-      >
-        <Block flex style={styles.profileDetails}>
-          <LinearGradient
-            colors={["rgba(110,120,247,0.2)", "rgba(110,120,247,0.3)"]}
-            style={styles.gradient}
-          />
-          <LinearGradient
-            colors={["rgba(110,120,247,0.2)", "rgba(110,120,247,0.3)"]}
-            style={styles.gradient}
-          />
-        </Block>
-      </ImageBackground>
-      <Block flex={0.7} style={styles.body}>
-        <Block style={styles.profileTexts}>
-          <Text bold size={24}>
-            Rachel Brown
-          </Text>
-          <Block row>
-            <Text bold size={18} color="white" style={styles.workforce}>
-              Workforce
+    <Block>
+      {navbar()}
+      <ScrollView vertical={true} showsVerticalScrollIndicator={false} style={{height: height * 0.8}}>
+        <Block style={styles.container}>
+          <Block style={{borderWidth: 1, borderColor:'black', borderRadius: theme.SIZES.BASE * 2, margin: theme.SIZES.BASE, padding: theme.SIZES.BASE, marginTop: theme.SIZES.BASE *4}}>
+            <Block row center style={{marginLeft: width * 0.3, marginTop: -theme.SIZES.BASE * 3.5}}>
+              <Block middle style={{ marginRight: 14 }}>
+                {imageUri ? (
+                  <Image
+                    source={{ uri: imageUri }}
+                    style={{ width: 80, height: 80, borderRadius: 20 }}
+                  />
+                ) : (
+                  <Image
+                    source={require("../assets/images/grayscale-photo-of-man2.png")}
+                    style={{ width: 80, height: 80, borderRadius: 20 }}
+                  />
+                )}
+              </Block>
+              <Block>
+                <SwitchButton
+                  onValueChange={handleAvatar}
+                  text1="Remove"
+                  text2="Upload"
+                  switchWidth={120}
+                  switchHeight={30}
+                  switchdirection="rtl"
+                  switchBorderRadius={100}
+                  switchSpeedChange={500}
+                  switchBorderColor="#3B3E51"
+                  switchBackgroundColor="#fff"
+                  btnBorderColor="#3B3E51"
+                  btnBackgroundColor="#3B3E51"
+                  fontColor="#3B3E51"
+                  activeFontColor="#fff"
+                />
+              </Block>
+            </Block>
+            <Text size={14} style={{ marginTop: theme.SIZES.BASE * 2 }} center>
+              Dr. Ronald Joseph
             </Text>
-            <Text bold size={17} color="white" style={styles.doctor}>
-              Doctor
+            <Text color={"grey"} text={12} center>
+              B.Sc, MBBS, DDVL, MD- Dermitologist
             </Text>
+            <Block style={styles.headBottom}>
+              <Text color="grey" size={12} style={{marginBottom: theme.SIZES.BASE}}>
+                <Text color="black" size={14}>
+                  16
+                </Text>{" "}
+                yrs. Experience
+              </Text>
+              <Block row center>
+                <Block style={{ paddingHorizontal: theme.SIZES.BASE / 2 }}>
+                  <Image
+                    style={{ width: 70, height: 70 }}
+                    source={require("../assets/images/grayscale-photo-of-man2.png")}
+                  ></Image>
+                </Block>
+                <Block style={{ paddingHorizontal: theme.SIZES.BASE / 2 }}>
+                  <Image
+                    style={{ width: 70, height: 70 }}
+                    source={require("../assets/images/grayscale-photo-of-man2.png")}
+                  ></Image>
+                </Block>
+                <Block style={{ paddingHorizontal: theme.SIZES.BASE / 2 }}>
+                  <Image
+                    style={{ width: 70, height: 70 }}
+                    source={require("../assets/images/grayscale-photo-of-man2.png")}
+                  ></Image>
+                </Block>
+                <Block style={{ paddingHorizontal: theme.SIZES.BASE / 2 }}>
+                  <Image
+                    style={{ width: 70, height: 70 }}
+                    source={require("../assets/images/grayscale-photo-of-man2.png")}
+                  ></Image>
+                </Block>
+              </Block>
+            </Block>
+          </Block>
+          <Block style={{borderWidth: 1,padding: theme.SIZES.BASE, borderColor:'black', borderRadius: theme.SIZES.BASE * 2, margin: theme.SIZES.BASE}}>
+            <Block row>
+              <Icon
+                name="map-marker"
+                family="font-awesome"
+                color={"#0288D1"}
+                style={{ margin: 10 }}
+              />
+              <Text size={12} color={"grey"} style={{ marginTop: 10 }}>
+                92/6, 3rd Floor, Outer Ring Road, Chandra Layout
+              </Text>
+            </Block>
+            <Image
+              source={require("../assets/images/map.png")}
+              alt=""
+              style={{ margin: width * 0.01, alignSelf: "center" }}
+            />
+            <Block row style={{ margin: 10 }}>
+              <Text color="black" style={{ alignSelf: "flex-start" }}>
+                Tel
+                <Text color="red">*</Text>
+              </Text>
+              <Text color="grey" style={{ paddingLeft: 10 }}>
+                +1234567890
+              </Text>
+            </Block>
+            <Block>
+              <Text color="black" style={styles.info} size={14}>
+                Account Info
+                <Text color="red">*</Text>
+              </Text>
+              <Block flex flexDirection="row" style={{ left: width * 0.1 }}>
+                <Block flex={1}>
+                  <Text color="grey">
+                    Email
+                    <Text color="grey">*</Text>
+                  </Text>
+                  <Text color="grey" style={{paddingTop: theme.SIZES.BASE}}>
+                    Password
+                    <Text color="grey">*</Text>
+                  </Text>
+                </Block>
+                <Block flex={2}>
+                  <Text color="grey">Joseph@gmail.com</Text>
+                  <Input
+                    password
+                    viewPass
+                    bgColor="transparent"
+                    placeholder="password"
+                    color="black"
+                    style={[styles.input, styles.inputDefault]}
+                  />
+                </Block>
+              </Block>
+            </Block>
+            <Block>
+              <Text color="black" style={styles.info} size={14}>
+                Description
+                <Text color="red">*</Text>
+              </Text>
+              <Text color="grey" size={16} style={styles.descriptionText}>
+                Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
+                diam nonu my eirmod tempor invidun.
+              </Text>
+            </Block>
+            <Block flex flexDirection="row"  style={styles.info} >
+              <Block>
+                <Text color="black" size={14}>
+                  Schedule
+                  <Text color="red">*</Text>
+                </Text>
+              </Block>
+              <Block style={{marginLeft: width * 0.4}}>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("DoctorMySchedule")}
+                >
+                  <Text
+                    color={"#00CE30"}
+                    sytle={{ textDecorationLine: "underline" }}
+                  >
+                    View
+                  </Text>
+                </TouchableOpacity>
+              </Block>
+            </Block>
+            <Button color="#00CE30" style={{borderRadius: 16, width: width * 0.8}}>UPDATE</Button>
           </Block>
         </Block>
-        {renderEvents({
-          eventHeading: IMLocalized("fullName"),
-          eventContent: "Rachel Brown",
-        })}
-        {renderEvents({
-          eventHeading: IMLocalized("Address"),
-          eventContent: "Los Angeles,CA",
-        })}
-        {renderEvents({
-          eventHeading: IMLocalized("Phone number"),
-          eventContent: "+92 314 1254789",
-        })}
-        {renderEvents({
-          eventHeading: IMLocalized("ongoingCase"),
-          eventContent: 80,
-        })}
-      </Block>
+      </ScrollView>
     </Block>
   );
 };
 
 const styles = StyleSheet.create({
-  profile: {
-    marginTop: Platform.OS === "android" ? -HeaderHeight : 0,
-  },
-  profileImage: {
+  navbar: {
+    backgroundColor: "#6E78F7",
     width: width,
-    height: "auto",
-    top: height * 0.1,
+    height: height * 0.16,
+    paddingTop: theme.SIZES.BASE * 2,
+    paddingLeft: theme.SIZES.BASE,
   },
-  profileContainer: {
-    width: width,
-    height: height,
-    flex: 1,
+  input: {
+    width: width * 0.3
   },
-  profileDetails: {
-    paddingTop: theme.SIZES.BASE * 4,
-    justifyContent: "flex-end",
-    position: "relative",
+  modalButton: {
+    width: width * 0.25,
+    height: theme.SIZES.BASE * 2,
+    borderRadius: 17,
+    borderWidth: 0.5,
+    borderColor: "#C7C7C7",
+    marginTop: theme.SIZES.BASE,
   },
-  profileTexts: {
-    position: "relative",
-    paddingHorizontal: theme.SIZES.BASE,
-    paddingVertical: theme.SIZES.BASE,
-    marginHorizontal: theme.SIZES.BASE,
-    marginTop: -theme.SIZES.BASE * 14,
-    marginBottom: theme.SIZES.BASE * 4,
-    borderRadius: 30,
-    zIndex: 2,
+  innerModal: {
+    backgroundColor: "rgba(255,255,255,0.99)",
+    width: width * 0.8,
+    borderRadius: 15,
+    height: height * 0.15,
+    shadowColor: theme.COLORS.BLACK,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 3,
+    shadowOpacity: 0.1,
+    elevation: 5,
+  },
+  container: {
+    backgroundColor: "#F5F5F5",
+  },
+  headArrow: {
+    marginTop: height * 0.1,
+    paddingHorizontal: theme.SIZES.BASE * 0.5,
+    position: "absolute",
+    zIndex: 1,
+  },
+  button: {
+    borderWidth: 1,
+    borderColor: "#ECECEC",
+    borderRadius: 25,
+    width: width - theme.SIZES.BASE * 6,
+    height: theme.SIZES.BASE * 3,
+    shadowRadius: 2,
+    shadowOpacity: 5,
+    backgroundColor: "white",
+  },
+  optionsButton: {
+    backgroundColor: "#6E78F7",
+    borderRadius: 25,
+    marginVertical: 50,
+    height: 50,
+    width: width * 0.5,
+    justifyContent: "center",
   },
   pro: {
     backgroundColor: materialTheme.COLORS.LABEL,
-    paddingHorizontal: 6,
-    marginRight: theme.SIZES.BASE / 2,
-    borderRadius: 4,
-    height: 19,
-    width: 90,
-  },
-  events: {
-    padding: theme.SIZES.BASE * 0.2,
-    marginLeft: 10,
-  },
-  marginLB10: {
-    marginLeft: 10,
-    marginBottom: 10,
-  },
-  marginL10: {
-    marginLeft: 10,
-  },
-  options: {
-    position: "relative",
-    paddingHorizontal: theme.SIZES.BASE,
-    paddingVertical: theme.SIZES.BASE,
-    marginHorizontal: theme.SIZES.BASE,
-    marginTop: -theme.SIZES.BASE * 3,
-    marginBottom: theme.SIZES.BASE * 4,
-    borderRadius: 30,
-    backgroundColor: theme.COLORS.WHITE,
-    shadowColor: "black",
-    shadowOffset: { width: 0, height: 0 },
-    shadowRadius: 8,
-    shadowOpacity: 0.2,
-    elevation: 3,
-    zIndex: 2,
+    paddingHorizontal: 8,
+    marginLeft: 12,
+    borderRadius: 2,
+    height: 22,
   },
   gradient: {
-    zIndex: 10,
+    zIndex: 1,
+    position: "absolute",
+    top: 33 + theme.SIZES.BASE,
     left: 0,
     right: 0,
-    bottom: 0,
-    height: "100%",
+    height: 90,
+  },
+  circle: {
+    width: theme.SIZES.BASE * 10,
+    height: theme.SIZES.BASE * 10,
+    backgroundColor: "#3946FF",
     position: "absolute",
+    borderRadius: 1000,
+    right: -theme.SIZES.BASE * 5,
+    bottom: -theme.SIZES.BASE * 8,
   },
   body: {
-    backgroundColor: "#6E78F7",
+    marginHorizontal: width * 0.04,
+    backgroundColor: "white",
+    borderRadius: 12,
   },
-  workforce: {
-    backgroundColor: "#FE2472",
-    borderRadius: 10,
-    paddingVertical: 1,
+  prime: {
+    top: height * 0.08,
+    left: -width * 0.08,
+    position: "absolute",
+  },
+  header: {
+    marginHorizontal: width * 0.01,
+    marginTop: -height * 0.05,
+  },
+  rating: {
+    top: height * 0.08,
+    right: -width * 0.08,
+    position: "absolute",
+  },
+  headBottom: {
+    margin: theme.SIZES.BASE,
+  },
+  star: {
+    top: height * 0.08,
+    right: -width * 0.01,
+    position: "absolute",
+  },
+  info: {
+    marginHorizontal: theme.SIZES.BASE,
+    padding: theme.SIZES.BASE,
+  },
+  schedule: {
+    alignSelf: "flex-start",
+    margin: 10,
+    marginBottom: 0,
+  },
+  descriptionText: {
+    alignSelf: "flex-start",
     paddingHorizontal: 10,
-  },
-  doctor: {
-    padding: 2,
+    marginLeft: 10,
   },
 });
 
-export default ProfileInfo;
+export default AgentDoctorDetail;

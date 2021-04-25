@@ -243,7 +243,6 @@ const Header = (props) => {
         rightStyle={{ alignItems: 'center' }}
         leftStyle={{ paddingTop: 3, flex: 0.3 }}
         leftIconName={back ? null : "navicon"}
-        // leftIconFamily="font-awesome"
         leftIconColor={white ? theme.COLORS.WHITE : theme.COLORS.ICON}
         titleStyle={[
           styles.title,

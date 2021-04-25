@@ -72,42 +72,42 @@ const AddInsurance = (props) => {
     }
   };
 
+  const navbar = () => {
+    return (
+      <Block row style={styles.navbar} center>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+        >
+          <Icon
+            name="arrow-left"
+            family="font-awesome"
+            color="white"
+            size={16}
+            style={styles.chevronLeft}
+          />
+        </TouchableOpacity>
+        <Text
+          color="white"
+          style={{ paddingLeft: theme.SIZES.BASE }}
+          size={17}
+          bold
+        >
+          Add Insurance Info
+        </Text>
+        <TouchableOpacity>
+          <Image
+            source={require("../assets/icons/editHeaderWhite.png")}
+            alt=""
+            style={{ marginLeft: width * 0.4 }}
+          />
+        </TouchableOpacity>
+      </Block>
+    );
+  };
+
   return (
     <Block center flex style={styles.profile}>
-      <Block>
-        <Block style={styles.roundBlock}>
-          <Block row style={styles.heading}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Icon
-                size={16}
-                name="chevron-left"
-                family="font-awesome"
-                color={"white"}
-                style={{ padding: 7 }}
-              />
-            </TouchableOpacity>
-            <Block>
-              <Text
-                color="white"
-                size={20}
-                style={{ fontFamily: "Inter-Black" }}
-                bold
-              >
-                Add Insurance Info
-              </Text>
-            </Block>
-            <Block
-              style={{
-                position: "absolute",
-                right: 10,
-                padding: 7,
-              }}
-            >
-              <Image source={require("../assets/images/editWhite.png")} />
-            </Block>
-          </Block>
-        </Block>
-      </Block>
+      {navbar()}
       <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
         <Block style={styles.userDetail}>
           {renderUserDetail({
@@ -363,6 +363,15 @@ const styles = StyleSheet.create({
   asteride: {
     position: "absolute",
     left: theme.SIZES.BASE * 12,
+  },
+  navbar: {
+    backgroundColor: "#6E78F7",
+    borderBottomRightRadius: 24,
+    borderBottomLeftRadius: 24,
+    width: width,
+    height: height * 0.16,
+    paddingTop: theme.SIZES.BASE * 2,
+    paddingLeft: theme.SIZES.BASE,
   },
 });
 

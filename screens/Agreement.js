@@ -1,10 +1,44 @@
 import React from "react";
-import { ScrollView, StyleSheet } from "react-native";
-import { Block, Text, theme } from "galio-framework";
+import { ScrollView, StyleSheet, Dimensions, TouchableOpacity } from "react-native";
+import { Block, Text, theme, Icon } from "galio-framework";
+import { IMLocalized, init } from "../src/localization/IMLocalization";
+
+const { width, height } = Dimensions.get("screen");
 
 const Agreement = (props) => {
+
+  const { navigation } = props;
+
+  const navbar = () => {
+    return (
+      <Block>
+        <Block row style={styles.navbar} center>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Icon
+              name="arrow-left"
+              family="font-awesome"
+              color="black"
+              size={16}
+              style={styles.chevronLeft}
+            />
+          </TouchableOpacity>
+          <Text
+            color="black"
+            style={{ paddingLeft: theme.SIZES.BASE }}
+            size={22}
+            fontWeight="semiBold"
+          >
+            {IMLocalized("User Agreement")}
+          </Text>
+        </Block>
+        <Block style={{ borderTopWidth: 1, borderColor: "white" }}></Block>
+      </Block>
+    );
+  };
+
   return (
-    <Block flex style={{ position: "relative" }}>
+    <Block flex style={styles.agreement}>
+      {navbar()}
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.agreements}
@@ -39,8 +73,21 @@ const Agreement = (props) => {
 };
 
 const styles = StyleSheet.create({
+  agreement: {
+    backgroundColor: 'white'
+  },  
   agreements: {
-    padding: theme.SIZES.BASE,
+    paddingVertical: theme.SIZES.BASE,
+    paddingHorizontal: theme.SIZES.BASE * 2
+  },
+  navbar: {
+    backgroundColor: "white",
+    width: width,
+    height: height * 0.16,
+    paddingTop: theme.SIZES.BASE * 2,
+    paddingLeft: theme.SIZES.BASE,
+    borderBottomWidth: 1,
+    borderColor: "rgba(112, 112, 112, 0.1)",
   },
 });
 

@@ -58,7 +58,7 @@ const InsuranceInfo = (props) => {
         <SvgUri
           width="26"
           height="26"
-          source={require("../assets/icons/edit.svg")}
+          source={require("../assets/icons/editGreen.svg")}
           style={{ paddingLeft: width * 0.45 }}
         />
       </Block>

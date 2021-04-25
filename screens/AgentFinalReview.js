@@ -14,6 +14,7 @@ import { materialTheme } from "../constants";
 import { CheckBox } from "react-native-elements";
 import SvgUri from "expo-svg-uri";
 import { set } from "react-native-reanimated";
+import { IMLocalized, init } from "../src/localization/IMLocalization";
 
 const { width, height } = Dimensions.get("screen");
 const thumbMeasure = (width - 48 - 32) / 3;
@@ -21,7 +22,7 @@ const thumbMeasure = (width - 48 - 32) / 3;
 const AgentReview = (props) => {
   const { navigation } = props;
 
-  const [ reviews, setReviews ] = useState ([
+  const [reviews, setReviews] = useState([
     {
       title: "02/03/2021",
       checked: true,
@@ -57,34 +58,51 @@ const AgentReview = (props) => {
   ]);
 
   const handleCheck = (index) => {
-    let tempReviews = [...reviews];    
-    tempReviews[index].checked = !(tempReviews[index].checked);
-    setReviews(tempReviews)
-  }
+    let tempReviews = [...reviews];
+    tempReviews[index].checked = !tempReviews[index].checked;
+    setReviews(tempReviews);
+  };
+
+  const navbar = () => {
+    return (
+      <Block>
+        <Block row style={styles.navbar} center>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("DashboardPatient")}
+          >
+            <Icon
+              name="arrow-left"
+              family="font-awesome"
+              color="black"
+              size={16}
+              style={styles.chevronLeft}
+            />
+          </TouchableOpacity>
+          <Text
+            color="black"
+            style={{ paddingLeft: theme.SIZES.BASE }}
+            size={22}
+            fontWeight="semiBold"
+          >
+            {IMLocalized("Case Final Review")}
+          </Text>
+          <TouchableOpacity>
+            <Image
+              source={require("../assets/icons/editHeaderBlack.png")}
+              alt=""
+              style={{ marginLeft: width * 0.3 }}
+            />
+          </TouchableOpacity>
+        </Block>
+        <Block style={{ borderTopWidth: 1, borderColor: "white" }}></Block>
+      </Block>
+    );
+  };
 
   return (
     <Block flex style={styles.review}>
+      {navbar()}
       <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
-        <Block row style={styles.title}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Icon
-              name="chevron-left"
-              family="font-awesome"
-              style={styles.backIcon}
-            />
-          </TouchableOpacity>
-          <Text size={22}>Case Final Review</Text>
-          <SvgUri
-            width="25"
-            height="25"
-            source={require("../assets/icons/headerEditBlack.svg")}
-            style={{
-              position: "absolute",
-              right: 0,
-              marginTop: 6,
-            }}
-          />
-        </Block>
         <Block style={styles.reviewContent}>
           {reviews.map((value, index) => {
             return (
@@ -136,7 +154,7 @@ const styles = StyleSheet.create({
     borderColor: "grey",
     borderRadius: 30,
     backgroundColor: "white",
-    marginVertical: 10
+    marginVertical: 10,
   },
   text: {
     alignSelf: "flex-end",
@@ -148,8 +166,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginBottom: 50,
     borderRadius: 30,
-    backgroundColor: "#00CE30"
-  }
+    backgroundColor: "#00CE30",
+  },
+  navbar: {
+    backgroundColor: "white",
+    width: width,
+    height: height * 0.16,
+    paddingTop: theme.SIZES.BASE * 2,
+    paddingLeft: theme.SIZES.BASE,
+    borderBottomWidth: 1,
+    borderColor: "rgba(112, 112, 112, 0.1)",
+  },
 });
 
 export default AgentReview;

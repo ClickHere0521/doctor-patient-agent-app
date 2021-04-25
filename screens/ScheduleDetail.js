@@ -8,6 +8,8 @@ import {
 } from "react-native";
 import { Block, Text, theme } from "galio-framework";
 import CalendarPicker from "react-native-calendar-picker";
+import DateTime from "./DateTime";
+import _ from "lodash";
 
 import { Icon } from "../components";
 
@@ -17,11 +19,6 @@ const ScheduleDetail = (props) => {
   const { navigation } = props;
   const [isOpenCalendar, setIsOpenCalendar] = useState(false);
 
-  const handleCalendar = () => {
-    let isOpenCalendarTemp = !isOpenCalendar;
-    setIsOpenCalendar(isOpenCalendarTemp);
-  };
-
   const renderDetils = (details) => {
     let { heading, subHeading1, subHeading2, subHeading3, time, location } = {
       ...details,
@@ -29,217 +26,248 @@ const ScheduleDetail = (props) => {
 
     return (
       <Block style={styles.schedule}>
-        <Block row>
-          <Image
-            source={require("../assets/images/check.png")}
-            style={styles.check}
-          />
-          <Block middle>
-            <Image source={require("../assets/images/avatar.png")} />
-          </Block>
-          <Block middle style={{ paddingTop: 10 }}>
-            <Text
-              bold
-              size={18}
-              style={{ alignSelf: "flex-start", paddingVertical: 5 }}
-            >
-              {heading}
-            </Text>
-            <Block
-              style={{
-                borderWidth: 1,
-                borderRadius: 5,
-                borderColor: theme.COLORS.GREY,
-                padding: 8,
-              }}
-            >
-              <Text>{subHeading1}</Text>
-              <Text>{subHeading2}</Text>
-              <Text>{subHeading3}</Text>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("AgentCaseDetail")}
+        >
+          <Block row>
+            <Image
+              source={require("../assets/images/check.png")}
+              style={styles.check}
+            />
+            <Block middle>
+              <Image source={require("../assets/images/avatar.png")} />
             </Block>
-            <Block row style={{ paddingVertical: 8 }}>
-              <Block middle>
-                <Icon
-                  name="map-marker"
-                  family="font-awesome"
-                  color={theme.COLORS.CUSTOM}
-                  size={16}
-                >
-                  {" "}
-                </Icon>
+            <Block middle style={{ paddingTop: 10 }}>
+              <Text
+                bold
+                size={18}
+                style={{ alignSelf: "flex-start", paddingVertical: 5 }}
+              >
+                {heading}
+              </Text>
+              <Block
+                style={{
+                  borderWidth: 1,
+                  borderRadius: 5,
+                  borderColor: theme.COLORS.GREY,
+                  padding: 8,
+                }}
+              >
+                <Text>{subHeading1}</Text>
               </Block>
-              <Block middle style={{ marginRight: 40 }}>
-                <Text>{time}</Text>
-              </Block>
-              <Block middle>
-                <Icon
-                  name="map-marker"
-                  family="font-awesome"
-                  color={theme.COLORS.CUSTOM}
-                  size={16}
-                >
-                  {" "}
-                </Icon>
-              </Block>
-              <Block middle>
-                <Text>{location}</Text>
+              <Block row style={{ paddingVertical: 8 }}>
+                <Block middle>
+                  <Icon
+                    name="map-marker"
+                    family="font-awesome"
+                    color={theme.COLORS.CUSTOM}
+                    size={16}
+                  >
+                    {" "}
+                  </Icon>
+                </Block>
+                <Block middle style={{ marginRight: 40 }}>
+                  <Text>{time}</Text>
+                </Block>
               </Block>
             </Block>
           </Block>
-        </Block>
+        </TouchableOpacity>
       </Block>
     );
   };
 
-  return (
-    <Block flex style={styles.notification}>
-      <Block>
-        <Block style={styles.roundBlock}>
-          <Block row style={styles.heading}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Icon
-                size={16}
-                name="chevron-left"
-                family="font-awesome"
-                color={"white"}
-                style={{ padding: 7 }}
-              />
-            </TouchableOpacity>
-            <Block>
-              <Text
-                color="white"
-                size={20}
-                style={{ fontFamily: "Inter-Black" }}
-                bold
-              >
-                Dr.Adila Tahir
-              </Text>
-            </Block>
-          </Block>
-          <Block style={styles.btnCalendar}>
-            <TouchableOpacity onPress={handleCalendar}>
-              <Block row>
-                <Text color="white">Calendar</Text>
-                <Icon
-                  name="chevron-right"
-                  family="font-awesome"
-                  color={"white"}
-                  size={10}
-                  style={{ padding: 6 }}
-                />
-              </Block>
-            </TouchableOpacity>
-          </Block>
-        </Block>
-      </Block>
-      <Block style={styles.body}>
-        <ScrollView
-          horizontal={true}
-          pagingEnabled={true}
-          decelerationRate={0}
-          scrollEventThrottle={16}
-          snapToAlignment="center"
-          showsHorizontalScrollIndicator={false}
-          snapToInterval={theme.SIZES.BASE * 0.375}
-          contentContainerStyle={{ paddingHorizontal: theme.SIZES.BASE / 2 }}
-        >
-          <TouchableOpacity style={styles.dateActive}>
-            <Text size={16} color={"white"} style={{ paddingLeft: 10 }}>
-              Today
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.dateInActive}>
-            <Text size={16} style={{ paddingLeft: 24 }}>
-              3.5
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.dateInActive}>
-            <Text size={16} style={{ paddingLeft: 24 }}>
-              3.6
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.dateInActive}>
-            <Text size={16} style={{ paddingLeft: 24 }}>
-              3.7
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.dateInActive}>
-            <Text size={16} style={{ paddingLeft: 24 }}>
-              3.8
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.dateInActive}>
-            <Text size={16} style={{ paddingLeft: 24 }}>
-              3.9
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.dateInActive}>
-            <Text size={16} style={{ paddingLeft: 18 }}>
-              3.10
-            </Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </Block>
+  const [time, setTime] = useState("");
 
-      <ScrollView
-        vertical={true}
-        showsVerticalScrollIndicator={false}
-        style={{ top: height * 0.27 }}
-      >
-        {isOpenCalendar ? (
-          <CalendarPicker
-            onDateChange={(date) => {
-              console.log(date);
+  const onChangeDate = (date) => {
+    alert(date);
+  };
+
+  const renderChildDay = (day) => {
+    if (_.includes(["2018-11-15", "2018-12-10", "2018-12-20"], day)) {
+      return (
+        <Image
+          source={require("../assets/images/doctor1.png")}
+          style={styles.icLockRed}
+        />
+      );
+    }
+    if (
+      _.includes(["2018-11-16", "2018-12-12", "2018-12-21", "2018-12-18"], day)
+    ) {
+      return (
+        <Image
+          source={require("../assets/images/doctor.png")}
+          style={styles.icLockRed}
+        />
+      );
+    }
+  };
+
+  const checkCalendar = () => {
+    if (isOpenCalendar) {
+      return (
+        <Block style={{ marginTop: 150, position: "absolute" }}>
+          <DateTime
+            date={time}
+            changeDate={(date) => onChangeDate(date)}
+            format="YYYY-MM-DD"
+            renderChildDay={(day) => renderChildDay(day)}
+            warpRowWeekdays={{ backgroundColor: "rgba(0,0,0,0)" }}
+            warpDayStyle={{
+              backgroundColor: "rgba(0,0,0,0)",
+              borderColor: "rgba(0,0,0,0)",
             }}
           />
-        ) : (
-          <></>
-        )}
-        {renderDetils({
-          heading: "Zean Ronen",
-          subHeading1: "MBBS,DOMS,MS - Ophthalmology",
-          subHeading2: "Ophthalmologist",
-          subHeading3: "26 years of experience",
-          time: "8.00-9.00",
-          location: "Andheri East",
-        })}
-        {renderDetils({
-          heading: "Zean Ronen",
-          subHeading1: "MBBS,DOMS,MS - Ophthalmology",
-          subHeading2: "Ophthalmologist",
-          subHeading3: "26 years of experience",
-          time: "8.00-9.00",
-          location: "Andheri East",
-        })}
-        {renderDetils({
-          heading: "Zean Ronen",
-          subHeading1: "MBBS,DOMS,MS - Ophthalmology",
-          subHeading2: "Ophthalmologist",
-          subHeading3: "26 years of experience",
-          time: "8.00-9.00",
-          location: "Andheri East",
-        })}
-        {renderDetils({
-          heading: "Zean Ronen",
-          subHeading1: "MBBS,DOMS,MS - Ophthalmology",
-          subHeading2: "Ophthalmologist",
-          subHeading3: "26 years of experience",
-          time: "8.00-9.00",
-          location: "Andheri East",
-        })}
-      </ScrollView>
+        </Block>
+      );
+    } else {
+      return <Block></Block>;
+    }
+  };
+
+  return (
+    <Block>
+      <Block>
+        <Block>
+          <Block style={styles.roundBlock}>
+            <Block row style={styles.heading}>
+              <TouchableOpacity onPress={() => navigation.goBack()}>
+                <Icon
+                  size={16}
+                  name="chevron-left"
+                  family="font-awesome"
+                  color={"white"}
+                  style={{ padding: 7 }}
+                />
+              </TouchableOpacity>
+              <Block>
+                <Text
+                  color="white"
+                  size={20}
+                  style={{ fontFamily: "Inter-Black" }}
+                  bold
+                >
+                  Dr.Adila Tahir
+                </Text>
+              </Block>
+            </Block>
+            <Block style={styles.btnCalendar}>
+              <TouchableOpacity
+                onPress={() => setIsOpenCalendar(!isOpenCalendar)}
+              >
+                <Block row>
+                  <Text color="white">Calendar</Text>
+                  <Icon
+                    name="chevron-right"
+                    family="font-awesome"
+                    color={"white"}
+                    size={10}
+                    style={{ padding: 6 }}
+                  />
+                </Block>
+              </TouchableOpacity>
+            </Block>
+          </Block>
+          <Block style={styles.body}>
+            <ScrollView
+              horizontal={true}
+              pagingEnabled={true}
+              decelerationRate={0}
+              scrollEventThrottle={16}
+              snapToAlignment="center"
+              showsHorizontalScrollIndicator={false}
+              snapToInterval={theme.SIZES.BASE * 0.375}
+              contentContainerStyle={{
+                paddingHorizontal: theme.SIZES.BASE / 2,
+              }}
+            >
+              <TouchableOpacity style={styles.dateActive}>
+                <Text size={16} color={"white"}>
+                  Today
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.dateInActive}>
+                <Text size={16}>3.5</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.dateInActive}>
+                <Text size={16}>3.6</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.dateInActive}>
+                <Text size={16}>3.7</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.dateInActive}>
+                <Text size={16}>3.8</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.dateInActive}>
+                <Text size={16}>3.9</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.dateInActive}>
+                <Text size={16}>3.10</Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </Block>
+        </Block>
+        <Block style={{ marginTop: theme.SIZES.BASE * 2 }}>
+          <ScrollView
+            vertical={true}
+            showsVerticalScrollIndicator={false}
+            style={{ height: height * 0.75 }}
+          >
+            {renderDetils({
+              heading: "Zean Ronen",
+              subHeading1: "MBBS,DOMS,MS - Ophthalmology",
+              time: "8.00-9.00",
+            })}
+            {renderDetils({
+              heading: "Zean Ronen",
+              subHeading1: "MBBS,DOMS,MS - Ophthalmology",
+              time: "8.00-9.00",
+            })}
+            {renderDetils({
+              heading: "Zean Ronen",
+              subHeading1: "MBBS,DOMS,MS - Ophthalmology",
+              time: "8.00-9.00",
+            })}
+            {renderDetils({
+              heading: "Zean Ronen",
+              subHeading1: "MBBS,DOMS,MS - Ophthalmology",
+              time: "8.00-9.00",
+            })}
+            {renderDetils({
+              heading: "Zean Ronen",
+              subHeading1: "MBBS,DOMS,MS - Ophthalmology",
+              time: "8.00-9.00",
+            })}
+            {renderDetils({
+              heading: "Zean Ronen",
+              subHeading1: "MBBS,DOMS,MS - Ophthalmology",
+              time: "8.00-9.00",
+            })}
+          </ScrollView>
+        </Block>
+      </Block>
+
+      {checkCalendar()}
     </Block>
   );
 };
 
 const styles = StyleSheet.create({
-  notification: {
-    paddingVertical: theme.SIZES.BASE / 3,
+  container: {
+    flex: 1,
+  },
+  icLockRed: {
+    width: 13 / 2,
+    height: 9,
+    position: "absolute",
+    top: 2,
+    left: 1,
   },
   schedule: {
     paddingHorizontal: width * 0.03,
-    marginTop: height * 0.02,
     marginHorizontal: width * 0.04,
+    marginVertical: theme.SIZES.BASE,
     borderRadius: 13,
     backgroundColor: theme.COLORS.WHITE,
     shadowColor: "black",
@@ -247,7 +275,6 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     shadowOpacity: 0.2,
     elevation: 3,
-    zIndex: 2,
   },
   title: {
     paddingTop: theme.SIZES.BASE / 2,
@@ -258,32 +285,26 @@ const styles = StyleSheet.create({
     marginBottom: theme.SIZES.BASE * 1.25,
   },
   roundBlock: {
-    borderBottomLeftRadius: 34,
-    borderBottomRightRadius: 34,
-    position: "absolute",
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
     backgroundColor: "rgba(100, 120, 247, 0.84)",
-    height: height * 0.25,
+    height: height * 0.16,
     width: width,
-    top: -10,
-    zIndex: 2,
   },
   dateActive: {
     backgroundColor: "#00CE30",
     borderRadius: 18,
-    paddingHorizontal: 8,
-    paddingVertical: 5,
-    marginRight: 4,
-    width: 80,
+    width: 110,
     height: 34,
+    justifyContent: "center",
+    alignItems: "center",
+    marginHorizontal: theme.SIZES.BASE / 2,
   },
   dateInActive: {
     borderWidth: 1,
     borderColor: "white",
     borderRadius: 18,
-    paddingHorizontal: 4,
-    paddingVertical: 5,
-    marginRight: 4,
-    width: 80,
+    width: 110,
     height: 34,
     backgroundColor: "white",
     shadowColor: "black",
@@ -291,26 +312,27 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     shadowOpacity: 0.2,
     elevation: 3,
+    justifyContent: "center",
+    alignItems: "center",
+    marginHorizontal: theme.SIZES.BASE / 2,
   },
   heading: {
-    marginTop: height * 0.12,
+    marginTop: height * 0.08,
     paddingHorizontal: theme.SIZES.BASE * 0.5,
     position: "absolute",
-    zIndex: 1,
   },
   btnCalendar: {
     position: "absolute",
     right: width * 0.05,
-    top: height * 0.13,
+    top: height * 0.08,
   },
   body: {
-    marginTop: height * 0.21,
+    marginTop: height * 0.14,
     position: "absolute",
-    zIndex: 5,
   },
   check: {
     position: "absolute",
-    zIndex: 5,
+
     right: -width * 0.05,
     top: -height * 0.01,
   },

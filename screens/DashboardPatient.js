@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+  import React, { useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -8,19 +8,16 @@ import {
   TouchableOpacity,
   TouchableOpacityComponent,
 } from "react-native";
-import { Button, Block, Text, theme } from "galio-framework";
+import { Button, Block, Text, theme, Icon } from "galio-framework";
 
 import { Products, Images } from "../constants";
 
 import { Product, HorizontalListItem } from "../components";
 import SwitchButton from "switch-button-react-native";
 import { IMLocalized } from "../src/localization/IMLocalization";
-
-const { width } = Dimensions.get("screen");
 import SvgUri from "expo-svg-uri";
-const thumbMeasure = (width - 48 - 32) / 3;
-const cardWidth = width - theme.SIZES.BASE * 2;
 
+const { width, height } = Dimensions.get("screen");
 const DashboardPatient = (props) => {
   const { navigation } = props;
   const [activeSwitch, setActiveSwitch] = useState(null);
@@ -34,39 +31,44 @@ const DashboardPatient = (props) => {
         middle
         style={{ marginTop: theme.SIZES.BASE * 2 }}
       >
-        <Text size={13} color="grey" style={{ marginRight: theme.SIZES.BASE }}>
-          {IMLocalized("useAppFirst")}
-        </Text>
-        <SwitchButton
-          onValueChange={(val) => setActiveSwitch(val)}
-          text1="Yes"
-          text2="No"
-          switchWidth={100}
-          switchHeight={34}
-          switchDirection="rtl"
-          switchBorderRadius={100}
-          switchSpeedChange={500}
-          switchBorderColor="#3B3E51"
-          switchBackgroundColor="#fff"
-          btnBorderColor="#3B3E51"
-          btnBackgroundColor="#3B3E51"
-          fontColor="#3B3E51"
-          activeFontColor="#fff"
-        />
       </Block>
     );
   };
+
+  const navbar = () => {
+    return (
+      <Block>
+        <Block row style={styles.navbar} center>
+          <TouchableOpacity
+            onPress={() => navigation.openDrawer()}
+          >
+            <Icon
+              name="align-justify"
+              family="font-awesome"
+              color="black"
+              size={16}
+              style={styles.chevronLeft}
+            />
+          </TouchableOpacity>
+          <Text
+            color="black"
+            style={{ paddingLeft: theme.SIZES.BASE }}
+            size={22}
+            fontWeight="semiBold"
+          >
+            {IMLocalized("Dashboard Agent")}
+          </Text>
+        </Block>
+        <Block style={{ borderTopWidth: 1, borderColor: "white" }}></Block>
+      </Block>
+    );
+  };
+
   const typeIcons = () => {
     return (
       <Block flex flexDirection={"row"} style={[styles.navbarBtnGroup]}>
         <Block flexDirection={"column"} style={[styles.navbarBtn]} center>
-          <TouchableOpacity
-            onPress={() => {
-              activeSwitch > 1
-                ? navigation.navigate("PatientCaseDetail")
-                : null;
-            }}
-          >
+          <TouchableOpacity>
             <Block center middle style={[styles.imageBtn]}>
               <SvgUri
                 width="50"
@@ -97,13 +99,7 @@ const DashboardPatient = (props) => {
           </Block>
         </Block>
         <Block flexDirection={"column"} style={[styles.navbarBtn]} center>
-          <TouchableOpacity
-            onPress={() => {
-              activeSwitch > 1
-                ? navigation.navigate("PatientScheduleDetail")
-                : null;
-            }}
-          >
+          <TouchableOpacity  onPress={() => navigation.navigate("PatientActiveCase")}>
             <Block center middle style={[styles.imageBtn]}>
               <>
                 {activeSwitch > 1 ? (
@@ -124,9 +120,7 @@ const DashboardPatient = (props) => {
           </TouchableOpacity>
           <Block center style={styles.typeIconText}>
             <Text size={12} bold center color={"#333348"}>
-              {activeSwitch > 1
-                ? IMLocalized("schedule")
-                : IMLocalized("status")}
+                {IMLocalized("activeCase")}
             </Text>
             <Text
               size={10}
@@ -140,27 +134,29 @@ const DashboardPatient = (props) => {
           </Block>
         </Block>
         <Block flexDirection={"column"} style={[styles.navbarBtn]} center>
-          <Block center middle style={[styles.imageBtn]}>
-            <SvgUri
-              width="50"
-              height="50"
-              source={require("../assets/icons/nurse.svg")}
-            />
-          </Block>
-          <Block center style={styles.typeIconText}>
-            <Text size={12} bold center color={"#333348"}>
-              {IMLocalized("bookDoctor")}
-            </Text>
-            <Text
-              size={10}
-              muted
-              color={"#898A8F"}
-              center
-              style={{ paddingVertical: 5 }}
-            >
-              {IMLocalized("searchDoctor")}
-            </Text>
-          </Block>
+          <TouchableOpacity onPress={() => navigation.navigate("BookDoctor")}>
+            <Block center middle style={[styles.imageBtn]}>
+              <SvgUri
+                width="50"
+                height="50"
+                source={require("../assets/icons/nurse.svg")}
+              />
+            </Block>
+            <Block center style={styles.typeIconText}>
+              <Text size={12} bold center color={"#333348"}>
+                {IMLocalized("bookDoctor")}
+              </Text>
+              <Text
+                size={10}
+                muted
+                color={"#898A8F"}
+                center
+                style={{ paddingVertical: 5 }}
+              >
+                {IMLocalized("searchDoctor")}
+              </Text>
+            </Block>
+          </TouchableOpacity>
         </Block>
       </Block>
     );
@@ -230,7 +226,7 @@ const DashboardPatient = (props) => {
               </Text>
               <TouchableOpacity
                 onPress={() => navigation.navigate("Primary Care Doctor View")}
-                style={{ marginLeft: theme.SIZES.BASE * 13 }}
+                style={{ marginLeft: width * 0.5 }}
               >
                 <Text color={"#3A58FC"} bold size={14}>
                   {IMLocalized("seeAll")}
@@ -259,6 +255,7 @@ const DashboardPatient = (props) => {
 
   return (
     <Block flex>
+      {navbar()}
       <ScrollView
         style={styles.components}
         showsVerticalScrollIndicator={false}
@@ -308,11 +305,13 @@ const styles = StyleSheet.create({
     paddingTop: theme.SIZES.BASE * 3.75,
   },
   navbar: {
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    backgroundColor: "#6E78F7",
-    padding: 0,
-    height: theme.SIZES.BASE * 10,
+    backgroundColor: "white",
+    width: width,
+    height: height * 0.16,
+    paddingTop: theme.SIZES.BASE * 2,
+    paddingLeft: theme.SIZES.BASE,
+    borderBottomWidth: 1,
+    borderColor: "rgba(112, 112, 112, 0.1)",
   },
   navbarBtnGroup: {
     marginBottom: theme.SIZES.BASE * 2,

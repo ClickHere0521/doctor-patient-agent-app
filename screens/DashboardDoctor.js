@@ -21,12 +21,14 @@ import {
   HorizontalListItem,
 } from "../components";
 
-const { width } = Dimensions.get("screen");
+const { width, height } = Dimensions.get("screen");
 
 const thumbMeasure = (width - 48 - 32) / 3;
 const cardWidth = width - theme.SIZES.BASE * 2;
 
 const Components = (props) => {
+  
+  const { navigation } = props;
   const cardBox = () => {
     return (
       <Block style={styles.listBox}>
@@ -114,7 +116,7 @@ const Components = (props) => {
         <Block
           flex
           style={{
-            marginVertical: theme.SIZES.BASE,
+            marginBottom: theme.SIZES.BASE,
             paddingBottom: theme.SIZES.BASE,
           }}
         >
@@ -126,7 +128,7 @@ const Components = (props) => {
         <Block
           flex
           flexDirection="row"
-          style={{ marginVertical: theme.SIZES.BASE * 2.5 }}
+          style={{ marginVertical: theme.SIZES.BASE * 1.5}}
         >
           <Text color={"#0033A7"} bold>
             Today's Schedule
@@ -148,8 +150,35 @@ const Components = (props) => {
     );
   };
 
+  const navbar = () => {
+    return (
+      <Block row style={styles.navbar} center>
+        <TouchableOpacity
+            onPress={() => navigation.openDrawer()}
+          >
+            <Icon
+              name="align-justify"
+              family="font-awesome"
+              color="white"
+              size={16}
+              style={styles.chevronLeft}
+            />
+          </TouchableOpacity>
+        <Text
+          color="white"
+          style={{ paddingLeft: theme.SIZES.BASE }}
+          size={17}
+          bold
+        >
+          Doctor Dashboard
+        </Text>
+      </Block>
+    );
+  };
+
   return (
     <Block flex>
+      {navbar()}
       <ScrollView
         style={styles.components}
         showsVerticalScrollIndicator={false}
@@ -161,6 +190,13 @@ const Components = (props) => {
 };
 
 const styles = StyleSheet.create({
+  navbar: {
+    backgroundColor: "#6E78F7",
+    width: width,
+    height: height * 0.16,
+    paddingTop: theme.SIZES.BASE * 2,
+    paddingLeft: theme.SIZES.BASE,
+  },
   insideSchduleItem: {
     borderRadius: 12,
     backgroundColor: "#6695FF",
@@ -195,7 +231,6 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
   },
   mutedText: {
-    padding: theme.SIZES.BASE / 2,
     paddingLeft: theme.SIZES.BASE / 2,
   },
   headerText: {

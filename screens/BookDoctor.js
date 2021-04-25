@@ -1,321 +1,135 @@
-import React, { useState } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  Image,
-  ImageBackground,
-  Dimensions,
-} from "react-native";
-import { Button, Block, Text, Input, theme } from "galio-framework";
+import React, { useEffect, useState } from 'react';
+import { Image, StyleSheet, Dimensions, View, TouchableOpacity, ScrollView } from 'react-native';
+import { Block, Button, Text, theme, Input } from 'galio-framework';
+import materialTheme from '../constants/Theme';
+import {IMLocalized, init} from '../src/localization/IMLocalization';
+import { useFonts } from 'expo-font';
+import AppLoading from 'expo-app-loading';
+import { useDispatch, useSelector } from 'react-redux';
+import { roleSelector } from '../store/duck/action'
+import SvgUri from "expo-svg-uri";
+import { Icon } from "../components";
+import SearchBar from "react-native-dynamic-search-bar";
+import LocateItem from "../components/LocateItem";
+import products from "../constants/images/home";
+const { height, width } = Dimensions.get('screen');
 
-import { materialTheme, products, Images, tabs } from "../constants/";
-import {
-  Select,
-  Icon,
-  Header,
-  Product,
-  Switch,
-  Tabs,
-  HorizontalListItem,
-} from "../components/";
+const InsuranceInfo = (props) => {
+    const { navigation } = props;
 
-const { width } = Dimensions.get("screen");
+    const [request, setRequest] = useState(1);
 
-const thumbMeasure = (width - 48 - 32) / 3;
-const cardWidth = width - theme.SIZES.BASE * 2;
+    const [vals, setVals] = useState({
+        email: "-",
+        password: "-",
+        active: {
+          email: false,
+          password: false,
+        },
+      });
+    
+      const handleChange = (name, value) => {
+        setVals({ ...vals, [name]: value });
+      };
 
-const Components = (props) => {
-  const navbar = () => {
-    return (
-      <Block>
-        <Block
-          style={[styles.navbar, { paddingLeft: theme.SIZES.BASE }]}
-          middle
-          left
-        >
-          <Text middle color="white" bold size={17}>
-            Book Doctor
-          </Text>
-        </Block>
-        <Block flex flexDirection={"row"} style={[styles.navbarBtnGroup]}>
-          <Block flexDirection={"column"} style={[styles.navbarBtn]} center>
-            <Block
-              center
-              middle
-              style={{
-                width: theme.SIZES.BASE * 5,
-                height: theme.SIZES.BASE * 5,
-                borderRadius: 1000,
-                backgroundColor: "white",
-              }}
-            >
-              <Image
-                shadow
-                source={require("../assets/images/doctor.png")}
-                style={{
-                  width: theme.SIZES.BASE * 4,
-                  height: theme.SIZES.BASE * 4,
-                  borderRadius: 1000,
-                }}
+    const navbar = () => {
+      return (
+        <Block row style={styles.navbar} center>
+            <TouchableOpacity onPress={() => navigation.navigate("DashboardPatient")}>
+          <Icon
+              name="arrow-left"
+              family="font-awesome"
+              color="white"
+              size={16}
+              style={styles.chevronLeft}
               />
-            </Block>
-            <Block center style={{ width: theme.SIZES.BASE * 6 }}>
-              <Text size={17} center color={"#000"}>
-                Doctor
-              </Text>
-              <Text size={14} muted color={"#000"} center>
-                Search doctor around you
-              </Text>
-            </Block>
-          </Block>
-          <Block flexDirection={"column"} style={[styles.navbarBtn]} center>
-            <Block
-              center
-              middle
-              style={{
-                width: theme.SIZES.BASE * 5,
-                height: theme.SIZES.BASE * 5,
-                borderRadius: 1000,
-                backgroundColor: "white",
-              }}
-            >
-              <Image
-                shadow
-                source={require("../assets/images/doctor.png")}
-                style={{
-                  width: theme.SIZES.BASE * 4,
-                  height: theme.SIZES.BASE * 4,
-                  borderRadius: 1000,
-                }}
-              />
-            </Block>
-            <Block center style={{ width: theme.SIZES.BASE * 6 }}>
-              <Text size={17} center color={"#000"}>
-                Medicines
-              </Text>
-              <Text size={14} muted color={"#000"} center>
-                Order Medicine to home
-              </Text>
-            </Block>
-          </Block>
-          <Block flexDirection={"column"} style={[styles.navbarBtn]} center>
-            <Block
-              center
-              middle
-              style={{
-                width: theme.SIZES.BASE * 5,
-                height: theme.SIZES.BASE * 5,
-                borderRadius: 1000,
-                backgroundColor: "white",
-              }}
-            >
-              <Image
-                shadow
-                source={require("../assets/images/doctor.png")}
-                style={{
-                  width: theme.SIZES.BASE * 4,
-                  height: theme.SIZES.BASE * 4,
-                  borderRadius: 1000,
-                }}
-              />
-            </Block>
-            <Block center style={{ width: theme.SIZES.BASE * 6 }}>
-              <Text size={17} center color={"#000"}>
-                Digonostic
-              </Text>
-              <Text size={14} muted color={"#000"} center>
-                Book test at Doorstep
-              </Text>
-            </Block>
+              </TouchableOpacity>
+          <Text color="white" style={{paddingLeft: theme.SIZES.BASE}} size={17} bold>Book Doctor</Text>
+          <Block style={{position: "absolute", width: width, top: height * 0.14}}>
+            <SearchBar
+                placeholder="Search here"
+                onChangeText={(text) => console.log(text)}
+                style={{borderRadius: 50, color: 'grey', height: 50}}
+            />
           </Block>
         </Block>
-      </Block>
-    );
-  };
+      )
+    }
 
-  const googleMap = () => {
     return (
-      <Block style={{ borderRadius: theme.SIZES.BASE }} center>
-        <Image
-          shadow
-          middle
-          center
-          source={require("../assets/images/doctor.png")}
-          style={{
-            width: width - theme.SIZES.BASE * 2,
-            padding: theme.SIZES.BASE,
-          }}
-        />
-      </Block>
-    );
-  };
-  const renderCards = () => {
-    return (
-      <Block flex style={styles.group}>
-        <Block flex>
-          <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
-            <ScrollView
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-            >
-              <Block flex card shadow style={styles.category}>
-                <ImageBackground
-                  source={{ uri: Images.Products["Accessories"] }}
-                  style={[
-                    styles.imageBlock,
-                    { width: width - theme.SIZES.BASE * 2, height: 200 },
-                  ]}
-                  imageStyle={{
-                    width: width - theme.SIZES.BASE * 2,
-                    height: 200,
-                  }}
-                >
-                  <Block style={styles.categoryTitle}>
-                    <Text size={18} bold color={theme.COLORS.WHITE}>
-                      Accessories
-                    </Text>
-                  </Block>
-                </ImageBackground>
-              </Block>
-              <Block flex card shadow style={styles.category}>
-                <ImageBackground
-                  source={{ uri: Images.Products["Makeup"] }}
-                  style={[
-                    styles.imageBlock,
-                    { width: width - theme.SIZES.BASE * 2, height: 200 },
-                  ]}
-                  imageStyle={{
-                    width: width - theme.SIZES.BASE * 2,
-                    height: 200,
-                  }}
-                >
-                  <Block style={styles.categoryTitle}>
-                    <Text size={18} bold color={theme.COLORS.WHITE}>
-                      Makeup
-                    </Text>
-                  </Block>
-                </ImageBackground>
-              </Block>
-              <Block flex card shadow style={styles.category}>
-                <ImageBackground
-                  source={{ uri: Images.Products["Harley-Davidson"] }}
-                  style={[
-                    styles.imageBlock,
-                    { width: width - theme.SIZES.BASE * 2, height: 200 },
-                  ]}
-                  imageStyle={{
-                    width: width - theme.SIZES.BASE * 2,
-                    height: 200,
-                  }}
-                >
-                  <Block style={styles.categoryTitle}>
-                    <Text size={18} bold color={theme.COLORS.WHITE}>
-                      Harley-Davidson
-                    </Text>
-                  </Block>
-                </ImageBackground>
-              </Block>
-            </ScrollView>
-            <Text
-              color={"#3F4079"}
-              bold
-              size={17}
-              style={{ marginVertical: theme.SIZES.BASE }}
-            >
-              Doctors near by you
-            </Text>
-            <ScrollView
-              horizontal={true}
-              showsHorizontalScrollIndicator={false}
-            >
-              <Block flex row>
-                <HorizontalListItem
-                  product={products[1]}
-                  style={{ marginRight: theme.SIZES.BASE }}
-                />
-                <HorizontalListItem product={products[2]} />
-                <HorizontalListItem product={products[3]} />
-                <HorizontalListItem product={products[4]} />
-              </Block>
-            </ScrollView>
-          </Block>
+        <Block style={{backgroundColor: "white"}}>
+            {navbar()}
+            <Block  style={{marginTop: theme.SIZES.BASE * 3, padding: theme.SIZES.BASE}}>
+                <Text style={{color: '#3F4079', marginBottom: theme.SIZES.BASE}} size={12}>{IMLocalized('doctorsNearbyYou')}</Text>
+                <ScrollView style={{height: height * 0.65}}>
+                    <Block flex>
+                        <LocateItem product={products[0]} horizontal />
+                        <LocateItem product={products[1]} horizontal />
+                        <LocateItem product={products[3]} horizontal />
+                        <LocateItem product={products[4]} horizontal />
+                        <LocateItem product={products[2]} horizontal />
+                        <LocateItem product={products[0]} horizontal />
+                        <LocateItem product={products[0]} horizontal />
+                        <LocateItem product={products[0]} horizontal />
+                        <LocateItem product={products[1]} horizontal />
+                    </Block>
+                </ScrollView>
+            </Block>
         </Block>
-      </Block>
-    );
-  };
-
-  return (
-    <Block flex>
-      <ScrollView
-        style={styles.components}
-        showsVerticalScrollIndicator={false}
-      >
-        {navbar()}
-        {renderCards()}
-        {googleMap()}
-      </ScrollView>
-    </Block>
-  );
-};
-
+    )
+}
 const styles = StyleSheet.create({
-  navbarBtn: {
-    width: theme.SIZES.BASE * 5,
-    height: theme.SIZES.BASE * 5,
-    padding: theme.SIZES.BASE,
-    borderColor: "white",
-    marginLeft: theme.SIZES.BASE * 3,
-  },
-  components: {
-    marginBottom: theme.SIZES.BASE,
-  },
-  title: {
-    paddingVertical: theme.SIZES.BASE,
-    paddingHorizontal: theme.SIZES.BASE * 2,
-  },
-  group: {
-    paddingTop: theme.SIZES.BASE * 3.75,
-  },
-  navbar: {
-    borderBottomLeftRadius: 24,
-    borderBottomRightRadius: 24,
-    backgroundColor: "#6E78F7",
-    padding: 0,
-    height: theme.SIZES.BASE * 10,
-  },
-  navbarBtnGroup: {
-    marginTop: -theme.SIZES.BASE * 4,
-    marginBottom: theme.SIZES.BASE,
-  },
-  shadow: {
-    shadowColor: "black",
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 4,
-    shadowOpacity: 0.2,
-    elevation: 1,
-  },
-  imageBlock: {
-    overflow: "hidden",
-    borderRadius: 4,
-  },
-  rows: {
-    height: theme.SIZES.BASE * 2,
-  },
-  category: {
-    backgroundColor: theme.COLORS.WHITE,
-    marginVertical: theme.SIZES.BASE / 2,
-    borderWidth: 0,
-    paddingRight: theme.SIZES.BASE,
-  },
-  categoryTitle: {
-    height: "100%",
-    paddingHorizontal: theme.SIZES.BASE,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
-  },
+    inputNote: {
+        width: width * 0.9,
+        borderRadius: theme.SIZES.BASE,
+        borderColor: 'grey',
+        borderWidth: 1,
+        marginTop: theme.SIZES.BASE,
+        height: height * 0.4,
+    },
+    inputItem: {
+        width: width * 0.9,
+        borderRadius: theme.SIZES.BASE,
+        borderColor: 'grey',
+        borderWidth: 1,
+        marginTop: theme.SIZES.BASE
+    },
+    location: {
+        marginTop: theme.SIZES.BASE,
+        width: width * 0.8,
+        borderRadius: 10,
+        padding: 5,
+        borderRadius: 15,
+        borderColor: '#DEDEDE',
+        borderWidth: 1,
+    },
+    cardStyle: {
+        borderWidth: 1,
+        borderColor: '#EDEDED',
+        borderRadius: 30,
+        width: width,
+        height:100,
+        marginTop: theme.SIZES.BASE * 1.5,
+        padding: theme.SIZES.BASE
+    },
+    navbar: {
+        backgroundColor: "#6E78F7",
+        borderBottomRightRadius: 24,
+        borderBottomLeftRadius: 24,
+        width: width,
+        height: height * 0.16,
+        paddingTop: theme.SIZES.BASE * 2,
+        paddingLeft: theme.SIZES.BASE,
+    },
+    input: {
+        marginVertical: theme.SIZES.BASE,
+        width: width * 0.8,
+        borderBottomWidth: 1,
+        borderBottomColor: materialTheme.COLORS.PLACEHOLDER,
+        color: 'black',
+    },
+    inputActive: {
+        borderBottomColor: "black",
+    },
 });
-
-export default Components;
+export default InsuranceInfo;

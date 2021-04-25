@@ -6,6 +6,7 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
+  Modal
 } from "react-native";
 import { Block, Button, Text, theme, Input } from "galio-framework";
 import materialTheme from "../constants/Theme";
@@ -22,6 +23,7 @@ const { height, width } = Dimensions.get("screen");
 const ForgotPassword = (props) => {
   const { navigation } = props;
 
+  const [modalVisible, setModalVisible] = useState(0);
   const [vals, setVals] = useState({
     user: "-",
     email: "-",
@@ -212,7 +214,7 @@ const ForgotPassword = (props) => {
                 borderColor: "#707070",
                 width: theme.SIZES.BASE * 12,
               }}
-              onPress={() => navigation.replace("App")}
+              onPress={() => setModalVisible(true)}
             >
               <Text size={18} bold>
                 Reset Password
@@ -224,6 +226,21 @@ const ForgotPassword = (props) => {
               <Text>Start Again</Text>
             </TouchableOpacity>
           </Block>
+          
+          <Modal
+            animationType="slide"
+            transparent={true}
+            visible={modalVisible}
+            onRequestClose={() => {
+              Alert.alert('Modal has been closed.');
+            }}>
+            <Block style={{marginTop: height * 0.3, backgroundColor: 'rgba(255,255,255,0.6)', width: width, height: height * 0.3}} center middle>
+              <Block style={styles.innerModal} center middle>
+                <Text size={16}>{IMLocalized('You have succefully reset your password.')}</Text>
+                <Button color="white" style={styles.modalButton} onPress={() => { setModalVisible(1); navigation.navigate('SignIn')}}><Text size={18}>OK</Text></Button>
+              </Block>
+            </Block>
+          </Modal>
         </Block>
       </Block>
     );
@@ -248,6 +265,22 @@ const ForgotPassword = (props) => {
   );
 };
 const styles = StyleSheet.create({
+  modalButton: {
+    width: width * 0.25,
+    height: theme .SIZES.BASE * 2,
+    borderRadius: 17,
+    borderWidth: 0.5,
+    borderColor: "#C7C7C7",
+    marginTop: theme.SIZES.BASE
+  },
+  innerModal: {
+    backgroundColor: 'rgba(255,255,255,0.99)', width: width * 0.8, borderRadius: 15, height: height * 0.15, 
+    shadowColor: theme.COLORS.BLACK,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 3,
+    shadowOpacity: 0.1,
+    elevation: 5
+  },
   navbar: {
     backgroundColor: "#6E78F7",
     borderBottomRightRadius: 24,

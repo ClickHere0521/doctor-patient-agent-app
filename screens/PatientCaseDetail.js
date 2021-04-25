@@ -1,369 +1,596 @@
 import React, { useState } from "react";
-import { materialTheme } from "../constants";
-import SwitchButton from "switch-button-react-native";
-import SvgUri from "expo-svg-uri";
-import { Button, Block, Text, theme, Icon } from "galio-framework";
-import { Products, Images } from "../constants";
-import { Product, HorizontalListItem } from "../components";
-import { IMLocalized } from "../src/localization/IMLocalization";
-import { SliderBox } from "react-native-image-slider-box";
-
 import {
   ScrollView,
   StyleSheet,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
   Image,
   ImageBackground,
   Dimensions,
-  Platform,
-  TouchableOpacity,
-  TouchableOpacityComponent,
+  Touchable,
 } from "react-native";
+import { Button, Block, Text, Input, theme } from "galio-framework";
+import { materialTheme, products, Images, tabs } from "../constants/";
+import {
+  Select,
+  Icon,
+  Header,
+  Product,
+  Switch,
+  Tabs,
+  ListItem,
+} from "../components/";
+import { launchCamera, launchImageLibrary } from "react-native-image-picker";
+import { SliderBox } from "react-native-image-slider-box";
+import SvgUri from "expo-svg-uri";
 
 const { width, height } = Dimensions.get("screen");
-const thumbMeasure = (width - 48 - 32) / 3;
 
-const DoctorScheduleDetail = (props) => {
+const Components = (props) => {
   const { navigation } = props;
-  const [activeSwitch, setActiveSwitch] = useState(1);
-  const [images, setImages] = useState([
-    "https://source.unsplash.com/900x900/?tree",
-    "https://source.unsplash.com/700x700/?enjoy",
-    "https://source.unsplash.com/1024x768/?general",
-    "https://source.unsplash.com/500x500/?gun=161", // Network image
-  ]);
-  const renderDetails = (details) => {
-    let { heading, doctor, symptom, appointment, medication } = { ...details };
+  const [imageSource, setImageSource] = useState(null);
+  const options = {
+    title: "Load Photo",
+    customButtons: [
+      { name: "button_id_1", title: "CustomButton 1" },
+      { name: "button_id_2", title: "CustomButton 2" },
+    ],
+    storageOptions: {
+      skipBackup: true,
+      path: "images",
+    },
+  };
 
+  const weekBar = () => {
     return (
-      <Block style={styles.scheduleDetail}>
-        <Text size={18}>{heading}</Text>
-        <Text size={12}>{doctor}</Text>
-        <Text style={{ marginTop: 10 }}>{symptom}</Text>
-        <Text>{appointment}</Text>
-        <Text bold style={{ marginTop: 10 }}>
-          Medication{" "}
-        </Text>
-        <Text>{medication}</Text>
-        <TouchableOpacity
-          style={styles.edit}
-          onPress={() => navigation.navigate("TimeSlot")}
-        >
-          <Text color="#00CE30">Edit</Text>
+      <ScrollView
+        horizontal={true}
+        pagingEnabled={true}
+        decelerationRate={0}
+        scrollEventThrottle={16}
+        snapToAlignment="center"
+        showsHorizontalScrollIndicator={false}
+        snapToInterval={theme.SIZES.BASE * 0.375}
+        style={styles.weekScrollView}
+      >
+        <TouchableOpacity style={styles.dateActive}>
+          <Text size={16} color={"white"}>
+            WED
+          </Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={{ position: "absolute", top: -10, right: -10 }}
-        >
-          <SvgUri
-            width="20"
-            height="20"
-            source={require("../assets/icons/topGreeenStatus.svg")}
-            style={{ paddingLeft: 15 }}
+        <TouchableOpacity style={styles.dateInActive}>
+          <Text size={16} style={{ paddingLeft: 3 }}>
+            THU
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.dateInActive}>
+          <Text size={16} style={{ paddingLeft: 8 }}>
+            FRI
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.dateInActive}>
+          <Text size={16} style={{ paddingLeft: 6 }}>
+            SAT
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.dateInActive}>
+          <Text size={16} style={{ paddingLeft: 4 }}>
+            SUN
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.dateInActive}>
+          <Text size={16}>MON</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.dateInActive}>
+          <Text size={16} style={{ paddingLeft: 4 }}>
+            THE
+          </Text>
+        </TouchableOpacity>
+      </ScrollView>
+    );
+  };
+
+  const renderNotes = (notes) => {
+    let { author, date, content } = notes;
+    return (
+      <Block row center style={styles.patientHeading}>
+        <Block>
+          <Image
+            source={require("../assets/images/grayscale-photo-of-man2.png")}
+            style={{ width: 60, height: 60 }}
           />
-        </TouchableOpacity>
+          <Image
+            source={require("../assets/images/ok.png")}
+            style={{ position: "absolute", right: 0 }}
+          />
+        </Block>
+
+        <Block column style={{ paddingLeft: 10, width: width * 0.7 }}>
+          <Text bold size={16}>
+            {author}
+          </Text>
+          <Text
+            color={"#909CA1"}
+            style={{ paddingTop: theme.SIZES.BASE * 0.5 }}
+          >
+            {date}
+          </Text>
+          <Text
+            color={"#909CA1"}
+            style={{ paddingTop: theme.SIZES.BASE * 0.5 }}
+          >
+            {content}
+          </Text>
+        </Block>
       </Block>
     );
   };
 
   return (
-    <Block flex style={styles.patientInfo}>
-      <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
-        <Block
-          flex
-          center
-          style={{ margin: 10, marginTop: theme.SIZES.BASE * 2 }}
-        >
+    <Block flex style={styles.agentCaseDetail}>
+      <Block style={styles.roundBlock}>
+        <Block row style={styles.heading}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Icon
+              size={16}
+              name="chevron-left"
+              family="font-awesome"
+              color={"white"}
+              style={{ padding: 7 }}
+            />
+          </TouchableOpacity>
+          <Block>
+            <Text
+              color="white"
+              size={20}
+              style={{ fontFamily: "Inter-Black" }}
+              bold
+            >
+              Case Details
+            </Text>
+          </Block>
+          <Block
+            style={{
+              position: "absolute",
+              right: 10,
+              padding: 7,
+            }}
+          >
+            <Image source={require("../assets/images/editWhite.png")} />
+          </Block>
+        </Block>
+      </Block>
+      <ScrollView
+        style={styles.components}
+        showsVerticalScrollIndicator={false}
+      >
+        <Text bold size={18} style={{ paddingLeft: width * 0.05 }}>
+          Patient
+        </Text>
+        <Block row center style={styles.patientHeading}>
           <Image
-            source={require("../assets/images/grayscale-photo-of-man2.png")}
-            style={styles.imageStyle}
-          ></Image>
-          <Text size={20}>Dr. Ronald Joseph</Text>
-          <Block flex flexDirection="row" center>
-            <Text>neurosergion specialist</Text>
+            source={require("../assets/images/patient1.png")}
+            style={{ width: 60, height: 60 }}
+          />
+          <Block column style={{ paddingLeft: 10, width: width * 0.55 }}>
+            <Text bold size={16}>
+              Edie Sparks Turie
+            </Text>
+            <Text
+              color={"#909CA1"}
+              style={{ paddingTop: theme.SIZES.BASE * 0.5 }}
+            >
+              1993/04/29
+            </Text>
+          </Block>
+          <Block column>
+            <Text style={{ alignSelf: "flex-end" }} color={"#06D81E"}></Text>
             <SvgUri
               width="20"
               height="20"
               source={require("../assets/icons/editGreen.svg")}
-              style={{ paddingLeft: 15 }}
+              style={{
+                right: -theme.SIZES.BASE * 2,
+                paddingTop: theme.SIZES.BASE,
+              }}
             />
           </Block>
         </Block>
-        <Block flex flexDirection="row" style={{ margin: theme.SIZES.BASE }}>
-          <Block flex={1}>
-            <SliderBox
-              images={images}
-              parentWidth={width / 2 - 20}
-              ImageComponentStyle={{ borderRadius: 15, width: "100%" }}
-              onCurrentImagePressed={(index) =>
-                console.warn(`image ${index} pressed`)
-              }
+
+        <Text bold size={18} style={{ paddingLeft: width * 0.05 }}>
+          Doctor
+        </Text>
+        <Block row center style={styles.patientHeading}>
+          <Block>
+            <Image
+              source={require("../assets/images/grayscale-photo-of-man2.png")}
+              style={{ width: 60, height: 60 }}
+            />
+            <Image
+              source={require("../assets/images/ok.png")}
+              style={{ position: "absolute", right: 0 }}
             />
           </Block>
-          <Block
-            flex={1}
-            flexDirection="column"
-            style={{
-              paddingLeft: theme.SIZES.BASE,
-              paddingTop: theme.SIZES.BASE / 2,
-            }}
-          >
-            <Block flex flexDirection="row">
-              <Icon name="angle-down" family="font-awesome" size={20} />
-              <Text style={{ paddingLeft: 14 }}>New case</Text>
-            </Block>
-            <Block flex flexDirection="row">
-              <Icon name="angle-down" family="font-awesome" size={20} />
-              <Text style={{ paddingLeft: 14 }}>Waiting schedule</Text>
-            </Block>
-            <Block flex flexDirection="row">
-              <Icon name="angle-down" family="font-awesome" size={20} />
-              <Text style={{ paddingLeft: 14 }}>Scheduled</Text>
-            </Block>
-            <Block flex flexDirection="row">
-              <Icon name="angle-down" family="font-awesome" size={20} />
-              <Text style={{ paddingLeft: 14 }}>Treatment</Text>
-            </Block>
-            <Block flex flexDirection="row">
-              <Icon name="angle-down" family="font-awesome" size={20} />
-              <Text style={{ paddingLeft: 14 }}>Treatment review</Text>
-            </Block>
-            <Block flex flexDirection="row">
-              <Icon name="angle-down" family="font-awesome" size={20} />
-              <Text style={{ paddingLeft: 14 }}>Discharged</Text>
-            </Block>
+
+          <Block column style={{ paddingLeft: 10, width: width * 0.55 }}>
+            <Text bold size={16}>
+              Edie Sparks
+            </Text>
+            <Text
+              color={"#909CA1"}
+              style={{ paddingTop: theme.SIZES.BASE * 0.5 }}
+            >
+              1993/04/29
+            </Text>
+          </Block>
+          <Block column>
+            <Text style={{ alignSelf: "flex-end" }} color={"#06D81E"}></Text>
+            <SvgUri
+              width="20"
+              height="20"
+              source={require("../assets/icons/editGreen.svg")}
+              style={{
+                right: -theme.SIZES.BASE * 2,
+                paddingTop: theme.SIZES.BASE,
+              }}
+            />
           </Block>
         </Block>
-        <Block style={styles.Container}>
-          <Text style={styles.schedules} size={14}>
-            Planned Remainders
+        <Block style={styles.interval}>
+          <Text bold size={18} style={{ paddingLeft: width * 0.05 }}>
+            Status
+          </Text>
+          <Text size={16} style={styles.startTimeRight}>
+            Case start time：2020.09.23
           </Text>
         </Block>
-        <ScrollView
-          horizontal={true}
-          pagingEnabled={true}
-          decelerationRate={0}
-          scrollEventThrottle={16}
-          snapToAlignment="center"
-          showsHorizontalScrollIndicator={false}
-          snapToInterval={theme.SIZES.BASE * 0.375}
-          contentContainerStyle={{ paddingHorizontal: theme.SIZES.BASE / 2 }}
-        >
-          <TouchableOpacity style={styles.dateActive}>
-            <Text size={16} color={"white"}>
-              WED
+        <Block center>
+          <Block row>
+            <Block style={{ marginLeft: 30 }}>
+              <Block row>
+                <SvgUri
+                  width="25"
+                  height="25"
+                  source={require("../assets/icons/rect_check.svg")}
+                  style={{
+                    position: "absolute",
+                    marginLeft: -16,
+                    marginTop: 6,
+                  }}
+                />
+                <Text size={16} style={styles.text}>
+                  New case
+                </Text>
+              </Block>
+              <Block row>
+                <SvgUri
+                  width="25"
+                  height="25"
+                  source={require("../assets/icons/rect_check.svg")}
+                  style={{
+                    position: "absolute",
+                    marginLeft: -16,
+                    marginTop: 6,
+                  }}
+                />
+                <Text size={16} style={styles.text}>
+                  Waiting schedule
+                </Text>
+              </Block>
+              <Block row>
+                <SvgUri
+                  width="25"
+                  height="25"
+                  source={require("../assets/icons/rect_check.svg")}
+                  style={{
+                    position: "absolute",
+                    marginLeft: -16,
+                    marginTop: 6,
+                  }}
+                />
+                <Text size={16} style={styles.text}>
+                  Scheduled
+                </Text>
+              </Block>
+            </Block>
+            <Block style={{ marginLeft: 30 }}>
+              <Block row>
+                <SvgUri
+                  width="25"
+                  height="25"
+                  source={require("../assets/icons/rect_check.svg")}
+                  style={{
+                    position: "absolute",
+                    marginLeft: -16,
+                    marginTop: 6,
+                  }}
+                />
+                <Text size={16} style={styles.text}>
+                  Treatment
+                </Text>
+              </Block>
+              <Block row>
+                <SvgUri
+                  width="25"
+                  height="25"
+                  source={require("../assets/icons/rect_check.svg")}
+                  style={{
+                    position: "absolute",
+                    marginLeft: -16,
+                    marginTop: 6,
+                  }}
+                />
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("AgentReview")}
+                >
+                  <Text color={"#6E78F7"} size={16} style={styles.text}>
+                    Case final review
+                  </Text>
+                </TouchableOpacity>
+              </Block>
+              <Block row>
+                <SvgUri
+                  width="25"
+                  height="25"
+                  source={require("../assets/icons/rect_check.svg")}
+                  style={{
+                    position: "absolute",
+                    marginLeft: -16,
+                    marginTop: 6,
+                  }}
+                />
+                <Text color={"black"} size={16} style={styles.text}>
+                  Discharged
+                </Text>
+              </Block>
+            </Block>
+          </Block>
+        </Block>
+        <Block style={styles.interval}>
+          <Text bold size={18} style={{ paddingLeft: width * 0.05 }}>
+            Date of Injury
+          </Text>
+          <Text size={16} style={styles.startTime}>
+            23.09.2020
+          </Text>
+        </Block>
+        <Block row style={styles.interval}>
+          <Text bold size={18} color={"black"} style={{ paddingLeft: width * 0.05 }}>
+            Attorney Info
+          </Text>
+          <TouchableOpacity onPress={() => navigation.navigate("AddAfforney")}>
+            <Text size={16} color={"#6E78F7"} style={styles.startTimeDetail, {marginLeft: width * 0.2}}>
+              Detail
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.dateInActive}>
-            <Text size={16} style={{ paddingLeft: 3 }}>
-              THU
+        </Block>
+        <Block row style={styles.interval}>
+          <Text bold size={18} color={"black"} style={{ paddingLeft: width * 0.05 }}>
+            Insurance Info
+          </Text>
+          <TouchableOpacity onPress={() => navigation.navigate("AddInsurance")}>
+            <Text size={16} color={"#6E78F7"} style={styles.startTimeDetail, {marginLeft: width * 0.18}}>
+              Detail
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.dateInActive}>
-            <Text size={16} style={{ paddingLeft: 8 }}>
-              FRI
+        </Block>
+        <Block style={styles.interval}>
+          <Text bold size={18} style={{ paddingLeft: width * 0.05 }}>
+            Schedule
+          </Text>
+        </Block>
+        {weekBar()}
+        <Block center row style={{ marginBottom: 10 }}>
+          <Text style={{ marginRight: width * 0.3 }}>9.00-11.00</Text>
+          <Text>Dr.Ronald</Text>
+        </Block>
+        <Block row center>
+          <TouchableOpacity
+            style={styles.save}
+            onPress={() => navigation.navigate('PatientCaseFile')}
+          >
+            <Text color={"white"} size={16}>
+              Case file
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.dateInActive}>
-            <Text size={16} style={{ paddingLeft: 6 }}>
-              SAT
+        </Block>
+        <Block style={styles.bar}></Block>
+        <Block style={styles.interval}>
+          <Text bold size={18} style={{ paddingLeft: width * 0.05 }}>
+            Notes
+          </Text>
+          <TouchableOpacity
+            style={{
+              right: theme.SIZES.BASE * 1,
+              top: theme.SIZES.BASE * 0.3,
+              position: "absolute",
+              zIndex: 10,
+            }}
+            onPress={() => navigation.navigate("CreateCase")}
+          >
+            <Text color={"white"}>
+              <SvgUri
+                width="16"
+                height="16"
+                source={require("../assets/icons/add.svg")}
+              />
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.dateInActive}>
-            <Text size={16} style={{ paddingLeft: 4 }}>
-              SUN
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.dateInActive}>
-            <Text size={16} style={{ paddingLeft: 4 }}>
-              MON
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.dateInActive}>
-            <Text size={16} style={{ paddingLeft: 4 }}>
-              THE
-            </Text>
-          </TouchableOpacity>
-        </ScrollView>
-        {renderDetails({
-          heading: "Sevre Pain",
-          doctor: "Dr. Naveed Baloch",
-          symptom: "Symptoms: Headache",
-          appointment: "Appointment Date: 23, November 2020",
-          medication: "Esso 20g, Amastan 5/80g, Cipronxin 500g",
+        </Block>
+        {renderNotes({
+          author: "DR.Adila Tahir",
+          date: "21/02/2021",
+          content: "Please don't say that...",
         })}
-        {renderDetails({
-          heading: "Sevre Pain",
-          doctor: "Dr. Naveed Baloch",
-          symptom: "Symptoms: Headache",
-          appointment: "Appointment Date: 23, November 2020",
-          medication: "Esso 20g, Amastan 5/80g, Cipronxin 500g",
+        {renderNotes({
+          author: "DR.Adila Tahir",
+          date: "21/02/2021",
+          content: "Please don't say that...",
         })}
-        {renderDetails({
-          heading: "Sevre Pain",
-          doctor: "Dr. Naveed Baloch",
-          symptom: "Symptoms: Headache",
-          appointment: "Appointment Date: 23, November 2020",
-          medication: "Esso 20g, Amastan 5/80g, Cipronxin 500g",
+        {renderNotes({
+          author: "DR.Adila Tahir",
+          date: "21/02/2021",
+          content: "Please don't say that...",
         })}
-        {renderDetails({
-          heading: "Sevre Pain",
-          doctor: "Dr. Naveed Baloch",
-          symptom: "Symptoms: Headache",
-          appointment: "Appointment Date: 23, November 2020",
-          medication: "Esso 20g, Amastan 5/80g, Cipronxin 500g",
-        })}
+        <Block style={{ marginBottom: 50 }}></Block>
       </ScrollView>
     </Block>
   );
 };
 
 const styles = StyleSheet.create({
-  dateActive: {
-    backgroundColor: "#00CE30",
-    borderRadius: 18,
-    paddingHorizontal: 10,
-    paddingVertical: 20,
-    marginHorizontal: 10,
-    width: theme.SIZES.BASE * 3.5,
-    height: theme.SIZES.BASE * 5,
-    alignSelf: "center",
-    justifyContent: "center",
-  },
-  dateInActive: {
-    backgroundColor: "#EdEdEd",
-    borderRadius: 18,
-    paddingHorizontal: 10,
-    paddingVertical: 20,
-    marginHorizontal: 10,
-    width: theme.SIZES.BASE * 3.5,
-    height: theme.SIZES.BASE * 5,
-    alignSelf: "center",
-    justifyContent: "center",
-  },
-  imageStyle: {
-    width: 80,
-    height: 80,
-    margin: 5,
-  },
-  centerBlock: {
-    marginTop: 30,
-  },
-  scheduleDetail: {
-    borderWidth: 1,
-    borderColor: "#EDEDED",
-    borderRadius: 10,
-    padding: 10,
-    margin: 8,
-  },
-  edit: {
-    padding: 4,
-    paddingLeft: 12,
-    borderWidth: 1,
-    borderRadius: 10,
-    width: 50,
-    position: "absolute",
-    top: height * 0.03,
-    right: width * 0.03,
-    borderColor: "#00CE30",
-  },
-  patientInfo: {
-    marginTop: Platform.OS === "android" ? height * 0.03 : height * 0.03,
+  components: {
+    paddingTop: theme.SIZES.BASE,
     backgroundColor: "white",
   },
-  profileImage: {
-    width: width * 1.1,
-    height: "auto",
+  patientImage: {
+    width: 60,
+    height: 60,
   },
-  Container: {
-    width: width,
-    height: "auto",
-    flex: 1,
-    paddingHorizontal: 30,
-    paddingVertical: 20,
-  },
-  profileDetails: {
-    paddingTop: theme.SIZES.BASE * 4,
-    justifyContent: "flex-end",
-    position: "relative",
-  },
-  profileTexts: {
-    paddingHorizontal: theme.SIZES.BASE * 2,
-    paddingVertical: theme.SIZES.BASE * 2,
-    zIndex: 2,
-  },
-  pro: {
-    backgroundColor: materialTheme.COLORS.LABEL,
-    paddingHorizontal: 6,
-    marginRight: theme.SIZES.BASE / 2,
-    borderRadius: 4,
-    height: 19,
-    width: 90,
-  },
-  seller: {
-    marginRight: theme.SIZES.BASE / 2,
-  },
-  options: {
-    position: "relative",
-    marginHorizontal: theme.SIZES.BASE,
-    marginTop: -theme.SIZES.BASE,
-    marginBottom: 0,
-    paddingTop: height * 0.02,
-    borderTopLeftRadius: 13,
-    borderTopRightRadius: 13,
-    borderBottomLeftRadius: 13,
-    borderBottomRightRadius: 13,
-    elevation: 3,
-    backgroundColor: theme.COLORS.WHITE,
-    shadowColor: "black",
-    shadowOffset: { width: 10, height: 10 },
-    shadowRadius: 8,
-    shadowOpacity: 0.8,
-    zIndex: 2,
-  },
-  thumb: {
-    borderRadius: 4,
-    marginVertical: 4,
-    alignSelf: "center",
-    width: thumbMeasure,
-    height: thumbMeasure,
-  },
-  gradient: {
-    zIndex: 1,
-    left: 0,
+  statusImage: {
+    position: "absolute",
     right: 0,
-    bottom: 0,
-    height: "30%",
+  },
+  takePhoto: {
+    borderWidth: 1,
+    borderRadius: 8,
+    borderColor: "#CCCCCC",
+    paddingVertical: 8,
+    paddingHorizontal: 32,
+    marginTop: 16,
+  },
+  photo: {
+    width: 200,
+    height: 200,
+    borderRadius: 8,
+  },
+  doctor: {
+    paddingVertical: 14,
+    borderRadius: 40,
+    borderWidth: 1,
+    borderColor: "#CCCCCC",
+    marginTop: theme.SIZES.BASE * 18,
+  },
+  doctorItem: {
+    marginHorizontal: 10,
+  },
+  profileBtn: {
+    borderRadius: 20,
+    backgroundColor: "#00CE30",
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+  },
+  text: {
+    marginHorizontal: 10,
+    marginVertical: 10,
+  },
+  startTime: {
+    marginHorizontal: 10,
+    position: "absolute",
+    left: width * 0.5,
+  },
+  startTimeRight: {
+    marginHorizontal: 10,
+    position: "absolute",
+    right: 16,
+  },
+  camera: {
+    backgroundColor: "#E7F0FF",
+    borderRadius: 30,
+    marginVertical: theme.SIZES.BASE * 4,
+    width: 250,
+    height: 250,
     position: "absolute",
   },
-  past: {
-    borderRadius: 10,
-    paddingHorizontal: 44,
-    paddingVertical: 6,
-    backgroundColor: "#3B3E51",
+  slider: {
+    position: "absolute",
+    marginTop: theme.SIZES.BASE * 4,
   },
-  schedules: {
-    alignContent: "flex-start",
-    alignSelf: "flex-start",
+  backIcon: {
+    position: "absolute",
+    marginLeft: theme.SIZES.BASE * 2,
   },
-
-  category: {
-    backgroundColor: theme.COLORS.WHITE,
-    marginVertical: theme.SIZES.BASE / 2,
-    borderWidth: 0,
-    paddingRight: theme.SIZES.BASE,
+  roundBlock: {
+    borderBottomLeftRadius: 34,
+    borderBottomRightRadius: 34,
+    backgroundColor: "rgba(100, 120, 247, 0.84)",
+    height: height * 0.16,
+    width: width,
+    top: -10,
+    zIndex: 2,
   },
-  categoryTitle: {
-    height: "100%",
-    paddingHorizontal: theme.SIZES.BASE,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
+  heading: {
+    marginTop: height * 0.08,
+    paddingHorizontal: theme.SIZES.BASE * 0.5,
+    zIndex: 1,
+  },
+  agentCaseDetail: {
+    backgroundColor: "white",
+  },
+  patientHeading: {
+    width: width * 0.92,
+    borderColor: "#F1F1F1",
+    borderRadius: 20,
+    shadowColor: "grey",
+    shadowOpacity: 0.2,
+    shadowOpacity: 5,
+    elevation: 2,
+    backgroundColor: "#FEFEFE",
+    padding: 10,
+    marginVertical: 5,
+  },
+  interval: {
+    marginTop: 14,
+  },
+  weekScrollView: {
+    marginVertical: theme.SIZES.BASE,
+    padding: theme.SIZES.BASE,
+    paddingTop: 0,
+  },
+  dateActive: {
+    backgroundColor: "#00CE30",
+    borderRadius: theme.SIZES.BASE * 1.5,
+    paddingHorizontal: 8,
+    paddingVertical: 20,
+    marginRight: theme.SIZES.BASE,
+    width: theme.SIZES.BASE * 4,
+    height: theme.SIZES.BASE * 5,
     alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "center",
   },
-  imageBlock: {
-    width: width / 2 - theme.SIZES.BASE * 2,
-    height: 200,
-    overflow: "hidden",
-    borderRadius: 4,
+  dateInActive: {
+    borderWidth: 1,
+    borderColor: "#EDEDED",
+    borderRadius: theme.SIZES.BASE * 1.5,
+    paddingHorizontal: 4,
+    paddingVertical: 20,
+    marginRight: theme.SIZES.BASE,
+    width: theme.SIZES.BASE * 4,
+    height: theme.SIZES.BASE * 5,
+    alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "center",
+  },
+  save: {
+    backgroundColor: "#00CE30",
+    borderRadius: 15,
+    paddingVertical: 10,
+    paddingHorizontal: 50,
+    marginBottom: 10,
+    marginHorizontal: 20,
+  },
+  bar: {
+    alignSelf: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: "#EDEDED",
+    paddingTop: 20,
+    width: width * 0.8,
+  },
+  startTimeDetail: {
+    textDecorationLine: "underline",
+    marginHorizontal: 10,
   },
 });
 
-export default DoctorScheduleDetail;
+export default Components;

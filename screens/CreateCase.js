@@ -56,38 +56,38 @@ const CreateCase = (props) => {
     );
   };
 
+  const navbar = () => {
+    return (
+      <Block row style={styles.navbar} center>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+        >
+          <Icon
+            name="arrow-left"
+            family="font-awesome"
+            color="white"
+            size={16}
+            style={styles.chevronLeft}
+          />
+        </TouchableOpacity>
+        <Text
+          color="white"
+          style={{ paddingLeft: theme.SIZES.BASE }}
+          size={17}
+          bold
+        >
+          Create Case
+        </Text>
+      </Block>
+    );
+  };
+
   return (
     <Block flex style={styles.notification}>
-      <Block>
-        <Block style={styles.roundBlock}>
-          <Block row style={styles.heading}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
-              <Icon
-                size={16}
-                name="chevron-left"
-                family="font-awesome"
-                color={"white"}
-                style={{ padding: 7 }}
-              />
-            </TouchableOpacity>
-            <Block>
-              <Text
-                color="white"
-                size={20}
-                style={{ fontFamily: "Inter-Black" }}
-                bold
-              >
-                Create Case
-              </Text>
-            </Block>
-          </Block>
-        </Block>
-      </Block>
-
+      {navbar()}
       <ScrollView
         vertical={true}
         showsVerticalScrollIndicator={false}
-        style={{ top: height * 0.16 }}
       >
         <TouchableOpacity onPress={() => navigation.navigate("AddPatient")} style={{width:60}}>
           <Image source={require("../assets/images/createCase.png")} />
@@ -173,7 +173,7 @@ const CreateCase = (props) => {
             link: "",
           })}
         </Block>
-        <Block row style={{ marginBottom: 100 }} center>
+        <Block row center>
           <TouchableOpacity
             style={styles.save}
             onPress={() => console.log("save")}
@@ -198,7 +198,6 @@ const CreateCase = (props) => {
 
 const styles = StyleSheet.create({
   notification: {
-    paddingVertical: theme.SIZES.BASE / 3,
     backgroundColor: theme.COLORS.WHITE,
   },
   schedule: {
@@ -304,6 +303,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     marginBottom: 80,
     marginHorizontal: 20,
+  },
+  navbar: {
+    backgroundColor: "#6E78F7",
+    borderBottomRightRadius: 24,
+    borderBottomLeftRadius: 24,
+    width: width,
+    height: height * 0.16,
+    paddingTop: theme.SIZES.BASE * 2,
+    paddingLeft: theme.SIZES.BASE,
   },
 });
 

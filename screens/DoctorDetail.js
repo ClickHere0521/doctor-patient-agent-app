@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { Image, StyleSheet, Dimensions, TouchableOpacity } from "react-native";
+import React, { useState } from "react";
+import { Modal, Image, View, StyleSheet, Dimensions, TouchableOpacity, TouchableHighlight } from "react-native";
 import { Block, Button, Text, theme } from "galio-framework";
 
 const { height, width } = Dimensions.get("screen");
@@ -11,10 +11,11 @@ import { ScrollView } from "react-native-gesture-handler";
 
 const DoctorDetail = (props) => {
   const { navigation } = props;
+  const [modalVisible, setModalVisible] = useState(0);
 
   return (
     <Block flex style={styles.container}>
-      <Block>
+      <Block> 
         <Block style={styles.roundBlock}>
           <Block row style={styles.headArrow}>
             <Block>
@@ -31,43 +32,38 @@ const DoctorDetail = (props) => {
         </Block>
       </Block>
       <Block style={styles.body}>
-        <Block center style={styles.header}>
-          <Text style={styles.prime} color={"#00CE30"} bold>
-            {" "}
-            Prime{" "}
-          </Text>
-          <Text style={styles.rating} color={"grey"}>
-            {" "}
-            4.2{" "}
-          </Text>
-          <Image
-            style={styles.star}
-            source={require("../assets/images/star.png")}
-            alt=""
-          />
-          <Block>
+        <Block  style={styles.header}>
+          <Block center>
             <Image
               source={require("../assets/images/grayscale-photo-of-man2.png")}
               style={styles.imageStyle}
             ></Image>
           </Block>
-          <Text bold size={16} style={{ marginTop: 10 }}>
+          <Text size={14} style={{ marginTop: 10 }} center>
             Dr. Ronald Joseph
           </Text>
-          <Text color={"grey"}>B.Sc, MBBS, DDVL, MD- Dermitologist</Text>
-          <Block row style={styles.headBottom}>
-            <Text color="grey" size={12} style={{ paddingRight: width * 0.1 }}>
+          <Text color={"grey"} text={12} center>B.Sc, MBBS, DDVL, MD- Dermitologist</Text>
+          <Block style={styles.headBottom} >
+            <Text color="grey" size={12}>
               <Text color="black" size={14}>
                 16
               </Text>{" "}
               yrs. Experience
             </Text>
-            <Text color="grey" size={12}>
-              <Text color="black" size={14}>
-                89
-              </Text>
-              % (4384 votes)
-            </Text>
+            <Block row center>
+              <Block style={{paddingHorizontal: theme.SIZES.BASE / 2}}>
+                <Image style={{width: 70, height: 70}} source={require("../assets/images/grayscale-photo-of-man2.png")}></Image>
+              </Block>
+              <Block style={{paddingHorizontal: theme.SIZES.BASE / 2}}>
+                <Image style={{width: 70, height: 70}} source={require("../assets/images/grayscale-photo-of-man2.png")}></Image>
+              </Block>
+              <Block style={{paddingHorizontal: theme.SIZES.BASE / 2}}>
+                <Image style={{width: 70, height: 70}} source={require("../assets/images/grayscale-photo-of-man2.png")}></Image>
+              </Block>
+              <Block style={{paddingHorizontal: theme.SIZES.BASE / 2}}>
+                <Image style={{width: 70, height: 70}} source={require("../assets/images/grayscale-photo-of-man2.png")}></Image>
+              </Block>
+            </Block>
           </Block>
         </Block>
       </Block>
@@ -78,7 +74,7 @@ const DoctorDetail = (props) => {
               <Icon
                 name="map-marker"
                 family="font-awesome"
-                color={"#00CE30"}
+                color={"#0288D1"}
                 style={{ margin: 10 }}
               />
               <Text size={12} color={"grey"} style={{ marginTop: 10 }}>
@@ -90,8 +86,8 @@ const DoctorDetail = (props) => {
               alt=""
               style={{ margin: width * 0.01, alignSelf: "center" }}
             />
-            <Block row style={{ margin: 10, marginBottom: height * 0.02 }}>
-              <Text bold color="black" style={{ alignSelf: "flex-start" }}>
+            <Block row style={{ margin: 10 }}>
+              <Text color="black" style={{ alignSelf: "flex-start" }}>
                 Tel
                 <Text color="red">*</Text>
               </Text>
@@ -99,68 +95,69 @@ const DoctorDetail = (props) => {
                 +1234567890
               </Text>
             </Block>
-            <Text bold color="black" style={styles.info}>
-              Info
+            <Text color="black" style={styles.info} size={14}>
+              Description
               <Text color="red">*</Text>
             </Text>
             <Text
               color="grey"
+              size={16}
               style={{
                 alignSelf: "flex-start",
-                paddingLeft: 10,
+                paddingHorizontal: 10,
                 marginLeft: 10,
               }}
             >
-              Description: Lorem ipsum dolor sit amet, consetetur sadipscing
+              Lorem ipsum dolor sit amet, consetetur sadipscing
               elitr, sed diam nonu my eirmod tempor invidun.
             </Text>
             <Block center>
               <TouchableOpacity
                 textStyle={styles.optionsButtonText}
                 style={styles.optionsButton}
-                onPress={() => navigation.navigate("DoctorInfo")}
+                onPress={() => setModalVisible(true)}
               >
-                <Text color="white">Detail</Text>
+                <Text color="white" center size={14}>{IMLocalized('book')}</Text>
               </TouchableOpacity>
             </Block>
-            <Text bold color="black" style={styles.schedule}>
-              Schedule
-              <Text color="red">*</Text>
-            </Text>
-            <Block center>
-              <TouchableOpacity
-                textStyle={styles.optionsButtonText}
-                style={styles.optionsButton}
-                onPress={() => navigation.navigate("DoctorScheduleDetail")}
-              >
-                <Text color="white">Detail</Text>
-              </TouchableOpacity>
-            </Block>
-            {/* <Text
-              bold
-              color="black"
-              style={{ alignSelf: "flex-start", margin: 10, marginBottom: 0 }}
-            >
-              Linked case list
-              <Text color="red">*</Text>
-            </Text>
-            <Block center>
-              <TouchableOpacity
-                textStyle={styles.optionsButtonText}
-                style={styles.optionsButton}
-                onPress={() => handleDelete(item.id)}
-              >
-                <Text color="white">Detail</Text>
-              </TouchableOpacity>
-            </Block> */}
           </Block>
         </Block>
       </ScrollView>
+      <Modal
+          animationType="slide"
+          transparent={true}
+          visible={modalVisible}
+          onRequestClose={() => {
+            Alert.alert('Modal has been closed.');
+          }}>
+          <Block style={{marginTop: height * 0.3, backgroundColor: 'rgba(255,255,255,0.6)', width: width, height: height * 0.3}} center middle>
+            <Block style={styles.innerModal} center middle>
+              <Text size={16}>{IMLocalized('You have successfully booked.')}</Text>
+              <Button color="white" style={styles.modalButton} onPress={() => setModalVisible(1)}><Text size={18}>OK</Text></Button>
+            </Block>
+          </Block>
+        </Modal>
     </Block>
   );
 };
 
 const styles = StyleSheet.create({
+  modalButton: {
+    width: width * 0.25,
+    height: theme .SIZES.BASE * 2,
+    borderRadius: 17,
+    borderWidth: 0.5,
+    borderColor: "#C7C7C7",
+    marginTop: theme.SIZES.BASE
+  },
+  innerModal: {
+    backgroundColor: 'rgba(255,255,255,0.99)', width: width * 0.8, borderRadius: 15, height: height * 0.15, 
+    shadowColor: theme.COLORS.BLACK,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 3,
+    shadowOpacity: 0.1,
+    elevation: 5
+  },
   container: {
     backgroundColor: "#F5F5F5",
   },
@@ -181,11 +178,12 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   optionsButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 40,
-    backgroundColor: "#00CE30",
-    borderRadius: 14,
-    marginVertical: 16,
+    backgroundColor: "#6E78F7",
+    borderRadius: 25,
+    marginVertical: 50,
+    height: 50,
+    width: width * 0.5,
+    justifyContent: "center",
   },
   pro: {
     backgroundColor: materialTheme.COLORS.LABEL,
@@ -212,10 +210,10 @@ const styles = StyleSheet.create({
     bottom: -theme.SIZES.BASE * 8,
   },
   roundBlock: {
-    borderBottomLeftRadius: 34,
-    borderBottomRightRadius: 34,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
     position: "absolute",
-    backgroundColor: "rgba(100, 120, 247, 0.84)",
+    backgroundColor: "#6E78F7",
     height: height * 0.25,
     width: width,
     top: 0,
@@ -276,7 +274,7 @@ const styles = StyleSheet.create({
   },
   info: {
     marginHorizontal: 10,
-    marginTop: height * 0.06,
+    marginTop: height * 0.01,
     zIndex: 2,
     backgroundColor: "white",
     borderRadius: 12,

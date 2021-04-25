@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Image,
 } from "react-native";
-import { Block, Text, theme } from "galio-framework";
+import { Block, Text, theme, Icon } from "galio-framework";
 import { LinearGradient } from "expo-linear-gradient";
 
 import products from "../constants/images/home";
@@ -20,7 +20,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import { ListItem } from "../components/";
 import SvgUri from "expo-svg-uri";
 
-const { width } = Dimensions.get("screen");
+const { width, height } = Dimensions.get("screen");
 const cardWidth = theme.SIZES.BASE * 4;
 
 const sortCategories = [
@@ -134,8 +134,38 @@ const DashboardAgent = (props) => {
     );
   };
 
+  const navbar = () => {
+    return (
+      <Block>
+        <Block row style={styles.navbar} center>
+          <TouchableOpacity
+            onPress={() => navigation.openDrawer()}
+          >
+            <Icon
+              name="align-justify"
+              family="font-awesome"
+              color="black"
+              size={16}
+              style={styles.chevronLeft}
+            />
+          </TouchableOpacity>
+          <Text
+            color="black"
+            style={{ paddingLeft: theme.SIZES.BASE }}
+            size={22}
+            fontWeight="semiBold"
+          >
+            {IMLocalized("Dashboard Agent")}
+          </Text>
+        </Block>
+        <Block style={{ borderTopWidth: 1, borderColor: "white" }}></Block>
+      </Block>
+    );
+  };
+
   return (
     <Block flex style={styles.profile}>
+      {navbar()}
       <ImageBackground
         source={require("../assets/images/dashboard.png")}
         style={styles.profileContainer}
@@ -219,7 +249,9 @@ const DashboardAgent = (props) => {
 
 const styles = StyleSheet.create({
   profile: {
-    marginTop: Platform.OS === "android" ? -HeaderHeight : 0,
+    paddingTop: Platform.OS === "android" ? height * 0.02 : height * 0.02,
+    backgroundColor: "white",
+    width: width,
   },
   profileImage: {
     width: width * 1.1,
@@ -228,7 +260,7 @@ const styles = StyleSheet.create({
   profileContainer: {
     width: width,
     height: "auto",
-    flex: 1,
+    flex: 0.6,
   },
   profileDetails: {
     paddingTop: theme.SIZES.BASE * 4,
@@ -385,6 +417,15 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     shadowOpacity: 0.2,
     elevation: 2,
+  },
+  navbar: {
+    backgroundColor: "white",
+    width: width,
+    height: height * 0.16,
+    paddingTop: theme.SIZES.BASE * 2,
+    paddingLeft: theme.SIZES.BASE,
+    borderBottomWidth: 1,
+    borderColor: "rgba(112, 112, 112, 0.1)",
   },
 });
 

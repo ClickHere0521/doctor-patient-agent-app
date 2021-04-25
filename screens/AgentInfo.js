@@ -6,11 +6,13 @@ import {
   Image,
   ImageBackground,
   Platform,
+  TouchableOpacity,
 } from "react-native";
-import { Button, Block, Text, theme, Input } from "galio-framework";
+import { Button, Block, Text, theme, Input, Icon } from "galio-framework";
 
 import { materialTheme } from "../constants";
 import SwitchButton from "switch-button-react-native";
+import { IMLocalized } from "../src/localization/IMLocalization";
 import * as ImagePicker from "expo-image-picker";
 
 const { width, height } = Dimensions.get("screen");
@@ -55,8 +57,36 @@ const AgentInfo = (props) => {
     }
   };
 
+  const navbar = () => {
+    return (
+      <Block>
+        <Block row style={styles.navbar} center>
+          <TouchableOpacity onPress={() => navigation.openDrawer()}>
+            <Icon
+              name="align-justify"
+              family="font-awesome"
+              color="black"
+              size={16}
+              style={styles.chevronLeft}
+            />
+          </TouchableOpacity>
+          <Text
+            color="black"
+            style={{ paddingLeft: theme.SIZES.BASE }}
+            size={22}
+            fontWeight="semiBold"
+          >
+            {IMLocalized("Agent Info")}
+          </Text>
+        </Block>
+        <Block style={{ borderTopWidth: 1, borderColor: "white" }}></Block>
+      </Block>
+    );
+  };
+
   return (
     <Block center flex style={styles.profile}>
+      {navbar()}
       <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
         <Block center row>
           <Block middle style={{ marginRight: 14 }}>
@@ -179,9 +209,7 @@ const AgentInfo = (props) => {
 };
 
 const styles = StyleSheet.create({
-  profile: {
-    marginTop: Platform.OS === "android" ? height * 0.02 : height * 0.02,
-  },
+  profile: {},
   optionsButtonText: {
     fontSize: theme.SIZES.BASE * 0.75,
     color: "white",
@@ -310,6 +338,15 @@ const styles = StyleSheet.create({
   label: {
     paddingTop: 10,
     alignSelf: "flex-start",
+  },
+  navbar: {
+    backgroundColor: "white",
+    width: width,
+    height: height * 0.16,
+    paddingTop: theme.SIZES.BASE * 2,
+    paddingLeft: theme.SIZES.BASE,
+    borderBottomWidth: 1,
+    borderColor: "rgba(112, 112, 112, 0.1)",
   },
 });
 

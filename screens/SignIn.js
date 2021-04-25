@@ -6,7 +6,6 @@ import {
   Alert,
   ScrollView,
   Platform,
-  CheckBox,
   TouchableOpacity,
 } from "react-native";
 import { Block, Button, Input, Text, theme } from "galio-framework";
@@ -18,6 +17,7 @@ import { IMLocalized, init } from "../src/localization/IMLocalization";
 import { useSelector } from "react-redux";
 import { Icon } from "../components";
 import SvgUri from "expo-svg-uri";
+import { CheckBox } from "react-native-elements";
 
 const { width, height } = Dimensions.get("window");
 
@@ -37,7 +37,7 @@ const SignIn = (props) => {
     setVals({ ...vals, [name]: value });
   };
 
-  const [isSelected, setSelection] = useState(false);
+  const [isSelected, setSelected] = useState(false);
 
   const SignInHeading = (role) => {
     switch (role) {
@@ -76,15 +76,7 @@ const SignIn = (props) => {
               size={34}
               style={{ alignSelf: "flex-start" }}
             >
-              {IMLocalized("Primary")}
-            </Text>
-            <Text
-              bold
-              color="white"
-              size={34}
-              style={{ alignSelf: "flex-start" }}
-            >
-              {IMLocalized("Care Doctor")}
+              {IMLocalized("doctor")}
             </Text>
           </Block>
         );
@@ -159,16 +151,16 @@ const SignIn = (props) => {
               </Text>
             </TouchableOpacity>
           </Block>
-          <Block
-            flex
-            flexDirection="row"
-            style={{ width: width * 0.8, marginTop: -theme.SIZES.BASE }}
-            center
-          >
-            <CheckBox value={isSelected} onValueChange={setSelection} />
+          <Block flex flexDirection="row" style={{ width: width * 0.8 }} center>
+            <CheckBox
+              
+              checked={isSelected}
+              containerStyle={{ backgroundColor: "rgba(0,0,0,0)", width: 10 }}
+              onPress={() => setSelected(!isSelected)}
+            />
             <Text style={styles.label}>Remember Me</Text>
             <TouchableOpacity
-              style={{ marginLeft: 5, marginLeft: width / 5 }}
+              style={{ marginLeft: 5, marginLeft: width / 6 }}
               onPress={() => navigation.navigate("ForgotPassword")}
             >
               <Text style={{ color: "white" }}>Forgot Password</Text>

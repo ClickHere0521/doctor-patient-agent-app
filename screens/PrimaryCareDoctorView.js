@@ -10,7 +10,7 @@ import {
   View,
   Component,
 } from "react-native";
-import { Button, Block, Text, Input, theme } from "galio-framework";
+import { Button, Block, Text, Input, theme, NavBar } from "galio-framework";
 
 import { materialTheme, products, Images, tabs } from "../constants/";
 import {
@@ -24,8 +24,9 @@ import {
 } from "../components/";
 import Accordion from "react-native-collapsible/Accordion";
 import { IMLocalized } from "../src/localization/IMLocalization";
+import SvgUri from "expo-svg-uri";
 
-const { width } = Dimensions.get("screen");
+const { width, height } = Dimensions.get("screen");
 
 const SECTIONS = [
   {
@@ -57,9 +58,72 @@ const PrimaryCareDoctorView = (props) => {
   const { navigation } = props;
   const [activeSections, setActiveSections] = useState([0]);
 
-  const _renderSectionTitle = (section) => {
-    return <View style={styles.content}></View>;
+  const navbar = () => {
+    return (
+      <Block>
+        <Block row style={styles.navbar} center>
+          <TouchableOpacity onPress={() => navigation.openDrawer()}>
+            <Icon
+              name="align-justify"
+              family="font-awesome"
+              color="black"
+              size={16}
+              style={styles.chevronLeft}
+            />
+          </TouchableOpacity>
+
+          <Text
+            color="black"
+            style={{ paddingLeft: theme.SIZES.BASE }}
+            size={22}
+            fontWeight="semiBold"
+          >
+            {IMLocalized("Doctors")}
+          </Text>
+
+          <Block row>
+            <TouchableOpacity onPress={() => navigation.navigate("CreateDoctorAccount")}
+            style={{ paddingLeft: width * 0.4, padding: 2 }}
+            >
+              <Text color={"white"}>
+                <SvgUri
+                  width="18"
+                  height="18"
+                  source={require("../assets/icons/add.svg")}
+                />
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => navigation.openDrawer()}
+            style={{ paddingLeft: width * 0.02, padding: 2 }}
+            >
+              <Text color={"white"}>
+                <SvgUri
+                  width="20"
+                  height="20"
+                  source={require("../assets/icons/headerEditBlack.svg")}
+                />
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => navigation.openDrawer()}
+            style={{ paddingLeft: width * 0.02 }}
+            >
+              <Text color={"white"}>
+                <SvgUri
+                  width="24"
+                  height="24"
+                  source={require("../assets/icons/trash.svg")}
+                />
+              </Text>
+            </TouchableOpacity>
+          </Block>
+        </Block>
+        <Block style={{ borderTopWidth: 1, borderColor: "white" }}></Block>
+      </Block>
+    );
   };
+
   const _renderHeader = (section) => {
     return (
       <Block flex style={[styles.container]}>
@@ -123,7 +187,7 @@ const PrimaryCareDoctorView = (props) => {
           shadowless
           color={"#00CE30"}
           style={[styles.button]}
-          onPress={() => navigation.navigate("DoctorDetail")}
+          onPress={() => navigation.navigate("AgentDoctorDetail")}
         >
           <Text size={15} color={"white"}>
             {IMLocalized("Detail")}
@@ -136,42 +200,6 @@ const PrimaryCareDoctorView = (props) => {
   const onChangeHandle = (event) => {
     console.log(event);
     setActiveSections(event);
-  };
-
-  const onclick = () => {};
-
-  const navbar = () => {
-    return (
-      <Block flex flexDirection="row" style={{ padding: 10 }}>
-        <Block left>
-          <Image
-            source={require("../assets/icons/PatientIcon.png")}
-            style={{
-              height: theme.SIZES.BASE * 3,
-              width: theme.SIZES.BASE * 3,
-              marginRight: theme.SIZES.BASE,
-            }}
-          />
-        </Block>
-        <Block center>
-          <Text h6 center middle>
-            {IMLocalized("patientView")}
-          </Text>
-        </Block>
-        <TouchableWithoutFeedback onclick={onclick()}>
-          <Block center middle style={[styles.searchBtn, styles.greyGradient]}>
-            <Icon
-              name="search"
-              family="font-awesome"
-              color={theme.COLORS.MUTED}
-              size={theme.SIZES.BASE}
-            >
-              {" "}
-            </Icon>
-          </Block>
-        </TouchableWithoutFeedback>
-      </Block>
-    );
   };
 
   const renderPatientsList = () => {
@@ -193,6 +221,7 @@ const PrimaryCareDoctorView = (props) => {
 
   return (
     <Block flex>
+      {navbar()}
       <ScrollView
         style={styles.components}
         showsVerticalScrollIndicator={false}
@@ -234,6 +263,15 @@ const styles = StyleSheet.create({
     borderTopWidth: 0,
     paddingTop: 0,
     marginBottom: theme.SIZES.BASE * 3,
+  },
+  navbar: {
+    backgroundColor: "#6E78F7",
+    borderBottomRightRadius: 24,
+    borderBottomLeftRadius: 24,
+    width: width,
+    height: height * 0.16,
+    paddingTop: theme.SIZES.BASE * 2,
+    paddingLeft: theme.SIZES.BASE,
   },
   picBox: {
     borderRadius: 16,
@@ -294,6 +332,15 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     shadowOpacity: 0.2,
     elevation: 2,
+  },
+  navbar: {
+    backgroundColor: "white",
+    width: width,
+    height: height * 0.16,
+    paddingTop: theme.SIZES.BASE * 2,
+    paddingLeft: theme.SIZES.BASE,
+    borderBottomWidth: 1,
+    borderColor: "rgba(112, 112, 112, 0.1)",
   },
 });
 

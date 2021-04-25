@@ -11,12 +11,12 @@ import { Images, materialTheme } from "../constants/";
 import { useDispatch, useSelector } from "react-redux";
 
 // screens
-import AboutScreen from "../screens/About";
+import ContactUsScreen from "../screens/ContactUs";
 import AgreementScreen from "../screens/Agreement";
 import AgentInfoScreen from "../screens/AgentInfo";
 import AgentCaseDetailScreen from "../screens/AgentCaseDetail";
 import BookDoctorScreen from "../screens/BookDoctor";
-import CaseHistoryScreen from "../screens/CaseHistory";
+import PatientCaseHistoryScreen from "../screens/PatientCaseHistory";
 import ChatScreen from "../screens/Chat";
 import CartScreen from "../screens/Cart";
 import CaseViewScreen from "../screens/CaseView";
@@ -30,7 +30,6 @@ import DoctorDetailScreen from "../screens/DoctorDetail";
 import DoctorInfoScreen from "../screens/DoctorInfo";
 import DoctorCaseDetailScreen from "../screens/DoctorCaseDetail";
 import LanguageScreen from "../screens/Language";
-import NotificationsScreen from "../screens/Notifications";
 import NotificationScreen from "../screens/Notification";
 import ProfileScreen from "../screens/Profile";
 import PrivacyScreen from "../screens/Privacy";
@@ -38,6 +37,7 @@ import PatientScheduleDetailScreen from "../screens/PatientScheduleDetail";
 import PatientViewScreen from "../screens/PatientView";
 import PrimaryCareDoctorViewScreen from "../screens/PrimaryCareDoctorView";
 import PatientCaseDetailScreen from "../screens/PatientCaseDetail";
+import PatientActiveCaseScreen from "../screens/PatientActiveCase";
 import PatientTimeSlotScreen from "../screens/PatientTimeSlot";
 import PatientInfoScreen from "../screens/PatientInfo";
 import SignInScreen from "../screens/SignIn";
@@ -56,6 +56,21 @@ import AddPatientScreen from "../screens/AddPatient";
 import AddAttorneyScreen from "../screens/AddAttorney";
 import AddInsuranceScreen from "../screens/AddInsurance";
 import AddNotesScreen from "../screens/AddNotes";
+import AgentDoctorDetailScreen from "../screens/AgentDoctorDetail";
+import CreateDoctorAccountScreen from "../screens/CreateDoctorAccount";
+import CalendarScreen from "../screens/Calendar";
+import PatientActiveCase from "../screens/PatientActiveCase";
+import PatientCaseFileScreen from "../screens/PatientCaseFile";
+import UploadCaseFilesScreen from "../screens/UploadCaseFiles";
+import ScheduleEditScreen from "../screens/EditSchedule";
+import SchedulePatientListScreen from "../screens/SchedulePatientList";
+import NotificationsScreen from "../screens/Notifications";
+import FontScreen from "../screens/Font";
+import NoteScreen from "../screens/Note";
+import DoctorMyScheduleScreen from "../screens/DoctorMySchedule";
+import DoctorCaseHistoryScreen from "../screens/DoctorCaseHistory";
+import DoctorAllNotesScreen from "../screens/DoctorAllNotes";
+import DoctorAddNotesScreen from "../screens/DoctorAddNotes";
 
 import { IMLocalized } from "../src/localization/IMLocalization";
 
@@ -66,11 +81,7 @@ const Drawer = createDrawerNavigator();
 
 const SettingsStack = (props) => {
   return (
-    <Stack.Navigator
-      initialRouteName="Settings"
-      mode="card"
-      headerMode="screen"
-    >
+    <Stack.Navigator initialRouteName="Settings" mode="card" headerMode="none">
       <Stack.Screen
         name="Settings"
         component={SettingsScreen}
@@ -95,6 +106,7 @@ const SettingsStack = (props) => {
           ),
         }}
       />
+      <Stack.Screen name="Font" component={FontScreen} />
       <Stack.Screen
         name="Agreement"
         component={AgreementScreen}
@@ -124,33 +136,20 @@ const SettingsStack = (props) => {
         }}
       />
       <Stack.Screen
-        name="About"
-        component={AboutScreen}
+        name="ContactUs"
+        component={ContactUsScreen}
         options={{
           header: ({ navigation, scene }) => (
             <Header
               back
-              title="About us"
+              title="ContactUs"
               scene={scene}
               navigation={navigation}
             />
           ),
         }}
       />
-      <Stack.Screen
-        name="Notifications"
-        component={NotificationsScreen}
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header
-              back
-              title="Notifications Settings"
-              scene={scene}
-              navigation={navigation}
-            />
-          ),
-        }}
-      />
+      <Stack.Screen name="Notifications" component={NotificationsScreen} />
       <Stack.Screen
         name="Chat"
         component={ChatScreen}
@@ -185,14 +184,12 @@ const SettingsStack = (props) => {
 
 const DashboardAgentStack = (props) => {
   return (
-    <Stack.Navigator mode="card" headerMode="screen">
+    <Stack.Navigator mode="card" headerMode="none">
       <Stack.Screen
         name="DashboardAgent"
         component={DashboardAgentScreen}
         options={{
-          header: ({ navigation, scene }) => (
-            <Header title="Dashboard" navigation={props.navigation} />
-          ),
+          headerTransparent: true,
         }}
       />
       <Stack.Screen
@@ -210,7 +207,7 @@ const DashboardAgentStack = (props) => {
 
 const DoctorInfoStack = (props) => {
   return (
-    <Stack.Navigator mode="card" headerMode="screen">
+    <Stack.Navigator mode="card" headerMode="none">
       <Stack.Screen
         name="DoctorInfo"
         component={DoctorInfoScreen}
@@ -220,6 +217,26 @@ const DoctorInfoStack = (props) => {
           ),
         }}
       />
+    </Stack.Navigator>
+  );
+};
+
+const DoctorCaseHistoryStack = (props) => {
+  return (
+    <Stack.Navigator mode="card" headerMode="none">
+      <Stack.Screen
+        name="Case History"
+        component={DoctorCaseHistoryScreen}
+        options={{
+          header: ({ navigation, scene }) => (
+            <Header title="Doctor Info" navigation={props.navigation} />
+          ),
+        }}
+      />
+      <Stack.Screen name="PatientCaseFile" component={PatientCaseFileScreen} />
+      <Stack.Screen name="DoctorCaseDetailFile" component={DoctorCaseDetailScreen} />
+      <Stack.Screen name="DoctorAllNotes" component={DoctorAllNotesScreen} />
+      <Stack.Screen name="DoctorAddNotes" component={DoctorAddNotesScreen} />
     </Stack.Navigator>
   );
 };
@@ -292,85 +309,42 @@ const AppStack = (props) => {
             name="Dashboard"
             component={DashboardAgentStack}
             options={{
-              drawerIcon: ({ focused }) => (
-                <Icon
-                  size={16}
-                  name="md-woman"
-                  family="ionicon"
-                  color={focused ? "white" : materialTheme.COLORS.MUTED}
-                  style={{ marginLeft: 4, marginRight: 4 }}
-                />
-              ),
+              headerTransparent: true,
             }}
           />
           <Drawer.Screen
             name="Agent Info"
             component={AgentInfoStack}
             options={{
-              drawerIcon: ({ focused }) => (
-                <Icon
-                  size={16}
-                  name="shop"
-                  family="GalioExtra"
-                  color={focused ? "white" : materialTheme.COLORS.MUTED}
-                />
-              ),
+              headerTransparent: true,
             }}
           />
           <Drawer.Screen
             name="Patients"
             component={PatientViewStack}
             options={{
-              drawerIcon: ({ focused }) => (
-                <Icon
-                  size={16}
-                  name="user"
-                  family="font-awesome"
-                  color={focused ? "white" : materialTheme.COLORS.MUTED}
-                />
-              ),
+              headerTransparent: true,
             }}
           />
           <Drawer.Screen
             name="Cases"
             component={CaseViewStack}
             options={{
-              drawerIcon: ({ focused }) => (
-                <Icon
-                  size={16}
-                  name="id-badge"
-                  family="font-awesome"
-                  color={focused ? "white" : materialTheme.COLORS.MUTED}
-                />
-              ),
+              headerTransparent: true,
             }}
           />
           <Drawer.Screen
             name="Doctors"
             component={PrimaryCareDoctorViewStack}
             options={{
-              drawerIcon: ({ focused }) => (
-                <Icon
-                  size={16}
-                  name="briefcase-medical"
-                  family="font-awesome"
-                  color={focused ? "white" : materialTheme.COLORS.MUTED}
-                />
-              ),
+              headerTransparent: true,
             }}
           />
           <Drawer.Screen
             name="Schedules"
             component={ScheduleViewStack}
             options={{
-              drawerIcon: ({ focused }) => (
-                <Icon
-                  size={16}
-                  name="calender"
-                  family="font-awesome"
-                  color={focused ? "white" : materialTheme.COLORS.MUTED}
-                />
-              ),
+              headerTransparent: true,
             }}
           />
           <Drawer.Screen
@@ -390,7 +364,7 @@ const AppStack = (props) => {
           />
           <Stack.Screen
             name="DoctorDetail"
-            component={DoctorDetailScreen}
+            component={DoctorDetailStack}
             options={{
               header: ({ navigation, scene }) => (
                 <Header
@@ -405,13 +379,7 @@ const AppStack = (props) => {
             name="DoctorScheduleDetail"
             component={DoctorScheduleDetailScreen}
             options={{
-              header: ({ navigation, scene }) => (
-                <Header
-                  back
-                  title="Doctor Schedule Detail"
-                  navigation={props.navigation}
-                />
-              ),
+              headerTransparent: true,
             }}
           />
           <Stack.Screen
@@ -470,6 +438,50 @@ const AppStack = (props) => {
               headerTransparent: true,
             }}
           />
+          <Stack.Screen
+            name="AgentDoctorDetail"
+            component={AgentDoctorDetailScreen}
+            options={{
+              headerTransparent: true,
+            }}
+          />
+          <Stack.Screen
+            name="CreateDoctorAccount"
+            component={CreateDoctorAccountScreen}
+            options={{
+              headerTransparent: true,
+            }}
+          />
+          <Stack.Screen
+            name="Calendar"
+            component={CalendarScreen}
+            options={{
+              headerTransparent: true,
+            }}
+          />
+          <Stack.Screen
+            name="ScheduleEdit"
+            component={ScheduleEditScreen}
+            options={{
+              headerTransparent: true,
+            }}
+          />
+          <Stack.Screen
+            name="SchedulePatientList"
+            component={SchedulePatientListScreen}
+            options={{
+              headerTransparent: true,
+            }}
+          />
+          <Stack.Screen
+            name="PatientCaseFile"
+            component={PatientCaseFileScreen}
+          />
+          <Stack.Screen name="Note" component={NoteScreen} />
+          <Stack.Screen
+            name="UploadCaseFiles"
+            component={UploadCaseFilesScreen}
+          />
         </Drawer.Navigator>
       );
     case "patient":
@@ -517,26 +529,19 @@ const AppStack = (props) => {
               ),
             }}
           />
+
+          <Drawer.Screen name="BookDoctor" component={BookDoctorStack} />
+
+          <Stack.Screen name="DoctorDetail" component={DoctorDetailStack} />
           <Drawer.Screen name="Profile Info" component={PatientInfoStack} />
-          <Drawer.Screen name="Case History" component={CaseHistoryStack} />
           <Drawer.Screen
-            name="Notification"
-            component={NotificationStack}
-            options={{
-              drawerIcon: ({ focused }) => (
-                <Icon
-                  size={16}
-                  name="md-woman"
-                  family="ionicon"
-                  color={focused ? "white" : materialTheme.COLORS.MUTED}
-                  style={{ marginLeft: 4, marginRight: 4 }}
-                />
-              ),
-            }}
+            name="Case History"
+            component={PatientCaseHistoryStack}
           />
+          <Drawer.Screen name="Notification" component={NotificationStack} />
           <Drawer.Screen
             name="Settings"
-            component={SettingsStack}
+            component={SettingsScreen}
             options={{
               drawerIcon: ({ focused }) => (
                 <Icon
@@ -549,9 +554,64 @@ const AppStack = (props) => {
               ),
             }}
           />
+
+          <Stack.Screen
+            name="Language"
+            component={LanguageScreen}
+            options={{
+              header: ({ navigation, scene }) => (
+                <Header
+                  back
+                  title="Language"
+                  scene={scene}
+                  navigation={navigation}
+                />
+              ),
+            }}
+          />
+          <Stack.Screen
+            name="Agreement"
+            component={AgreementScreen}
+            options={{
+              header: ({ navigation, scene }) => (
+                <Header
+                  back
+                  title="Agreement"
+                  scene={scene}
+                  navigation={navigation}
+                />
+              ),
+            }}
+          />
+          <Stack.Screen
+            name="Privacy"
+            component={PrivacyScreen}
+            options={{
+              header: ({ navigation, scene }) => (
+                <Header
+                  back
+                  title="Privacy"
+                  scene={scene}
+                  navigation={navigation}
+                />
+              ),
+            }}
+          />
+          <Stack.Screen
+            name="PatientCaseFile"
+            component={PatientCaseFileScreen}
+          />
+          <Stack.Screen
+            name="UploadCaseFiles"
+            component={UploadCaseFilesScreen}
+          />
           <Stack.Screen
             name="PatientCaseDetail"
             component={PatientCaseDetailScreen}
+          />
+          <Stack.Screen
+            name="PatientActiveCase"
+            component={PatientActiveCaseScreen}
           />
           <Stack.Screen
             name="PatientScheduleDetail"
@@ -644,6 +704,28 @@ const AppStack = (props) => {
             }}
           />
           <Drawer.Screen
+            name="Case History"
+            component={DoctorCaseHistoryStack}
+            options={{
+              drawerIcon: ({ focused }) => (
+                <Icon
+                  size={16}
+                  name="md-woman"
+                  family="ionicon"
+                  color={focused ? "white" : materialTheme.COLORS.MUTED}
+                  style={{ marginLeft: 4, marginRight: 4 }}
+                />
+              ),
+            }}
+          />
+          <Stack.Screen
+            name="Calendar"
+            component={CalendarScreen}
+            options={{
+              headerTransparent: true,
+            }}
+          />
+          <Drawer.Screen
             name="Case View"
             component={DoctorCaseViewStack}
             options={{
@@ -672,6 +754,10 @@ const AppStack = (props) => {
                 />
               ),
             }}
+          />
+          <Drawer.Screen
+            name="DoctorMySchedule"
+            component={DoctorMyScheduleScreen}
           />
           <Stack.Screen
             name="DoctorCaseDetail"
@@ -780,14 +866,12 @@ const PatientInfoStack = (props) => {
 
 const PatientViewStack = (props) => {
   return (
-    <Stack.Navigator mode="card" headerMode="screen">
+    <Stack.Navigator mode="card" headerMode="none">
       <Stack.Screen
         name="Patients"
         component={PatientViewScreen}
         options={{
-          header: ({ navigation, scene }) => (
-            <Header home title="Patients" navigation={props.navigation} />
-          ),
+          headerTransparent: true,
         }}
       />
     </Stack.Navigator>
@@ -796,14 +880,12 @@ const PatientViewStack = (props) => {
 
 const CaseViewStack = (props) => {
   return (
-    <Stack.Navigator mode="card" headerMode="screen">
+    <Stack.Navigator mode="card" headerMode="none">
       <Stack.Screen
         name="Cases"
         component={CaseViewScreen}
         options={{
-          header: ({ navigation, scene }) => (
-            <Header home title="Cases" navigation={props.navigation} />
-          ),
+          headerTransparent: true,
         }}
       />
     </Stack.Navigator>
@@ -878,14 +960,12 @@ const DoctorScheduleDetailStack = (props) => {
 
 const PrimaryCareDoctorViewStack = (props) => {
   return (
-    <Stack.Navigator mode="card" headerMode="screen">
+    <Stack.Navigator mode="card" headerMode="none">
       <Stack.Screen
         name="Doctors"
         component={PrimaryCareDoctorViewScreen}
         options={{
-          header: ({ navigation, scene }) => (
-            <Header home title="Doctors" navigation={props.navigation} />
-          ),
+          headerTransparent: true,
         }}
       />
       <Stack.Screen
@@ -903,7 +983,7 @@ const PrimaryCareDoctorViewStack = (props) => {
 
 const ScheduleViewStack = (props) => {
   return (
-    <Stack.Navigator mode="card" headerMode="screen">
+    <Stack.Navigator mode="card" headerMode="none">
       <Stack.Screen
         name="Schedules"
         component={ScheduleViewScreen}
@@ -919,14 +999,12 @@ const ScheduleViewStack = (props) => {
 
 const AgentInfoStack = (props) => {
   return (
-    <Stack.Navigator mode="card" headerMode="screen">
+    <Stack.Navigator mode="card" headerMode="none">
       <Stack.Screen
         name="Agent Info"
         component={AgentInfoScreen}
         options={{
-          header: ({ navigation, scene }) => (
-            <Header title="Agent Info" navigation={props.navigation} />
-          ),
+          headerTransparent: true,
         }}
       />
     </Stack.Navigator>
@@ -976,12 +1054,12 @@ const PatientScheduleDetailStack = (props) => {
   );
 };
 
-const CaseHistoryStack = (props) => {
+const PatientCaseHistoryStack = (props) => {
   return (
     <Stack.Navigator mode="card" headerMode="screen">
       <Stack.Screen
         name="Case History"
-        component={CaseHistoryScreen}
+        component={PatientCaseHistoryScreen}
         options={{
           header: ({ navigation, scene }) => (
             <Header title="Case History" navigation={props.navigation} />
@@ -994,19 +1072,10 @@ const CaseHistoryStack = (props) => {
 
 const DashboardPatientStack = (props) => {
   return (
-    <Stack.Navigator mode="card" headerMode="screen">
+    <Stack.Navigator mode="card" headerMode="none">
       <Stack.Screen
         name="DashboardPatient"
         component={DashboardPatientScreen}
-        options={{
-          header: ({ navigation, scene }) => (
-            <Header
-              home
-              title="DashboardPatient"
-              navigation={props.navigation}
-            />
-          ),
-        }}
       />
     </Stack.Navigator>
   );
@@ -1014,7 +1083,7 @@ const DashboardPatientStack = (props) => {
 
 const DashboardDoctorStack = (props) => {
   return (
-    <Stack.Navigator mode="card" headerMode="screen">
+    <Stack.Navigator mode="card" headerMode="none">
       <Stack.Screen
         name="DashboardDoctor"
         component={DashboardDoctorScreen}
@@ -1057,23 +1126,14 @@ const DoctorDetailStack = (props) => {
           headerTransparent: true,
         }}
       />
-      <Stack.Screen name="App" component={AppStack} />
     </Stack.Navigator>
   );
 };
 
 const NotificationStack = (props) => {
   return (
-    <Stack.Navigator mode="card" headerMode="screen">
-      <Stack.Screen
-        name="Notification"
-        component={NotificationScreen}
-        option={{
-          header: ({ navigation, scene }) => (
-            <Header home title="Notification" navigation={props.navigation} />
-          ),
-        }}
-      />
+    <Stack.Navigator mode="card" headerMode="none">
+      <Stack.Screen name="Notification" component={NotificationScreen} />
       <Stack.Screen name="App" component={AppStack} />
     </Stack.Navigator>
   );
