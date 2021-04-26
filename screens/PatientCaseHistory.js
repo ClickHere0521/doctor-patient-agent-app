@@ -38,20 +38,49 @@ const CaseHistory = (props) => {
       </Block>
     );
   };
+  
+  const navbar = () => {
+    return (
+      <Block>
+        <Block row style={styles.navbar} center>
+          <TouchableOpacity
+            onPress={() => navigation.openDrawer()}
+          >
+            <Icon
+              name="align-justify"
+              family="font-awesome"
+              color="black"
+              size={16}
+              style={styles.chevronLeft}
+            />
+          </TouchableOpacity>
+          <Text
+            color="black"
+            style={{ paddingLeft: theme.SIZES.BASE }}
+            size={22}
+            fontWeight="semiBold"
+          >
+            {IMLocalized("caseHistory")}
+          </Text>
+        </Block>
+        <Block style={{ borderTopWidth: 1, borderColor: "white" }}></Block>
+      </Block>
+    );
+  };
 
   return (
     <Block flex style={styles.notification}>
-      
+      {navbar()}
       <TouchableOpacity style={[styles.dateActive]}>
-          <Text size={16} color={"white"}>
-            {IMLocalized("recent")}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16}>
-            {IMLocalized('injuryTime')}
-          </Text>
-        </TouchableOpacity>
+        <Text size={16} color={"white"}>
+          {IMLocalized("recent")}
+        </Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.dateInActive}>
+        <Text size={16}>
+          {IMLocalized('injuryTime')}
+        </Text>
+      </TouchableOpacity>
       <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
         {renderCases({
           heading: "Get 50% off on complete medical checkup",
@@ -87,6 +116,15 @@ const CaseHistory = (props) => {
 };
 
 const styles = StyleSheet.create({
+  navbar: {
+    backgroundColor: "white",
+    width: width,
+    height: height * 0.16,
+    paddingTop: theme.SIZES.BASE * 2,
+    paddingLeft: theme.SIZES.BASE,
+    borderBottomWidth: 1,
+    borderColor: "rgba(112, 112, 112, 0.1)",
+  },
   modalButton: {
     width: width * 0.25,
     height: theme .SIZES.BASE * 2,
@@ -150,7 +188,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     position: 'absolute',
     zIndex: 5,
-    top: -theme.SIZES.BASE,
+    top: height * 0.15,
     left: width * 0.1
   },
   dateInActive: {
@@ -168,7 +206,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     zIndex: 5,
     zIndex: 5,
-    top: -theme.SIZES.BASE,
+    top: height * 0.15,
     left: width * 0.6
   },
 });

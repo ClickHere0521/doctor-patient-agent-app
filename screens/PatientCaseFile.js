@@ -204,6 +204,73 @@ const PatientView = (props) => {
           </LinearGradient>
         </TouchableHighlight>
       </Block>
+    )
+  }
+  
+  const scanAndUpload = () => {
+    if(userRole != "doctor"){
+      return (
+        <Block>
+        <ScrollView horizontal={true} style={{marginLeft: width * 0.2, marginBottom: theme.SIZES.BASE}}>
+              <TouchableHighlight
+                style={{ zIndex: 3 , marginTop: theme.SIZES.BASE}}
+                // onPress={}
+                >
+                <LinearGradient
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 0.25, y: 1.1 }}
+                  locations={[0.2, 1]}
+                  colors={["#00CE30", "#00CE30"]}
+                  style={styles.sortItem}
+                >
+                  <Block center>
+                    <Text center size={15} fontWeight="semiBold" color='white'>
+                      {IMLocalized('Scan File')}
+                    </Text>
+                  </Block>
+                </LinearGradient>
+              </TouchableHighlight>
+              <TouchableHighlight
+                style={{ zIndex: 3 , marginTop: theme.SIZES.BASE}}
+                // onPress={}
+                >
+                <LinearGradient
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 0.25, y: 1.1 }}
+                  locations={[0.2, 1]}
+                  colors={["#EFEFEF", "#FFF"]}
+                  style={styles.sortItem}
+                >
+                  <Block center>
+                    <Text center size={15} fontWeight="semiBold">
+                      {IMLocalized('Upload Files')}
+                    </Text>
+                  </Block>
+                </LinearGradient>
+              </TouchableHighlight>
+            </ScrollView>
+            </Block>
+      )
+    }
+  }
+  const renderSorts = () => {
+    return (
+          <Block style={{ marginTop: theme.SIZES.BASE / 2, padding: theme.SIZES.BASE/2}}>
+            <ScrollView
+              horizontal={true}
+              pagingEnabled={true}
+              decelerationRate={0}
+              scrollEventThrottle={16}
+              snapToAlignment="center"
+              style={{ width }}
+              showsHorizontalScrollIndicator={false}
+              snapToInterval={cardWidth + theme.SIZES.BASE * 0.375}
+              
+            >
+              {sortCategories &&
+                sortCategories.map((item, index) => renderSort(item, index))}
+            </ScrollView>
+          </Block>
     );
   };
 

@@ -319,7 +319,7 @@ const Components = (props) => {
           >
             Attorney Info
           </Text>
-          <TouchableOpacity onPress={() => navigation.navigate("AddAfforney")}>
+          <TouchableOpacity onPress={() => navigation.navigate("AddAttorney")}>
             <Text
               size={16}
               color={"#6E78F7"}

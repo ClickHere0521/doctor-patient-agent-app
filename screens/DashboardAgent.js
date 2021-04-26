@@ -43,22 +43,18 @@ const DashboardAgent = (props) => {
     const userRole = useSelector((state) => state.user.role);
     return (
       <Block style={styles.options}>
-        <Block column space="between" style={styles.events}>
-          <Block row>
-            <Block style={styles.marginLB10}>
+        <Block column space="between" style={styles.events}  flex flexDirection="row">
+            <Block row style={{padding: theme.SIZES.BASE,}} >
               <Text color={"grey"} size={14}>
                 {IMLocalized(eventHeading)}
               </Text>
+              <Text color={"red"}> *</Text>
             </Block>
-            <Block>
-              <Text color={"red"}>*</Text>
-            </Block>
-            <Block style={styles.marginR10}>
+            <Block center style={{paddingRight: theme.SIZES.BASE}}>
               <Text size={16} color={"black"}>
                 {eventContent}
               </Text>
             </Block>
-          </Block>
         </Block>
       </Block>
     );
@@ -82,8 +78,10 @@ const DashboardAgent = (props) => {
                 paddingHorizontal: theme.SIZES.BASE / 4,
               }}
             >
+              <Block flex flexDirection="row" style={{justifyContent: 'space-between'}}>
               {sortCategories &&
                 sortCategories.map((item, index) => renderSort(item, index))}
+                </Block>
             </ScrollView>
           </Block>
         </Block>
@@ -209,33 +207,27 @@ const DashboardAgent = (props) => {
           }}
         >
           <Block column space="between">
-            <Block row>
-              <Block style={styles.marginLB10}>
+              <Block row style={{padding: theme.SIZES.BASE / 2}}>
                 <Text color={"grey"} size={14}>
                   {IMLocalized("On going case")}
                 </Text>
-              </Block>
-              <Block>
-                <Text color={"red"}>*</Text>
-              </Block>
+                <Text color={"red"}> *</Text>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("CreateCase")}
+                  style={{
+                    justifyContent: "center",
+                    alignItems: "flex-end", marginLeft: width * 0.6}}
+                >
+                  <Text color={"white"}>
+                    <SvgUri
+                      width="16"
+                      height="16"
+                      source={require("../assets/icons/add.svg")}
+                    />
+                  </Text>
+                </TouchableOpacity>
             </Block>
-            <TouchableOpacity
-              style={{
-                right: -theme.SIZES.BASE * 0.5,
-                top: theme.SIZES.BASE * 0.3,
-                position: "absolute",
-                zIndex: 10,
-              }}
-              onPress={() => navigation.navigate("CreateCase")}
-            >
-              <Text color={"white"}>
-                <SvgUri
-                  width="16"
-                  height="16"
-                  source={require("../assets/icons/add.svg")}
-                />
-              </Text>
-            </TouchableOpacity>
+            
           </Block>
         </Block>
         <ScrollView showsVerticalScrollIndicator={false}>
@@ -260,12 +252,11 @@ const styles = StyleSheet.create({
   profileContainer: {
     width: width,
     height: "auto",
-    flex: 0.6,
+    flex: 0.85,
   },
   profileDetails: {
     paddingTop: theme.SIZES.BASE * 4,
     justifyContent: "flex-end",
-    position: "relative",
   },
   profileTexts: {
     paddingHorizontal: theme.SIZES.BASE * 2,
@@ -367,7 +358,7 @@ const styles = StyleSheet.create({
     borderColor: "#EFEFEF",
     paddingVertical: 8,
     paddingHorizontal: width * 0.05,
-    marginHorizontal: theme.SIZES.BASE,
+    marginHorizontal: theme.SIZES.BASE * 1.25,
     shadowColor: "black",
     shadowOffset: { width: -1, height: -1 },
     shadowRadius: 2,

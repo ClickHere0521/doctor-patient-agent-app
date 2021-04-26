@@ -7,6 +7,7 @@ import {
   ImageBackground,
   Platform,
   TouchableWithoutFeedback,
+  TouchableOpacity
 } from "react-native";
 import { Button, Block, Text, theme, Input } from "galio-framework";
 import SwitchButton from "switch-button-react-native";
@@ -23,8 +24,37 @@ const thumbMeasure = (width - 48 - 32) / 3;
 const PatientInfo = (props) => {
   const { navigation } = props;
 
+  const navbar = () => {
+    return (
+      <Block>
+        <Block row style={styles.navbar} center>
+          <TouchableOpacity
+            onPress={() => navigation.openDrawer()}
+          >
+            <Icon
+              name="align-justify"
+              family="font-awesome"
+              color="black"
+              size={16}
+              style={styles.chevronLeft}
+            />
+          </TouchableOpacity>
+          <Text
+            color="black"
+            style={{ paddingLeft: theme.SIZES.BASE }}
+            size={22}
+            fontWeight="semiBold"
+          >
+            {IMLocalized("profileInfo")}
+          </Text>
+        </Block>
+        <Block style={{ borderTopWidth: 1, borderColor: "white" }}></Block>
+      </Block>
+    );
+  };
   return (
     <Block flex flexDirection="column" style={styles.container}>
+      {navbar()}
       <Block flexDirection="row" center>
         <Block style={{ marginVertical: theme.SIZES.BASE * 1.5 }}>
           <Image
@@ -119,6 +149,18 @@ const PatientInfo = (props) => {
 };
 
 const styles = StyleSheet.create({
+  navbar: {
+    backgroundColor: "white",
+    width: width,
+    height: height * 0.16,
+    paddingTop: theme.SIZES.BASE * 2,
+    paddingLeft: theme.SIZES.BASE,
+    borderBottomWidth: 1,
+    borderColor: "rgba(112, 112, 112, 0.1)",
+  },
+  navbarBtnGroup: {
+    marginBottom: theme.SIZES.BASE * 2,
+  },
   paddingVBase: {
     paddingVertical: theme.SIZES.BASE / 2,
     fontSize: 14,

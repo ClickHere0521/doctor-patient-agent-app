@@ -45,11 +45,13 @@ const InsuranceInfo = (props) => {
               />
               </TouchableOpacity>
           <Text color="white" style={{paddingLeft: theme.SIZES.BASE}} size={17} bold>Book Doctor</Text>
-          <Block style={{position: "absolute", width: width, top: height * 0.14}}>
+          <Block style={styles.searchBox}>
             <SearchBar
                 placeholder="Search here"
                 onChangeText={(text) => console.log(text)}
-                style={{borderRadius: 50, color: 'grey', height: 50}}
+                style={{borderRadius: 50, color: 'grey', height: 50, 
+                borderWidth: 1,
+                borderColor: "#DDD"}}
             />
           </Block>
         </Block>
@@ -79,6 +81,11 @@ const InsuranceInfo = (props) => {
     )
 }
 const styles = StyleSheet.create({
+    searchBox: {
+        position: "absolute",
+        width: width,
+        top: height * 0.14,
+    },
     inputNote: {
         width: width * 0.9,
         borderRadius: theme.SIZES.BASE,

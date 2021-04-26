@@ -68,7 +68,7 @@ const AgentReview = (props) => {
       <Block>
         <Block row style={styles.navbar} center>
           <TouchableOpacity
-            onPress={() => navigation.navigate("DashboardPatient")}
+            onPress={() => navigation.goBack()}
           >
             <Icon
               name="arrow-left"
@@ -90,7 +90,7 @@ const AgentReview = (props) => {
             <Image
               source={require("../assets/icons/editHeaderBlack.png")}
               alt=""
-              style={{ marginLeft: width * 0.3 }}
+              style={{ marginLeft: width * 0.4 }}
             />
           </TouchableOpacity>
         </Block>

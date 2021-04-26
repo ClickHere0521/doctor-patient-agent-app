@@ -47,7 +47,7 @@ const SignIn = (props) => {
             <Text
               bold
               color="white"
-              size={34}
+              size={40}
               style={{ alignSelf: "flex-start" }}
             >
               {IMLocalized("Agent")}
@@ -85,6 +85,32 @@ const SignIn = (props) => {
     }
   };
 
+  const gotoSignUp = () => {
+    if(userRole != "agent")
+    {
+      return (
+        <Block style={{ width: width, borderTopWidth: 1, borderColor: "white" }}>
+          <Button
+            size="large"
+            color="transparent"
+            shadowless
+            onPress={() => navigation.navigate("Sign Up")}
+          >
+            <Text center color={theme.COLORS.WHITE} size={16}>
+              {"Don't have an account? SIGN UP "}
+            </Text>
+            <SvgUri
+              width="36"
+              height="36"
+              source={require("../assets/icons/arrow-long-right.svg")}
+              style={{ position: "absolute", right: 30 }}
+            />
+          </Button>
+        </Block>
+      );
+    }
+  };
+
   return (
     <ScrollView>
       <Block
@@ -118,11 +144,12 @@ const SignIn = (props) => {
               ]}
             />
             <Input
+              password
               viewPass
               borderless
               color="white"
               iconColor="white"
-              placeholder="Password"
+              placeholder="PASSWORD"
               bgColor="transparent"
               placeholderTextColor={"white"}
               onChangeText={(text) => handleChange("password", text)}
@@ -153,17 +180,18 @@ const SignIn = (props) => {
           </Block>
           <Block flex flexDirection="row" style={{ width: width * 0.8 }} center>
             <CheckBox
-              
               checked={isSelected}
               containerStyle={{ backgroundColor: "rgba(0,0,0,0)", width: 10 }}
               onPress={() => setSelected(!isSelected)}
             />
-            <Text style={styles.label}>Remember Me</Text>
+            <Text style={styles.label}>{IMLocalized("Remember Me")}</Text>
             <TouchableOpacity
               style={{ marginLeft: 5, marginLeft: width / 6 }}
               onPress={() => navigation.navigate("ForgotPassword")}
             >
-              <Text style={{ color: "white" }}>Forgot Password</Text>
+              <Text style={{ color: "white" }}>
+                {IMLocalized("ForgotPassword")}
+              </Text>
             </TouchableOpacity>
           </Block>
           <Block
@@ -208,27 +236,8 @@ const SignIn = (props) => {
             <Text color="white">Sign In Successfully!</Text>
           </Block>
         </Block>
+        {gotoSignUp()}
 
-        <Block
-          style={{ width: width, borderTopWidth: 1, borderColor: "white" }}
-        >
-          <Button
-            size="large"
-            color="transparent"
-            shadowless
-            onPress={() => navigation.navigate("Sign Up")}
-          >
-            <Text center color={theme.COLORS.WHITE} size={16}>
-              {"Don't have an account? SIGN UP "}
-            </Text>
-            <SvgUri
-              width="36"
-              height="36"
-              source={require("../assets/icons/arrow-long-right.svg")}
-              style={{ position: "absolute", right: 30 }}
-            />
-          </Button>
-        </Block>
       </Block>
     </ScrollView>
   );
@@ -285,6 +294,7 @@ const styles = StyleSheet.create({
   },
   checkboxContainer: {},
   label: {
+    paddingLeft: theme.SIZES.BASE / 2,
     color: "white",
   },
 });

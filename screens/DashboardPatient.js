@@ -56,7 +56,7 @@ const DashboardPatient = (props) => {
             size={22}
             fontWeight="semiBold"
           >
-            {IMLocalized("Dashboard Agent")}
+            {IMLocalized("Dashboard")}
           </Text>
         </Block>
         <Block style={{ borderTopWidth: 1, borderColor: "white" }}></Block>

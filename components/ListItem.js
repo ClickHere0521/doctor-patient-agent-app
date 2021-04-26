@@ -127,7 +127,6 @@ const ListItem = (props) => {
               <Text
                 size={12}
                 center
-                bold
                 style={{ justifyContent: "center", alignItems: "center" }}
                 color={"#FFF"}
                 fontWeight={"semiBold"}
@@ -158,7 +157,6 @@ const ListItem = (props) => {
               <Text
                 size={12}
                 center
-                bold
                 style={{ justifyContent: "center", alignItems: "center" }}
                 color={"#FFF"}
                 fontWeight={"semiBold"}
@@ -273,16 +271,14 @@ const ListItem = (props) => {
           <Text size={16} style={styles.userName}>
             {product.title}
           </Text>
-          <Block flexDirection={"row"}>
-            <Text
-              size={16}
-              muted={!priceColor}
-              color={priceColor}
-              style={styles.content}
-            >
-              {role != "schedulePatientList" && product.content}
-            </Text>
-          </Block>
+          <Text
+            size={14}
+            muted={!priceColor}
+            color={priceColor}
+            style={styles.content}
+          >
+            {role != "schedulePatientList" && product.content}
+          </Text>
         </Block>
       </TouchableWithoutFeedback>
       <TouchableWithoutFeedback onPress={() => console.log("Patient Pressed")}>
@@ -315,9 +311,6 @@ const styles = StyleSheet.create({
     padding: theme.SIZES.BASE / 2,
     width: width / 1.5,
   },
-  imageContainer: {
-    elevation: 1,
-  },
   image: {
     borderRadius: 1000,
     marginHorizontal: theme.SIZES.BASE / 2,
@@ -335,9 +328,9 @@ const styles = StyleSheet.create({
   },
   shadow: {
     shadowColor: theme.COLORS.BLACK,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 2, height: 2 },
     shadowRadius: 3,
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.4,
     elevation: 5,
   },
   times: {
@@ -347,7 +340,7 @@ const styles = StyleSheet.create({
   },
   userName: {
     padding: theme.SIZES.BASE / 2,
-    paddingBottom: theme.SIZES.BASE / 2,
+    paddingBottom: 0,
   },
   content: {
     padding: theme.SIZES.BASE / 2,
@@ -359,8 +352,8 @@ const styles = StyleSheet.create({
   },
   button: {
     marginBottom: theme.SIZES.BASE,
-    width: theme.SIZES.BASE * 3,
-    height: theme.SIZES.BASE * 1.3,
+    width: theme.SIZES.BASE * 3.5,
+    height: theme.SIZES.BASE * 1.5,
     position: "absolute",
     right: theme.SIZES.BASE / 4,
     borderRadius: 40,
@@ -368,8 +361,8 @@ const styles = StyleSheet.create({
   },
   createBtn: {
     marginBottom: theme.SIZES.BASE,
-    width: theme.SIZES.BASE * 3,
-    height: theme.SIZES.BASE * 1.3,
+    width: theme.SIZES.BASE * 3.5,
+    height: theme.SIZES.BASE * 1.5,
     position: "absolute",
     right: theme.SIZES.BASE * 4,
     borderRadius: 40,

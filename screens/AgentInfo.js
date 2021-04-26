@@ -88,7 +88,7 @@ const AgentInfo = (props) => {
     <Block center flex style={styles.profile}>
       {navbar()}
       <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
-        <Block center row>
+        <Block center row style={{marginTop: theme.SIZES.BASE * 3}}>
           <Block middle style={{ marginRight: 14 }}>
             {imageUri ? (
               <Image

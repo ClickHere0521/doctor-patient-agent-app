@@ -109,7 +109,7 @@ const AddNotes = (props) => {
           <Image
             source={require("../assets/icons/editHeaderWhite.png")}
             alt=""
-            style={{ marginLeft: width * 0.54 }}
+            style={{ marginLeft: width * 0.6 }}
           />
         </TouchableOpacity>
       </Block>

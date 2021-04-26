@@ -56,8 +56,6 @@ const Components = (props) => {
   };
 
   const renderPatient = (item, index) => {
-    const { navigation } = props;
-
     return (
       <TouchableWithoutFeedback
         style={{ zIndex: 3 }}
@@ -83,7 +81,6 @@ const Components = (props) => {
   };
 
   const renderSort = (item, index) => {
-    const { navigation } = props;
 
     return (
       <TouchableWithoutFeedback
@@ -105,33 +102,6 @@ const Components = (props) => {
           </Block>
         </LinearGradient>
       </TouchableWithoutFeedback>
-    );
-  };
-
-  const renderPatients = () => {
-    return (
-      <Block flex>
-        <Block flex>
-          <Block flex style={{ marginTop: theme.SIZES.BASE / 2 }}>
-            <ScrollView
-              horizontal={true}
-              pagingEnabled={true}
-              decelerationRate={0}
-              scrollEventThrottle={16}
-              snapToAlignment="center"
-              style={{ width }}
-              showsHorizontalScrollIndicator={false}
-              snapToInterval={cardWidth + theme.SIZES.BASE * 0.375}
-              contentContainerStyle={{
-                paddingHorizontal: theme.SIZES.BASE / 2,
-              }}
-            >
-              {categories &&
-                categories.map((item, index) => renderPatient(item, index))}
-            </ScrollView>
-          </Block>
-        </Block>
-      </Block>
     );
   };
 
@@ -301,7 +271,7 @@ const styles = StyleSheet.create({
     borderColor: "#FFF",
     paddingVertical: 8,
     paddingHorizontal: 25,
-    marginHorizontal: theme.SIZES.BASE * 0.5,
+    marginHorizontal: theme.SIZES.BASE ,
     shadowColor: "black",
     shadowOffset: { width: -3, height: -3 },
     shadowRadius: 10,

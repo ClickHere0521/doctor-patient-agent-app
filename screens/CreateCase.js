@@ -92,7 +92,7 @@ const CreateCase = (props) => {
         <TouchableOpacity onPress={() => navigation.navigate("AddPatient")} style={{width:60}}>
           <Image source={require("../assets/images/createCase.png")} />
         </TouchableOpacity>
-        <Block row>
+        <Block row style={{marginBottom: theme.SIZES.BASE}}>
           <Text size={10} style={{ left: theme.SIZES.BASE * 1.8 }}>
             Add
           </Text>       
@@ -132,12 +132,8 @@ const CreateCase = (props) => {
         </Block>
         <Block>
           <Text
-            size={16}
-            bold
-            style={{
-              paddingBottom: 10,
-              paddingTop: 10,
-              paddingLeft: theme.SIZES.BASE,
+            size={18}
+            style={{padding: theme.SIZES.BASE * 1.5
             }}
           >
             Case Info
@@ -173,7 +169,7 @@ const CreateCase = (props) => {
             link: "",
           })}
         </Block>
-        <Block row center>
+        <Block row center style={{marginTop: theme.SIZES.BASE}}>
           <TouchableOpacity
             style={styles.save}
             onPress={() => console.log("save")}
@@ -292,7 +288,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 5,
     elevation: 2,
     backgroundColor: "#FEFEFE",
-    paddingVertical: theme.SIZES.BASE,
+    paddingVertical: theme.SIZES.BASE * 1.5,
     paddingHorizontal: theme.SIZES.BASE,
     marginBottom: theme.SIZES.BASE,
   },

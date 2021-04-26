@@ -23,6 +23,7 @@ import {
   ListItem,
 } from "../components/";
 import Accordion from "react-native-collapsible/Accordion";
+import SvgUri from "expo-svg-uri";
 
 const { width, height } = Dimensions.get("screen");
 
@@ -225,6 +226,48 @@ const ScheduleView = (props) => {
           >
             {IMLocalized("Schedules")}
           </Text>
+          
+        <Block row>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("CreateDoctorAccount")}
+            style={{ paddingLeft: width * 0.45, padding: 2 }}
+          >
+            <Text color={"white"}>
+              <SvgUri
+                width="18"
+                height="18"
+                source={require("../assets/icons/add.svg")}
+              />
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => navigation.openDrawer()}
+            style={{ paddingLeft: width * 0.02, padding: 2 }}
+          >
+            <Text color={"white"}>
+              <SvgUri
+                width="20"
+                height="20"
+                source={require("../assets/icons/headerEditBlack.svg")}
+              />
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => navigation.openDrawer()}
+            style={{ paddingLeft: width * 0.02 }}
+          >
+            <Text color={"white"}>
+              <SvgUri
+                width="24"
+                height="24"
+                source={require("../assets/icons/trash.svg")}
+              />
+            </Text>
+          </TouchableOpacity>
+        </Block>
+      
         </Block>
         <Block style={{ borderTopWidth: 1, borderColor: "white" }}></Block>
       </Block>
@@ -255,8 +298,6 @@ const styles = StyleSheet.create({
     paddingTop: 0,
   },
   container: {
-    borderTopLeftRadius: 36,
-    borderTopRightRadius: 36,
     shadowColor: "black",
     shadowOffset: { width: 4, height: 4 },
     shadowRadius: 4,
@@ -266,7 +307,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#ddd",
     backgroundColor: "white",
-    marginTop: -theme.SIZES.BASE,
     borderBottomWidth: 0,
   },
   contentContainer: {

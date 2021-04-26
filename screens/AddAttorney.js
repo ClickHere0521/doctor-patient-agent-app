@@ -98,7 +98,7 @@ const AddAttorney = (props) => {
           <Image
             source={require("../assets/icons/editHeaderWhite.png")}
             alt=""
-            style={{ marginLeft: width * 0.4 }}
+            style={{ marginLeft: width * 0.45 }}
           />
         </TouchableOpacity>
       </Block>

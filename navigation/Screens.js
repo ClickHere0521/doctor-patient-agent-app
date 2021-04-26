@@ -850,7 +850,7 @@ const UserSelectStack = (props) => {
 
 const PatientInfoStack = (props) => {
   return (
-    <Stack.Navigator mode="card" headerMode="screen">
+    <Stack.Navigator mode="card" headerMode="none">
       <Stack.Screen
         name="Patient Info"
         component={PatientInfoScreen}
@@ -1056,7 +1056,7 @@ const PatientScheduleDetailStack = (props) => {
 
 const PatientCaseHistoryStack = (props) => {
   return (
-    <Stack.Navigator mode="card" headerMode="screen">
+    <Stack.Navigator mode="card" headerMode="none">
       <Stack.Screen
         name="Case History"
         component={PatientCaseHistoryScreen}

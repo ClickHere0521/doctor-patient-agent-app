@@ -40,20 +40,22 @@ const ForgotPassword = (props) => {
   const navbar = () => {
     return (
       <Block row style={styles.navbar} center>
-        <Icon
-          name="arrow-left"
-          family="font-awesome"
-          color={"white"}
-          size={16}
-          style={styles.chevronLeft}
-        />
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Icon
+            name="arrow-left"
+            family="font-awesome"
+            color={"white"}
+            size={16}
+            style={styles.chevronLeft}
+          />
+        </TouchableOpacity>
         <Text
           color="white"
           style={{ paddingLeft: theme.SIZES.BASE }}
           size={17}
           bold
         >
-          Forget Password
+          Forgot Password
         </Text>
       </Block>
     );
@@ -223,7 +225,7 @@ const ForgotPassword = (props) => {
           </Block>
           <Block style={{ marginTop: theme.SIZES.BASE }}>
             <TouchableOpacity onPress={() => setRequest(1)}>
-              <Text>Start Again</Text>
+              <Text bold>Start Again</Text>
             </TouchableOpacity>
           </Block>
           

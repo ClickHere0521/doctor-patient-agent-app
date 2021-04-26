@@ -48,8 +48,8 @@ const Components = (props) => {
   const [switch1, setSwitch1] = useState(true);
   const [switch2, setSwitch2] = useState(false);
 
+  const { navigation } = props;
   const renderPatient = (item, index) => {
-    const { navigation } = props;
 
     return (
       <TouchableWithoutFeedback
@@ -213,9 +213,7 @@ const Components = (props) => {
         <TouchableOpacity onPress={() => navigation.navigate("AddPatient")} style={{width:60}}>
           <Image source={require("../assets/images/createCase.png")} />
         </TouchableOpacity> 
-        <Text size={10} style={{left: 26}}>
-          Add
-        </Text>
+        <Text size={10} style={{left: 26}}> Add</Text>
         {renderSorts()}
         {renderPatientsList()}
         {/* {renderAlbum()} */}
@@ -227,7 +225,7 @@ const Components = (props) => {
 const styles = StyleSheet.create({
   components: {
     paddingTop: theme.SIZES.BASE,
-    backgroundColor: "#F8F8F8",
+    backgroundColor: "white",
   },
   title: {
     paddingVertical: theme.SIZES.BASE,
@@ -294,7 +292,7 @@ const styles = StyleSheet.create({
     borderColor: "#FFF",
     paddingVertical: 8,
     paddingHorizontal: width * 0.03,
-    marginHorizontal: theme.SIZES.BASE * 0.5,
+    marginHorizontal: theme.SIZES.BASE * 0.7,
     shadowColor: "black",
     shadowOffset: { width: -3, height: -3 },
     shadowRadius: 10,

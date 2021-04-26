@@ -30,24 +30,28 @@ const UploadCaseFiles = (props) => {
   const [caseFiles, setCaseFiles] = useState([
     {
       label: "Eddie",
+      author: "John",
       approved: false,
       uploadTime: "11:00 AM",
       file: "url",
     },
     {
       label: "Malcol",
+      author: "John",
       approved: true,
       uploadTime: "11:00 AM",
       file: "url",
     },
     {
       label: "John",
+      author: "Max",
       approved: false,
       uploadTime: "11:00 AM",
       file: "url",
     },
     {
       label: "Elif",
+      author: "Cool",
       approved: true,
       uploadTime: "11:00 AM",
       file: "url",
@@ -204,7 +208,7 @@ const UploadCaseFiles = (props) => {
                   </Text>
                 </Block>
                 <Block flex={1}  style={{alignItems: 'flex-start'}}>
-                  <Text center size={15} fontWeight="semiBold">
+                  <Text center size={15} bold color='grey' fontWeight="semiBold">
                     {IMLocalized(author)}
                   </Text>
                 </Block>
