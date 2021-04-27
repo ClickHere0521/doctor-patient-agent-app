@@ -1,3 +1,3 @@
 # A Doctor-Patient-Agent consulting app
 
-Built with react native, firebase, timekit etc...
+Built with react native, firebase, timekit etc..
