@@ -94,7 +94,7 @@ const Onboarding = (props) => {
             </Block>
           </Block>
         </Block>
-        <Block flex={1} space="between" style={{ marginTop: height / 10 }}>
+        <Block flex={1} space="between" style={{ marginTop: height / 13 }}>
           <Block center style={{ paddingBottom: 30 }}>
             <Button
               shadowless
@@ -123,7 +123,7 @@ const Onboarding = (props) => {
               {IMLocalized("doctor")}
             </Button>
 
-            <Text color="grey" size={10}>
+            <Text color="grey" size={10} style={{marginTop: theme.SIZES.BASE}}>
               {IMLocalized("agreeTerm")}
             </Text>
           </Block>

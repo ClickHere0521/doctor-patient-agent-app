@@ -1,11 +1,6 @@
 import React from "react";
 import { withNavigation } from "@react-navigation/compat";
-import {
-  StyleSheet,
-  Dimensions,
-  Image,
-  TouchableOpacity
-} from "react-native";
+import { StyleSheet, Dimensions, Image, TouchableOpacity } from "react-native";
 import { Block, Text, theme } from "galio-framework";
 import Icon from "./Icon";
 import Button from "./Button";
@@ -27,13 +22,13 @@ const ListItem = (props) => {
     unReaden,
     weekday,
   } = props;
-  
+
   const imageStyles = [
     styles.image,
     full ? styles.fullImage : styles.horizontalImage,
     imageStyle,
   ];
-  const userRole = useSelector(state => state.user.role)
+  const userRole = useSelector((state) => state.user.role);
 
   return (
     <Block
@@ -43,30 +38,39 @@ const ListItem = (props) => {
       style={[styles.product, styles.shadow, style]}
     >
       <TouchableOpacity
-        onPress={() => { navigation.navigate("DoctorDetail")}}
+        onPress={() => {
+          navigation.navigate("DoctorDetail");
+        }}
       >
         <Block style={[styles.imageContainer, styles.shadow]}>
           <Image source={{ uri: product.image }} style={imageStyles} />
         </Block>
       </TouchableOpacity>
       <TouchableOpacity
-        onPress={() => { navigation.navigate("DoctorDetail")}}
+        onPress={() => {
+          navigation.navigate("DoctorDetail");
+        }}
       >
-        <Block >
+        <Block>
           <Text size={16} style={styles.userName}>
             {product.title}
           </Text>
-          <Block row>
-            <Text size={16} muted={!priceColor} color={priceColor} style={{paddingTop: 8}}>
-              ${product.price}
-            </Text>
-          </Block>
+          <Text
+            size={16}
+            muted={!priceColor}
+            color={priceColor}
+            style={{ paddingTop: 8 }}
+          >
+            ${product.price}
+          </Text>
         </Block>
       </TouchableOpacity>
       <TouchableOpacity
-        onPress={() => { navigation.navigate("DoctorDetail")}}
+        onPress={() => {
+          navigation.navigate("DoctorDetail");
+        }}
       >
-        <Block flex={1} middle>
+        <Block flex middle center>
           <SvgUri
             width="25"
             height="25"
@@ -127,12 +131,12 @@ const styles = StyleSheet.create({
   userName: {
     padding: theme.SIZES.BASE / 2,
     paddingBottom: theme.SIZES.BASE / 2,
-    width: width * 0.62
+    width: width * 0.62,
   },
   icons: {
     paddingTop: 10,
     paddingRight: 2,
-    marginLeft: 8
+    marginLeft: 8,
   },
   button: {
     marginBottom: theme.SIZES.BASE,
@@ -141,7 +145,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: theme.SIZES.BASE / 2,
     borderRadius: 40,
-    bottom: 0,    
+    bottom: 0,
   },
 });
 

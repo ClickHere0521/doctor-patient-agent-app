@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   navbarBtn: {
-    width: theme.SIZES.BASE * 5,
+    width: theme.SIZES.BASE * 4,
     height: theme.SIZES.BASE * 5,
     padding: theme.SIZES.BASE,
     borderColor: "white",
@@ -346,7 +346,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   typeIconText: {
-    width: theme.SIZES.BASE * 8,
+    width: theme.SIZES.BASE * 6,
     paddingTop: 10,
     color: "#333348",
   },

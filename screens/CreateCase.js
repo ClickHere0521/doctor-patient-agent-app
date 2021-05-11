@@ -89,7 +89,7 @@ const CreateCase = (props) => {
         vertical={true}
         showsVerticalScrollIndicator={false}
       >
-        <TouchableOpacity onPress={() => navigation.navigate("AddPatient")} style={{width:60}}>
+        <TouchableOpacity onPress={() => navigation.navigate("AddPatient", { editPatient: false })} style={{width:60}}>
           <Image source={require("../assets/images/createCase.png")} />
         </TouchableOpacity>
         <Block row style={{marginBottom: theme.SIZES.BASE}}>
@@ -119,15 +119,19 @@ const CreateCase = (props) => {
             <Text style={{ alignSelf: "flex-end" }} color={"#06D81E"}>
               11:45 AM
             </Text>
-            <SvgUri
-              width="20"
-              height="20"
-              source={require("../assets/icons/editGreen.svg")}
-              style={{
-                right: -theme.SIZES.BASE * 2,
-                paddingTop: theme.SIZES.BASE,
-              }}
-            />
+            <TouchableOpacity
+              onPress={() => navigation.navigate("AddPatient", { editPatient: true })}
+            >
+              <SvgUri
+                width="20"
+                height="20"
+                source={require("../assets/icons/editGreen.svg")}
+                style={{
+                  right: -theme.SIZES.BASE * 2,
+                  paddingTop: theme.SIZES.BASE,
+                }}
+              />
+            </TouchableOpacity>
           </Block>
         </Block>
         <Block>

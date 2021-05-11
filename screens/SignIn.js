@@ -96,21 +96,39 @@ const SignIn = (props) => {
             shadowless
             onPress={() => navigation.navigate("Sign Up")}
           >
-            <Text center color={theme.COLORS.WHITE} size={16}>
-              {"Don't have an account? SIGN UP "}
-            </Text>
-            <SvgUri
-              width="36"
-              height="36"
-              source={require("../assets/icons/arrow-long-right.svg")}
-              style={{ position: "absolute", right: 30 }}
-            />
+            <Block flexDirection="row" center middle>
+              <Text center color={theme.COLORS.WHITE} size={16}>
+                {"Don't have an account? SIGN UP "}
+              </Text>
+              <SvgUri
+                width="36"
+                height="36"
+                source={require("../assets/icons/arrow-long-right.svg")}
+              />
+            </Block>
           </Button>
         </Block>
       );
     }
   };
 
+  const signInBlock = () =>{
+    console.log(userRole);
+    if(userRole == "agent"){
+      return (
+        <Block center style={{ marginBottom: theme.SIZES.BASE * 5 }}>
+          <Text color="white">Sign In Successfully!</Text>
+        </Block>
+      )
+    }
+    else{
+      return(
+        <Block center style={{ marginBottom: theme.SIZES.BASE }}>
+          <Text color="white">Sign In Successfully!</Text>
+        </Block>
+      )
+    }
+  }
   return (
     <ScrollView>
       <Block
@@ -119,13 +137,6 @@ const SignIn = (props) => {
         backgroundColor="rgba(139,147,248,1)"
         style={{ height: height }}
       >
-        {/* <Icon
-          name="chevron-left"
-          family="font-awesome"
-          color={"white"}
-          size={16}
-          style={styles.chevronLeft}
-        /> */}
         {SignInHeading(userRole)}
         <Block flex>
           <Block center>
@@ -174,19 +185,20 @@ const SignIn = (props) => {
                 color={theme.COLORS.WHITE}
                 style={{ alignSelf: "center", paddingTop: 7 }}
               >
-                SIGN IN
+                {IMLocalized('signIn')}
               </Text>
             </TouchableOpacity>
           </Block>
-          <Block flex flexDirection="row" style={{ width: width * 0.8 }} center>
+          <Block flex flexDirection="row" style={{ width: width*0.9}} center>
             <CheckBox
               checked={isSelected}
               containerStyle={{ backgroundColor: "rgba(0,0,0,0)", width: 10 }}
               onPress={() => setSelected(!isSelected)}
+              
             />
             <Text style={styles.label}>{IMLocalized("Remember Me")}</Text>
             <TouchableOpacity
-              style={{ marginLeft: 5, marginLeft: width / 6 }}
+              style={{marginLeft: width / 6 }}
               onPress={() => navigation.navigate("ForgotPassword")}
             >
               <Text style={{ color: "white" }}>
@@ -194,26 +206,7 @@ const SignIn = (props) => {
               </Text>
             </TouchableOpacity>
           </Block>
-          <Block
-            flex={0}
-            flexDirection="row"
-            center
-            style={{ borderWidth: 1, borderColor: "white", width: width * 0.8 }}
-          >
-            <Block
-              style={{
-                position: "absolute",
-                top: -12,
-                left: width * 0.36,
-                paddingHorizontal: 5,
-                backgroundColor: "rgba(139,147,248,1)",
-              }}
-            >
-              <Text color="white" size={17}>
-                OR
-              </Text>
-            </Block>
-          </Block>
+
           <Block
             flex
             flexDirection="row"
@@ -232,9 +225,7 @@ const SignIn = (props) => {
               style={{ marginLeft: theme.SIZES.BASE * 2 }}
             />
           </Block>
-          <Block center style={{ marginBottom: theme.SIZES.BASE * 5 }}>
-            <Text color="white">Sign In Successfully!</Text>
-          </Block>
+          {signInBlock()}
         </Block>
         {gotoSignUp()}
 
@@ -286,11 +277,6 @@ const styles = StyleSheet.create({
     height: theme.SIZES.BASE * 3,
     width: width * 0.8,
     position: "relative",
-  },
-  chevronLeft: {
-    position: "absolute",
-    marginTop: theme.SIZES.BASE * 8,
-    marginLeft: theme.SIZES.BASE * 1,
   },
   checkboxContainer: {},
   label: {

@@ -19,8 +19,9 @@ const { width, height } = Dimensions.get("screen");
 const thumbMeasure = (width - 48 - 32) / 3;
 
 const AddPatient = (props) => {
-  const { navigation } = props;
-
+  const { route, navigation } = props;
+  const { editPatient } = route.params;
+  
   const [vals, setVals] = useState({
     email: "-",
     password: "-",
@@ -75,7 +76,7 @@ const AddPatient = (props) => {
           size={17}
           bold
         >
-          Add Patient
+          {editPatient ? "Patient Info" : "Add Patient"}          
         </Text>
         <TouchableOpacity>
           <Image

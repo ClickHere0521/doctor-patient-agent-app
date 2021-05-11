@@ -44,9 +44,9 @@ const DashboardAgent = (props) => {
     return (
       <Block style={styles.options}>
         <Block column space="between" style={styles.events}  flex flexDirection="row">
-            <Block row style={{padding: theme.SIZES.BASE,}} >
+            <Block row center style={{padding: theme.SIZES.BASE}} >
               <Text color={"grey"} size={14}>
-                {IMLocalized(eventHeading)}
+                {eventHeading}
               </Text>
               <Text color={"red"}> *</Text>
             </Block>
@@ -153,7 +153,7 @@ const DashboardAgent = (props) => {
             size={22}
             fontWeight="semiBold"
           >
-            {IMLocalized("Dashboard Agent")}
+            {IMLocalized("Dashboard")}
           </Text>
         </Block>
         <Block style={{ borderTopWidth: 1, borderColor: "white" }}></Block>
@@ -169,35 +169,27 @@ const DashboardAgent = (props) => {
         style={styles.profileContainer}
         imageStyle={styles.profileImage}
       >
-        <Block flex style={styles.profileDetails}>
-          <Block style={styles.profileTexts}></Block>
           <LinearGradient
             colors={["rgba(110,120,247,0.2)", "rgba(110,120,247,0.3)"]}
             style={styles.gradient}
-          />
-          <LinearGradient
-            colors={["rgba(110,120,247,0.2)", "rgba(110,120,247,0.3)"]}
-            style={styles.gradient}
-          />
-        </Block>
+          >
+          <Block
+          >
+            {renderEvents({
+              eventHeading: IMLocalized("Total active case"),
+              eventContent: 3000,
+            })}
+            {renderEvents({
+              eventHeading: IMLocalized("This year"), 
+              eventContent: 700,
+            })}
+            {renderEvents({
+              eventHeading: IMLocalized("Case resolved this year"),
+              eventContent: 605,
+            })}
+          </Block>
+          </LinearGradient>
       </ImageBackground>
-      <Block
-        flex={0.7}
-        style={{ top: theme.SIZES.BASE * 14, position: "absolute" }}
-      >
-        {renderEvents({
-          eventHeading: IMLocalized("Total active case"),
-          eventContent: 3000,
-        })}
-        {renderEvents({
-          eventHeading: IMLocalized("This year"), 
-          eventContent: 700,
-        })}
-        {renderEvents({
-          eventHeading: IMLocalized("Case resolved this year"),
-          eventContent: 605,
-        })}
-      </Block>
       <Block flex={1.3} style={{ backgroundColor: "#F8F8F8" }}>
         <Block
           style={{
@@ -288,8 +280,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.SIZES.BASE * 0.3,
     paddingVertical: theme.SIZES.BASE * 0.2,
     marginHorizontal: theme.SIZES.BASE,
-    marginTop: -theme.SIZES.BASE * 3,
-    marginBottom: theme.SIZES.BASE * 4,
+    marginBottom: theme.SIZES.BASE ,
+    marginTop: theme.SIZES.BASE ,
     borderRadius: 40,
     backgroundColor: theme.COLORS.WHITE,
     shadowColor: "black",
@@ -298,6 +290,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     elevation: 3,
     zIndex: 2,
+    height: theme.SIZES.BASE *3,
   },
   gradient: {
     zIndex: 10,
@@ -305,7 +298,6 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     height: "100%",
-    position: "absolute",
   },
   button: {
     marginBottom: theme.SIZES.BASE,
