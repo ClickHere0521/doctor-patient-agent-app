@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Dimensions,
@@ -18,6 +18,7 @@ import { useSelector } from "react-redux";
 import { Icon } from "../components";
 import SvgUri from "expo-svg-uri";
 import { CheckBox } from "react-native-elements";
+import * as LocalAuthentication from "expo-local-authentication";
 
 const { width, height } = Dimensions.get("window");
 
@@ -31,6 +32,7 @@ const SignIn = (props) => {
       email: false,
       password: false,
     },
+    scanned: false,
   });
 
   const handleChange = (name, value) => {
@@ -86,10 +88,11 @@ const SignIn = (props) => {
   };
 
   const gotoSignUp = () => {
-    if(userRole != "agent")
-    {
+    if (userRole != "agent") {
       return (
-        <Block style={{ width: width, borderTopWidth: 1, borderColor: "white" }}>
+        <Block
+          style={{ width: width, borderTopWidth: 1, borderColor: "white" }}
+        >
           <Button
             size="large"
             color="transparent"
@@ -112,23 +115,6 @@ const SignIn = (props) => {
     }
   };
 
-  const signInBlock = () =>{
-    console.log(userRole);
-    if(userRole == "agent"){
-      return (
-        <Block center style={{ marginBottom: theme.SIZES.BASE * 5 }}>
-          <Text color="white">Sign In Successfully!</Text>
-        </Block>
-      )
-    }
-    else{
-      return(
-        <Block center style={{ marginBottom: theme.SIZES.BASE }}>
-          <Text color="white">Sign In Successfully!</Text>
-        </Block>
-      )
-    }
-  }
   return (
     <ScrollView>
       <Block
@@ -177,7 +163,7 @@ const SignIn = (props) => {
           >
             <TouchableOpacity
               style={styles.signInBtn}
-              onPress={() => navigation.replace("App")}
+              onPress={() => navigation.replace("Biometrics")}
               // onPress={() => navigation.navigate("AddNotes")}
             >
               <Text
@@ -185,20 +171,19 @@ const SignIn = (props) => {
                 color={theme.COLORS.WHITE}
                 style={{ alignSelf: "center", paddingTop: 7 }}
               >
-                {IMLocalized('signIn')}
+                {IMLocalized("signIn")}
               </Text>
             </TouchableOpacity>
           </Block>
-          <Block flex flexDirection="row" style={{ width: width*0.9}} center>
+          <Block flex flexDirection="row" style={{ width: width * 0.9 }} center>
             <CheckBox
               checked={isSelected}
               containerStyle={{ backgroundColor: "rgba(0,0,0,0)", width: 10 }}
               onPress={() => setSelected(!isSelected)}
-              
             />
             <Text style={styles.label}>{IMLocalized("Remember Me")}</Text>
             <TouchableOpacity
-              style={{marginLeft: width / 6 }}
+              style={{ marginLeft: width / 6 }}
               onPress={() => navigation.navigate("ForgotPassword")}
             >
               <Text style={{ color: "white" }}>
@@ -206,29 +191,17 @@ const SignIn = (props) => {
               </Text>
             </TouchableOpacity>
           </Block>
-
-          <Block
-            flex
-            flexDirection="row"
-            style={{ marginTop: height * 0.05 }}
-            center
-          >
-            <SvgUri
-              width="36"
-              height="36"
-              source={require("../assets/icons/face.svg")}
-            />
-            <SvgUri
-              width="36"
-              height="36"
-              source={require("../assets/icons/finger.svg")}
-              style={{ marginLeft: theme.SIZES.BASE * 2 }}
-            />
+          <Block flex>
+            <></>
           </Block>
-          {signInBlock()}
+          <Block flex>
+            <></>
+          </Block>
+          <Block flex>
+            <></>
+          </Block>
         </Block>
         {gotoSignUp()}
-
       </Block>
     </ScrollView>
   );

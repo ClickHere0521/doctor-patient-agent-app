@@ -71,6 +71,7 @@ import DoctorMyScheduleScreen from "../screens/DoctorMySchedule";
 import DoctorCaseHistoryScreen from "../screens/DoctorCaseHistory";
 import DoctorAllNotesScreen from "../screens/DoctorAllNotes";
 import DoctorAddNotesScreen from "../screens/DoctorAddNotes";
+import BiometricsScreen from "../screens/Biometrics";
 
 import { IMLocalized } from "../src/localization/IMLocalization";
 
@@ -813,6 +814,13 @@ const UserSelectStack = (props) => {
               color={focused ? "white" : materialTheme.COLORS.MUTED}
             />
           ),
+        }}
+      />
+      <Drawer.Screen
+        name="Biometrics"
+        component={BiometricsScreen}
+        options={{
+          headerTransparent: true,
         }}
       />
       <Drawer.Screen
