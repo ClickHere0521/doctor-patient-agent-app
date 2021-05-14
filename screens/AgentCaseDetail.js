@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -24,12 +24,44 @@ import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 import { SliderBox } from "react-native-image-slider-box";
 import SvgUri from "expo-svg-uri";
 import { CheckBox } from "react-native-elements";
+import { weekdays } from "moment";
 
 const { width, height } = Dimensions.get("screen");
 
 const Components = (props) => {
   const { navigation } = props;
   const [imageSource, setImageSource] = useState(null);
+  const [weekState, setWeekState] = useState([
+    {
+      date: "MON",
+      status: true,
+    },
+    {
+      date: "TUE",
+      status: false,
+    },
+    {
+      date: "WED",
+      status: false,
+    },
+    {
+      date: "THU",
+      status: false,
+    },
+    {
+      date: "FRI",
+      status: false,
+    },
+    {
+      date: "SAT",
+      status: false,
+    },
+    {
+      date: "SUN",
+      status: false,
+    },
+  ]);
+
   const options = {
     title: "Load Photo",
     customButtons: [
@@ -43,6 +75,12 @@ const Components = (props) => {
   };
 
   const weekBar = () => {
+    const handleWeekbar = index => {
+      weekState.map((value, indexTemp) => {
+        weekState[indexTemp].status = (index == indexTemp) ? true : false;
+      })        
+      setWeekState([...weekState]);
+    }
     return (
       <ScrollView
         horizontal={true}
@@ -54,39 +92,15 @@ const Components = (props) => {
         snapToInterval={theme.SIZES.BASE * 0.375}
         style={styles.weekScrollView}
       >
-        <TouchableOpacity style={styles.dateActive}>
-          <Text size={16} color={"white"}>
-            WED
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 3 }}>
-            THU
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 8 }}>
-            FRI
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 6 }}>
-            SAT
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 4 }}>
-            SUN
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16}>MON</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 4 }}>
-            THE
-          </Text>
-        </TouchableOpacity>
+        {weekState.map((value, index) => {
+          return (
+            <TouchableOpacity key={index} onPress={() => {handleWeekbar(index)}} style={value.status ? styles.dateActive : styles.dateInActive}>
+              <Text size={16} color={value.status ? "white" : "black"}>
+                {value.date}
+              </Text>
+            </TouchableOpacity>
+          )
+        })}
       </ScrollView>
     );
   };

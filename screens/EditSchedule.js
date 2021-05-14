@@ -6,6 +6,7 @@ import {
   Image,
   ImageBackground,
   Platform,
+  View,
   TouchableOpacity,
 } from "react-native";
 import { Block, Text, theme, Icon, NavBar } from "galio-framework";
@@ -20,8 +21,55 @@ const thumbMeasure = (width - 48 - 32) / 3;
 const EditSchedule = (props) => {
   const { navigation } = props;
   const [activeSwitch, setActiveSwitch] = useState(1);
+  const [dataSourceCords, setDataSourceCords] = useState([]);
+  const [ref, setRef] = useState(null);
+  const [weekState, setWeekState] = useState([
+    {
+      date: "MON",
+      status: true,
+    },
+    {
+      date: "TUE",
+      status: false,
+    },
+    {
+      date: "WED",
+      status: false,
+    },
+    {
+      date: "THU",
+      status: false,
+    },
+    {
+      date: "FRI",
+      status: false,
+    },
+    {
+      date: "SAT",
+      status: false,
+    },
+    {
+      date: "SUN",
+      status: false,
+    },
+  ]);
 
   const weekBar = () => {
+    const handleWeekbar = (index) => {
+      weekState.map((value, indexTemp) => {
+        weekState[indexTemp].status = index == indexTemp ? true : false;
+      });
+      setWeekState([...weekState]);
+      // if (dataSourceCords.length > scrollToIndex) {
+      //   ref.scrollTo({
+      //     x: 0,
+      //     y: dataSourceCords[scrollToIndex - 1],
+      //     animated: true,
+      //   });
+      // } else {
+      //   alert('Out of Max Index');
+      // }
+    };
     return (
       <ScrollView
         horizontal={true}
@@ -33,39 +81,34 @@ const EditSchedule = (props) => {
         snapToInterval={theme.SIZES.BASE * 0.375}
         style={styles.weekScrollView}
       >
-        <TouchableOpacity style={styles.dateActive}>
-          <Text size={16} color={"white"}>
-            WED
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 3 }}>
-            THU
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 8 }}>
-            FRI
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 6 }}>
-            SAT
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 4 }}>
-            SUN
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16}>MON</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 4 }}>
-            THE
-          </Text>
-        </TouchableOpacity>
+        {weekState.map((value, index) => {
+          return (
+            <View
+              onLayout={(event) => {
+                const layout = event.nativeEvent.layout;
+                // dataSourceCords[key] = layout.y;
+                // setDataSourceCords(dataSourceCords);
+                console.log(dataSourceCords);
+                console.log("height:", layout.height);
+                console.log("width:", layout.width);
+                console.log("x:", layout.x);
+                console.log("y:", layout.y);
+              }}
+            >
+              <TouchableOpacity
+                key={index}
+                onPress={() => {
+                  handleWeekbar(index);
+                }}
+                style={value.status ? styles.dateActive : styles.dateInActive}
+              >
+                <Text size={16} color={value.status ? "white" : "black"}>
+                  {value.date}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          );
+        })}
       </ScrollView>
     );
   };
@@ -154,7 +197,7 @@ const EditSchedule = (props) => {
               </Block>
               <Block flex={5}></Block>
               <Block flex={1} style={styles.schedule}>
-                <TouchableOpacity 
+                <TouchableOpacity
                   onPress={() => navigation.navigate("SchedulePatientList")}
                 >
                   <SvgUri
@@ -187,7 +230,7 @@ const EditSchedule = (props) => {
               </Block>
               <Block flex={5}></Block>
               <Block flex={1} style={styles.schedule}>
-                <TouchableOpacity 
+                <TouchableOpacity
                   onPress={() => navigation.navigate("SchedulePatientList")}
                 >
                   <SvgUri

@@ -19,8 +19,44 @@ const thumbMeasure = (width - 48 - 32) / 3;
 const DoctorScheduleDetail = (props) => {
   const { navigation } = props;
   const [activeSwitch, setActiveSwitch] = useState(1);
+  const [weekState, setWeekState] = useState([
+    {
+      date: "MON",
+      status: true,
+    },
+    {
+      date: "TUE",
+      status: false,
+    },
+    {
+      date: "WED",
+      status: false,
+    },
+    {
+      date: "THU",
+      status: false,
+    },
+    {
+      date: "FRI",
+      status: false,
+    },
+    {
+      date: "SAT",
+      status: false,
+    },
+    {
+      date: "SUN",
+      status: false,
+    },
+  ]);
 
   const weekBar = () => {
+    const handleWeekbar = index => {
+      weekState.map((value, indexTemp) => {
+        weekState[indexTemp].status = (index == indexTemp) ? true : false;
+      })        
+      setWeekState([...weekState]);      
+    }
     return (
       <ScrollView
         horizontal={true}
@@ -32,39 +68,15 @@ const DoctorScheduleDetail = (props) => {
         snapToInterval={theme.SIZES.BASE * 0.375}
         style={styles.weekScrollView}
       >
-        <TouchableOpacity style={styles.dateActive}>
-          <Text size={16} color={"white"}>
-            WED
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 3 }}>
-            THU
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 8 }}>
-            FRI
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 6 }}>
-            SAT
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 4 }}>
-            SUN
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16}>MON</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 4 }}>
-            THE
-          </Text>
-        </TouchableOpacity>
+        {weekState.map((value, index) => {
+          return (
+            <TouchableOpacity key={index} onPress={() => {handleWeekbar(index)}} style={value.status ? styles.dateActive : styles.dateInActive}>
+              <Text size={16} color={value.status ? "white" : "black"}>
+                {value.date}
+              </Text>
+            </TouchableOpacity>
+          )
+        })}
       </ScrollView>
     );
   };

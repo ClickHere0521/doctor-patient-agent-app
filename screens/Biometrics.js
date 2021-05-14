@@ -19,21 +19,13 @@ const { width, height } = Dimensions.get("window");
 
 const Biometrics = (props) => {
   const { navigation } = props;
-  const userRole = useSelector((state) => state.user.role);
-  const [vals, setVals] = useState({
-    email: "-",
-    password: "-",
-    active: {
-      email: false,
-      password: false,
-    },
-    scanned: false
-  });
+  const userRole = useSelector((state) => state.user.role);  
+  const [scanned, setScanned] = useState(false);
 
   useEffect(() => {
     checkDeviceForHardware();
     checkForBiometrics();
-    if (!vals.scanned) handleLoginPress();
+    if (!scanned) handleLoginPress();
   }, []);
 
   const checkDeviceForHardware = async () => {
@@ -59,7 +51,7 @@ const Biometrics = (props) => {
   const handleAuthentication = async () => {
     let result = await LocalAuthentication.authenticateAsync();
     if (result.success) {
-      setVals({ ...vals, scanned: true });    
+      setScanned(true);
       navigation.replace("App");
     } else {
       console.log("Error! Enter your username and password!");

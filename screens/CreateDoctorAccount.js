@@ -10,7 +10,7 @@ import {
   View,
   Component,
 } from "react-native";
-import { Button, Block, Text, Input, theme } from "galio-framework";
+import { Button, Block, Text, theme, Input } from "galio-framework";
 import { IMLocalized } from "../src/localization/IMLocalization";
 import { materialTheme, products, Images, tabs } from "../constants/";
 import {
@@ -23,6 +23,7 @@ import {
   ListItem,
 } from "../components/";
 import SwitchButton from "switch-button-react-native";
+import InputNew from "../components/Input";
 
 const { width, height } = Dimensions.get("screen");
 
@@ -41,6 +42,7 @@ const CreateDoctorAccount = (props) => {
       password: false,
     },
   });
+  const [email, setEmail] = useState("");
 
   const handleAvatar = (val) => {
     setActiveSwitch(val);
@@ -109,6 +111,15 @@ const CreateDoctorAccount = (props) => {
               />
             }
           />
+          {/* <InputNew
+            label="Email"
+            value={email}
+            onChangeText={setEmail}
+            disabled={false}
+            keyboardType="email-address"
+            leftIcon="email"
+            rightIcon="close"          
+          /> */}
           <Input
             bgColor="transparent"
             placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
@@ -283,7 +294,7 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 20,
     backgroundColor: "#00CE30",
-    marginVertical: 20
+    marginVertical: 20,
   },
   navbar: {
     backgroundColor: "#6E78F7",
@@ -314,8 +325,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   interval: {
-    paddingBottom: 20
-  }
+    paddingBottom: 20,
+  },
 });
 
 export default CreateDoctorAccount;

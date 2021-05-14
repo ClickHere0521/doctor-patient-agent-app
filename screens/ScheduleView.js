@@ -53,15 +53,49 @@ const SECTIONS = [
     content: "Lorem ipsum...",
   },
 ];
+
 const ScheduleView = (props) => {
   const { navigation } = props;
   const [activeSections, setActiveSections] = useState([0]);
-
-  const _renderSectionTitle = (section) => {
-    return <View style={styles.content}></View>;
-  };
+  const [weekState, setWeekState] = useState([
+    {
+      date: "MON",
+      status: true,
+    },
+    {
+      date: "TUE",
+      status: false,
+    },
+    {
+      date: "WED",
+      status: false,
+    },
+    {
+      date: "THU",
+      status: false,
+    },
+    {
+      date: "FRI",
+      status: false,
+    },
+    {
+      date: "SAT",
+      status: false,
+    },
+    {
+      date: "SUN",
+      status: false,
+    },
+  ]);
 
   const weekBar = () => {
+    const handleWeekbar = index => {
+      console.log(11111)
+      weekState.map((value, indexTemp) => {
+        weekState[indexTemp].status = (index == indexTemp) ? true : false;
+      })        
+      setWeekState([...weekState]);      
+    }
     return (
       <ScrollView
         horizontal={true}
@@ -73,42 +107,19 @@ const ScheduleView = (props) => {
         snapToInterval={theme.SIZES.BASE * 0.375}
         style={styles.weekScrollView}
       >
-        <TouchableOpacity style={styles.dateActive}>
-          <Text size={16} color={"white"}>
-            WED
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 3 }}>
-            THU
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 8 }}>
-            FRI
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 6 }}>
-            SAT
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 4 }}>
-            SUN
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16}>MON</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 4 }}>
-            THE
-          </Text>
-        </TouchableOpacity>
+        {weekState.map((value, index) => {
+          return (
+            <TouchableOpacity key={index} onPress={() => {handleWeekbar(index)}} style={value.status ? styles.dateActive : styles.dateInActive}>
+              <Text size={16} color={value.status ? "white" : "black"}>
+                {value.date}
+              </Text>
+            </TouchableOpacity>
+          )
+        })}
       </ScrollView>
     );
   };
+
   const _renderHeader = (section) => {
     return (
       <Block flex style={[styles.container]}>
@@ -242,7 +253,7 @@ const ScheduleView = (props) => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => navigation.openDrawer()}
+            onPress={() => {}}
             style={{ paddingLeft: width * 0.02, padding: 2 }}
           >
             <Text color={"white"}>
@@ -255,7 +266,7 @@ const ScheduleView = (props) => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => navigation.openDrawer()}
+            onPress={() => {}}
             style={{ paddingLeft: width * 0.02 }}
           >
             <Text color={"white"}>

@@ -14,6 +14,7 @@
     "preset": "jest-expo"
   },
   "dependencies": {
+    "@eva-design/eva": "^2.1.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.35",
     "@fortawesome/free-solid-svg-icons": "^5.15.3",
     "@freakycoder/react-native-bounceable": "^0.2.4",
@@ -45,6 +46,7 @@
     "moment": "^2.29.1",
     "react": "16.13.1",
     "react-dom": "16.13.1",
+    "react-hook-form": "^7.5.2",
     "react-native": "~0.63.4",
     "react-native-calendar-picker": "^7.1.1",
     "react-native-collapsible": "^1.5.3",
@@ -54,6 +56,7 @@
     "react-native-dynamic-search-bar": "^2.0.0",
     "react-native-easy-markdown": "^2.0.0",
     "react-native-elements": "^3.4.0",
+    "react-native-form-validator": "^0.3.5",
     "react-native-gesture-handler": "~1.8.0",
     "react-native-image-picker": "^3.3.2",
     "react-native-image-slider-box": "^1.0.12",
@@ -67,6 +70,7 @@
     "react-native-spinkit": "^1.5.1",
     "react-native-svg": "^12.1.1-0",
     "react-native-svg-uri": "^1.2.3",
+    "react-native-ui-kitten": "^4.4.1",
     "react-native-unimodules": "~0.12.0",
     "react-native-vector-icons": "^7.1.0",
     "react-native-web": "~0.13.12",
@@ -76,7 +80,8 @@
     "redux-persist": "^6.0.0",
     "redux-persist-expo-filesystem": "^2.0.0",
     "redux-thunk": "^2.3.0",
-    "switch-button-react-native": "^1.0.3"
+    "switch-button-react-native": "^1.0.3",
+    "validate-form-in-expo-style": "^1.0.9"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",

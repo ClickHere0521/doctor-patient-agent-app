@@ -32,7 +32,7 @@ const SignIn = (props) => {
       email: false,
       password: false,
     },
-    scanned: false,
+    scanned: false
   });
 
   const handleChange = (name, value) => {
