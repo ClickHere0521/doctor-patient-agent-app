@@ -99,7 +99,7 @@ const Onboarding = (props) => {
             <Button
               shadowless
               style={styles.button}
-              textStyle={{ fontSize: 14, color: "#3F4079", fontWeight: "bold" }}
+              textStyle={{ fontSize: 14, color: "#3F4079", fontWeight: "bold", shadowColor: "#EEE" }}
               onPress={() => handleRole("agent")}
             >
               {IMLocalized("agent")}
@@ -108,7 +108,7 @@ const Onboarding = (props) => {
             <Button
               shadowless
               style={styles.button}
-              textStyle={{ fontSize: 14, color: "#3082CC", fontWeight: "bold" }}
+              textStyle={{ fontSize: 14, color: "#3082CC", fontWeight: "bold", shadowColor: "#EEE" }}
               onPress={() => handleRole("patient")}
             >
               {IMLocalized("Patient")}
@@ -117,7 +117,7 @@ const Onboarding = (props) => {
             <Button
               shadowless
               style={styles.button}
-              textStyle={[styles.buttonTextStyle, { color: "#FF6B6B" }]}
+              textStyle={[styles.buttonTextStyle, { color: "#FF6B6B", shadowColor: "#EEE" }]}
               onPress={() => handleRole("doctor")}
             >
               {IMLocalized("doctor")}

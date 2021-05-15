@@ -10,6 +10,16 @@ const text = {
 
 export default [
   { label: 'FullName', ...text },
+  { label: 'CityState', ...text },
+  { label: 'Description', ...text },
+  { label: 'Address', ...text },
+  { label: 'Insurancenumber', ...text },
+  { label: 'Insuranceadjuster', ...text },
+  { label: 'Zipcode', ...text },
+  { label: 'Tel', ...text },
+  { label: 'Fax', ...text },
+  { label: 'Ssn', ...text },
+  { label: 'Date', ...text },
   { label: 'Email', ...text },
   { label: 'ProfileName', ...text },
   { label: 'Username', ...text },

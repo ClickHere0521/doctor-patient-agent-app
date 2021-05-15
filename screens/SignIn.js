@@ -8,7 +8,7 @@ import {
   Platform,
   TouchableOpacity,
 } from "react-native";
-import { Block, Button, Input, Text, theme } from "galio-framework";
+import { Block, Button, Text, theme } from "galio-framework";
 
 import { LinearGradient } from "expo-linear-gradient";
 import { materialTheme } from "../constants/";
@@ -18,7 +18,11 @@ import { useSelector } from "react-redux";
 import { Icon } from "../components";
 import SvgUri from "expo-svg-uri";
 import { CheckBox } from "react-native-elements";
+import { isValid } from '../src/utils/helpers';
+import Input from '../components/InputType1';
+
 import * as LocalAuthentication from "expo-local-authentication";
+// import { validEmail } from "validate-form-in-expo-style/src/CustomValidationRules";
 
 const { width, height } = Dimensions.get("window");
 
@@ -40,6 +44,14 @@ const SignIn = (props) => {
   };
 
   const [isSelected, setSelected] = useState(false);
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [repeatPassword, setRepeatPassword] = useState("");
+
+  const [requested, setRequested] = useState(false);
+  const validemail = isValid('email', email);
+  const validPassword = isValid('password', password);
 
   const SignInHeading = (role) => {
     switch (role) {
@@ -125,51 +137,58 @@ const SignIn = (props) => {
       >
         {SignInHeading(userRole)}
         <Block flex>
-          <Block center>
-            <Input
-              borderless
-              color="white"
-              placeholder={IMLocalized("userName")}
-              type="email-address"
-              autoCapitalize="none"
-              bgColor="transparent"
-              placeholderTextColor={"white"}
-              onChangeText={(text) => handleChange("email", text)}
-              style={[
-                styles.inputEmail,
-                vals.email ? styles.inputActive : null,
-              ]}
-            />
-            <Input
-              password
-              viewPass
-              borderless
-              color="white"
-              iconColor="white"
-              placeholder="PASSWORD"
-              bgColor="transparent"
-              placeholderTextColor={"white"}
-              onChangeText={(text) => handleChange("password", text)}
-              style={[
-                styles.inputPassword,
-                vals.password ? styles.inputActive : null,
-              ]}
-            />
+          <Block column flex style={{ margin: theme.SIZES.BASE * 2 }}>
+            <Block >
+              <Input
+                label="USERNAME"
+                value={email}
+                onChangeText={setEmail}
+                disabled={false}
+                keyboardType="email-address"
+                leftIcon=""
+                rightIcon=""
+                validate
+                requested={requested}
+              />
+            </Block>
+            <Block >
+              <Input
+                label="PASSWORD"
+                value={password}
+                onChangeText={setPassword}
+                disabled={false}
+                leftIcon=""
+                rightIcon="eye"
+                validate
+                requested={requested}
+              />
+            </Block>
           </Block>
           <Block
             center
             flex
-            style={{ marginTop: height * 0.05, borderRadius: 15 }}
+            style={{ marginTop: height * 0.15, borderRadius: 15 }}
           >
             <TouchableOpacity
               style={styles.signInBtn}
-              onPress={() => navigation.replace("Biometrics")}
               // onPress={() => navigation.navigate("AddNotes")}
+              onPress={() => {
+                console.log(validemail);
+                if (validemail || validPassword) {
+                  navigation.replace("Biometrics")
+                  setRequested(false);
+                }
+                else {
+                  setRequested(true);
+                }
+              }}
+
             >
               <Text
                 size={18}
                 color={theme.COLORS.WHITE}
                 style={{ alignSelf: "center", paddingTop: 7 }}
+
               >
                 {IMLocalized("signIn")}
               </Text>

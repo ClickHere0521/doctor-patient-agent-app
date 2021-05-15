@@ -8,7 +8,9 @@ import {
   TouchableOpacity,
   Platform,
 } from "react-native";
-import { Button, Block, Text, theme, Input, Icon } from "galio-framework";
+import { Button, Block, Text, theme, Icon } from "galio-framework";
+import { isValid } from '../src/utils/helpers';
+import Input from '../components/InputType2';
 
 import { materialTheme } from "../constants";
 import SwitchButton from "switch-button-react-native";
@@ -36,6 +38,26 @@ const AddInsurance = (props) => {
     setVals({ [name]: value });
   };
 
+  const [editFlg, setEditFlg] = useState(false);
+
+  const [userName, setUserName] = useState("");
+  const [insurancenumber, setInsurancenumber] = useState("");
+  const [zipcode, setZipcode] = useState("");
+  const [cityState, setCityState] = useState("");
+  const [insuranceadjuster, setInsuranceAdjuster] = useState("");
+  const [address, setAddress] = useState("");
+  const [description, setDescription] = useState("");
+
+  const [requested, setRequested] = useState(false);
+
+  const validName = isValid('username', userName);
+  const validInsurancePolicyNumber = isValid('insurancenumber', insurancenumber);
+  const validAddress = isValid('address', address);
+  const validCityState = isValid('citystate', cityState);
+  const validZipcode = isValid('zipcode', zipcode);
+  const validInsuranceadjuster = isValid('insuranceadjuster', insuranceadjuster);
+  const validDescription = isValid('description', description);
+
   const handleAvatar = (val) => {
     setActiveSwitch(val);
     if (val == 2) pickImage();
@@ -43,7 +65,7 @@ const AddInsurance = (props) => {
   };
 
   const renderUserDetail = (detail) => {
-    let { heading, content } = { ...detail };
+    let { heading, content, handleName, handleValue, handleLabel, handlePlaceholder } = { ...detail };
     return (
       <Block style={styles.detail}>
         <Block row>
@@ -53,7 +75,19 @@ const AddInsurance = (props) => {
           </Text>
         </Block>
         <Block>
-          <Text size={16}>{content}</Text>
+          <Input
+            label={handleLabel}
+            value={handleValue}
+            onChangeText={handleName}
+            editable={editFlg}
+            placeholder={handlePlaceholder}
+            keyboardType="email-address"
+            leftIcon=""
+            rightIcon=""
+            validate
+            requested={requested}
+            style={styles.valiInput}
+          />
         </Block>
       </Block>
     );
@@ -92,13 +126,13 @@ const AddInsurance = (props) => {
           size={17}
           bold
         >
-          Add Insurance Info
+             Add Insurance Info
         </Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => { setEditFlg(true) }}>
           <Image
             source={require("../assets/icons/editHeaderWhite.png")}
             alt=""
-            style={{ marginLeft: width * 0.4 }}
+            style={{ marginLeft: width * 0.45 }}
           />
         </TouchableOpacity>
       </Block>
@@ -109,36 +143,63 @@ const AddInsurance = (props) => {
     <Block center flex style={styles.profile}>
       {navbar()}
       <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
+        
         <Block style={styles.userDetail}>
           {renderUserDetail({
             heading: "Insurance Company Name",
-            content: "INSURANCE OF ...",
+            handlePlaceholder: "Zulqurnain Haider",
+            handleName: setUserName,
+            handleValue: userName,
+            handleLabel: "Username",
           })}
           {renderUserDetail({
             heading: "Insurance Policy Number",
-            content: "997930676821",
+            handlePlaceholder: "9994684215",
+            handleName: setInsurancenumber,
+            handleValue: insurancenumber,
+            handleLabel: "Insurancenumber",
           })}
           {renderUserDetail({
             heading: "Insurance Adjuster",
-            content: "James Hilton",
+            handlePlaceholder: "James Hamilton",
+            handleName: setInsuranceAdjuster,
+            handleValue: insuranceadjuster,
+            handleLabel: "Insuranceadjuster",
           })}
           {renderUserDetail({
             heading: "Address",
-            content: "California,US",
+            handlePlaceholder: "Avenue 32",
+            handleName: setAddress,
+            handleValue: address,
+            handleLabel: "Address",
           })}
           {renderUserDetail({
             heading: "City/State",
-            content: "098978",
+            handlePlaceholder: "California,US",
+            handleName: setCityState,
+            handleValue: cityState,
+            handleLabel: "Citystate",
           })}
           {renderUserDetail({
             heading: "Zip Code",
-            content: "330984",
+            handlePlaceholder: "098978",
+            handleName: setZipcode,
+            handleValue: zipcode,
+            handleLabel: "Zipcode",
           })}
         </Block>
         <Block row center>
           <TouchableOpacity
             style={styles.save}
-            onPress={() => console.log("save")}
+            onPress={() => {
+              if (validName && validAddress && validCityState && validZipcode && validInsurancePolicyNumber && validInsuranceadjuster) {
+                setEditFlg(false)
+                setRequested(false);
+              }
+              else {
+                setRequested(true);
+              }
+            }}
           >
             <Text color={"white"} size={16}>
               Save
@@ -146,7 +207,9 @@ const AddInsurance = (props) => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.save}
-            onPress={() => console.log("cancel")}
+            onPress={() => {
+              setEditFlg(false);
+            }}
           >
             <Text color={"white"} size={16}>
               Cancel
@@ -321,8 +384,10 @@ const styles = StyleSheet.create({
   save: {
     backgroundColor: "#00CE30",
     borderRadius: 15,
-    paddingVertical: 10,
-    paddingHorizontal: 50,
+    width: width * 0.35,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 10,
     marginHorizontal: 20,
   },
@@ -359,10 +424,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 20,
     marginVertical: 10,
+    paddingBottom: 0
   },
   asteride: {
     position: "absolute",
-    left: theme.SIZES.BASE * 12,
+    left: theme.SIZES.BASE * 11,
   },
   navbar: {
     backgroundColor: "#6E78F7",
@@ -373,6 +439,15 @@ const styles = StyleSheet.create({
     paddingTop: theme.SIZES.BASE * 2,
     paddingLeft: theme.SIZES.BASE,
   },
+  valiInput: {
+    textTransform: 'capitalize',
+    width: '100%',
+    borderRadius: 9,
+    backgroundColor: 'white',
+    fontSize: 14,
+    height: 40,
+    padding: 10,
+  }
 });
 
 export default AddInsurance;

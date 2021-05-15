@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { roleSelector } from "../store/duck/action";
 import SvgUri from "expo-svg-uri";
 import { Icon } from "../components";
-import { Form, InputText } from 'validate-form-in-expo-style';
+// import { Form, InputText } from 'validate-form-in-expo-style';
 import { FontAwesome, Feather } from "@expo/vector-icons"
 import { Ionicons } from '@expo/vector-icons';
 import { isValid } from '../src/utils/helpers';
@@ -93,15 +93,15 @@ const ForgotPassword = (props) => {
     return (
       <Block flex style={{ backgroundColor: "white", height: height * 0.84 }}>
         <Block middle style={{ padding: theme.SIZES.BASE }}>
-          <Block middle style={{ marginTop: theme.SIZES.BASE * 8 }}>
-            <Text size={14} bold>
+          <Block middle style={{ marginTop: theme.SIZES.BASE * 8  , paddingBottom: theme.SIZES.BASE}}>
+            <Text size={14} bold style={{ color: '#3B3E51'}}>
               Reset Your Password
             </Text>
-            <Text size={14} bold style={{ textAlign: "center" }}>
+            <Text size={14} bold style={{ textAlign: "center", color: '#3B3E51'}}>
               Please Provide your account email address to request a password
               reset code.
             </Text>
-            <Text size={14} bold style={{ textAlign: "center" }}>
+            <Text size={14} bold style={{ textAlign: "center", color: '#3B3E51'}}>
               You will receive your a code to your email{"\n"} address if it is
               valid.
             </Text>
@@ -128,6 +128,7 @@ const ForgotPassword = (props) => {
                 borderWidth: 1,
                 borderColor: "#707070",
                 width: theme.SIZES.BASE * 12,
+                paddingVertical: theme.SIZES.BASE
               }}
               onPress={() => {
                 console.log(validemail);
@@ -140,7 +141,7 @@ const ForgotPassword = (props) => {
                 }
               }}
             >
-              <Text size={18} bold>
+              <Text size={17} bold>
                 Request Resent Code
               </Text>
             </Button>
@@ -154,11 +155,11 @@ const ForgotPassword = (props) => {
     return (
       <Block flex style={{ backgroundColor: "white", height: height * 0.84 }}>
         <Block middle style={{ padding: theme.SIZES.BASE }}>
-          <Block middle style={{ marginTop: theme.SIZES.BASE * 8 }}>
-            <Text size={14} bold style={{ paddingBottom: theme.SIZES.BASE }}>
+          <Block middle style={{ marginTop: theme.SIZES.BASE * 8}}>
+            <Text size={14} bold style={{ paddingBottom: theme.SIZES.BASE , color: '#3B3E51'}}>
               Reset Your Password
             </Text>
-            <Text size={14} bold style={{ textAlign: "center", paddingBottom: theme.SIZES.BASE }}>
+            <Text size={14} bold style={{ textAlign: "center", paddingBottom: theme.SIZES.BASE , color: '#3B3E51'}}>
               Input the code sent to your email address.
             </Text>
           </Block>

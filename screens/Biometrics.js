@@ -5,6 +5,7 @@ import {
   ScrollView,
   Platform,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { Block, Button, Input, Text, theme } from "galio-framework";
 
@@ -32,13 +33,26 @@ const Biometrics = (props) => {
     let compatible = await LocalAuthentication.hasHardwareAsync();
     if (compatible) {
       console.log("Compatible Device!");
-    } else alert("Current device does not have the necessary hardware!");
+    } else 
+    Alert.alert(
+        "Warning",
+        "Current device does not have the necessary hardware!",
+        [
+          { text: "OK", onPress: () => navigation.navigate("SignIn") }
+        ]
+      );
   };
 
   const checkForBiometrics = async () => {
     let biometricRecords = await LocalAuthentication.isEnrolledAsync();   
     if (!biometricRecords) {
-      alert("No Biometrics Found");
+      Alert.alert(
+        "Warning",
+        "No Biometrics Found, please register a new",
+        [
+          { text: "OK", onPress: () => navigation.navigate("SignIn") }
+        ]
+      );
     } else {
       console.log("Biometrics Found");
     }

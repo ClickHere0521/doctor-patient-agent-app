@@ -8,12 +8,14 @@ import {
   TouchableOpacity,
   Platform,
 } from "react-native";
-import { Button, Block, Text, theme, Input, Icon } from "galio-framework";
+import { Button, Block, Text, theme, Icon } from "galio-framework";
 
 import { materialTheme } from "../constants";
 import SwitchButton from "switch-button-react-native";
 import * as ImagePicker from "expo-image-picker";
 import { SvgUri } from "react-native-svg";
+import { isValid } from '../src/utils/helpers';
+import Input from '../components/InputType2';
 
 const { width, height } = Dimensions.get("screen");
 const thumbMeasure = (width - 48 - 32) / 3;
@@ -21,7 +23,6 @@ const thumbMeasure = (width - 48 - 32) / 3;
 const AddPatient = (props) => {
   const { route, navigation } = props;
   const { editPatient } = route.params;
-  
   const [vals, setVals] = useState({
     email: "-",
     password: "-",
@@ -32,10 +33,32 @@ const AddPatient = (props) => {
   });
   const [activeSwitch, setActiveSwitch] = useState(1);
   const [imageUri, setImageUri] = useState(null);
+
+
   // const imageUri = "../assets/images/avatar.png";
   const handleChange = (name, value) => {
     setVals({ [name]: value });
   };
+
+  const [editFlg, setEditFlg] = useState(false);
+
+  const [userName, setUserName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [dob, setDob] = useState("");
+  const [cityState, setCityState] = useState("");
+  const [ssn, setSsn] = useState("");
+  const [description, setDescription] = useState("");
+
+  const [requested, setRequested] = useState(false);
+
+  const validName = isValid('username', userName);
+  const validEmail = isValid('email', email);
+  const validDate = isValid('date', dob);
+  const validCityState = isValid('citystate', cityState);
+  const validSsn = isValid('ssn', ssn);
+  const validDescription = isValid('description', description);
+
 
   const handleAvatar = (val) => {
     setActiveSwitch(val);
@@ -76,9 +99,9 @@ const AddPatient = (props) => {
           size={17}
           bold
         >
-          {editPatient ? "Patient Info" : "Add Patient"}          
+          {editPatient ? "Patient Info" : "Add Patient"}
         </Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => { setEditFlg(true) }}>
           <Image
             source={require("../assets/icons/editHeaderWhite.png")}
             alt=""
@@ -125,117 +148,145 @@ const AddPatient = (props) => {
           />
         </Block>
         <Block style={styles.userInfo}>
-          <Block row style-st>
-            <Text style={styles.label}>
-              Name <Text color={"red"}>*</Text>
-            </Text>
-            <Input
-              borderless
-              color="black"
-              iconColor="white"
-              placeholder="***********"
-              bgColor="transparent"
-              placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
-              onChangeText={(text) => handleChange("password", text)}
-              style={[
-                styles.inputPassword,
-                vals.password ? styles.inputActive : null,
-                { marginLeft: theme.SIZES.BASE * 4.7 },
-              ]}
-            />
+          <Block row style-st flex flexDirection="row">
+            <Block flex={2}>
+              <Text style={styles.label} flex>
+                Name <Text color={"red"}>*</Text>
+              </Text>
+            </Block>
+            <Block flex={7}>
+              <Input
+                label="USERNAME"
+                value={userName}
+                onChangeText={setUserName}
+                editable={editFlg}
+                placeholder="Name"
+                keyboardType="email-address"
+                leftIcon=""
+                rightIcon=""
+                validate
+                requested={requested}
+                style={styles.valiInput}
+              />
+            </Block>
           </Block>
-          <Block row style-st>
-            <Text style={styles.label}>
-              Date of Birth <Text color={"red"}>*</Text>
-            </Text>
-            <Input
-              borderless
-              color="black"
-              iconColor="white"
-              placeholder="***********"
-              bgColor="transparent"
-              placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
-              onChangeText={(text) => handleChange("password", text)}
-              style={[
-                styles.inputPassword,
-                vals.password ? styles.inputActive : null,
-                { marginLeft: theme.SIZES.BASE * 1.8 },
-              ]}
-            />
+          <Block row style-st flex flexDirection="row">
+            <Block flex={2}>
+              <Text style={styles.label}>
+                Date of Birth <Text color={"red"}>*</Text>
+              </Text>
+            </Block>
+            <Block flex={7}>
+              <Input
+                label="DATE"
+                value={dob}
+                onChangeText={setDob}
+                editable={editFlg}
+                placeholder="MM/DD/YYYY"
+                keyboardType="email-address"
+                leftIcon=""
+                rightIcon=""
+                validate
+                requested={requested}
+                style={styles.valiInput}
+              />
+            </Block>
           </Block>
-          <Block row style-st>
-            <Text style={styles.label}>
-              City/State <Text color={"red"}>*</Text>
-            </Text>
-            <Input
-              borderless
-              color="black"
-              iconColor="white"
-              placeholder="***********"
-              bgColor="transparent"
-              placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
-              onChangeText={(text) => handleChange("password", text)}
-              style={[
-                styles.inputPassword,
-                vals.password ? styles.inputActive : null,
-                { marginLeft: theme.SIZES.BASE * 3 },
-              ]}
-            />
+          <Block row style-st flex flexDirection="row">
+            <Block flex={2}>
+              <Text style={styles.label}>
+                City/State <Text color={"red"}>*</Text>
+              </Text>
+            </Block>
+            <Block flex={7}>
+              <Input
+                label="CityState"
+                value={cityState}
+                onChangeText={setCityState}
+                editable={editFlg}
+                placeholder="NewYork XX"
+                keyboardType="email-address"
+                leftIcon=""
+                rightIcon=""
+                validate
+                requested={requested}
+                style={styles.valiInput}
+              />
+            </Block>
           </Block>
-          <Block row style-st>
-            <Text style={styles.label}>
-              Email <Text color={"red"}>*</Text>
-            </Text>
-            <Input
-              borderless
-              color="black"
-              iconColor="white"
-              placeholder="***********"
-              bgColor="transparent"
-              placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
-              onChangeText={(text) => handleChange("password", text)}
-              style={[
-                styles.inputPassword,
-                vals.password ? styles.inputActive : null,
-                { marginLeft: theme.SIZES.BASE * 5 },
-              ]}
-            />
+          <Block row style-st flex flexDirection="row">
+            <Block flex={2}>
+              <Text style={styles.label}>
+                Email <Text color={"red"}>*</Text>
+              </Text>
+            </Block>
+            <Block flex={7}>
+              <Input
+                label="Email"
+                value={email}
+                onChangeText={setEmail}
+                editable={editFlg}
+                keyboardType="email-address"
+                placeholder="john0092@email.com"
+                leftIcon=""
+                rightIcon=""
+                validate
+                requested={requested}
+                style={styles.valiInput}
+              />
+            </Block>
           </Block>
-          <Block row style-st>
-            <Text style={styles.label}>
-              SSN <Text color={"red"}>*</Text>
-            </Text>
-            <Input
-              borderless
-              color="black"
-              iconColor="white"
-              placeholder="***********"
-              bgColor="transparent"
-              placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
-              onChangeText={(text) => handleChange("password", text)}
-              style={[
-                styles.inputPassword,
-                vals.password ? styles.inputActive : null,
-                { marginLeft: theme.SIZES.BASE * 5.6 },
-              ]}
-            />
+          <Block row style-st flex flexDirection="row">
+            <Block flex={2}>
+              <Text style={styles.label}>
+                SSN <Text color={"red"}>*</Text>
+              </Text>
+            </Block>
+            <Block flex={7}>
+              <Input
+                label="SSN"
+                value={ssn}
+                onChangeText={setSsn}
+                editable={editFlg}
+                leftIcon=""
+                rightIcon=""
+                validate
+                placeholder="123456789"
+                requested={requested}
+                style={styles.valiInput}
+              />
+            </Block>
           </Block>
           <Block style-st>
             <Text style={styles.label}>
               Description <Text color={"red"}>*</Text>
             </Text>
-            <Block style={styles.description}>
-              <Text size={16}>
-                Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
-                diam nonu my eirmod tempor invidun.
-              </Text>
-            </Block>
+            <Input
+              label="Description"
+              value={description}
+              onChangeText={setDescription}
+              editable={editFlg}
+              leftIcon=""
+              rightIcon=""
+              validate
+              requested={requested}
+              style={[styles.valiInput, { height: 100 }]}
+              multiline={true}
+            />
           </Block>
         </Block>
         <Block row center>
           <TouchableOpacity
             style={styles.save}
-            onPress={() => console.log("save")}
+            onPress={() => {
+              if (validEmail && validName && validSsn && validCityState && validDate && validDescription) {
+                setEditFlg(false)
+                setRequested(false);
+              }
+              else {
+                setRequested(true);
+              }
+            }}
           >
             <Text color={"white"} size={16}>
               Save
@@ -294,7 +345,6 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   userInfo: {
-    paddingHorizontal: width * 0.06,
     marginTop: height * 0.04,
     marginBottom: height * 0.05,
     marginHorizontal: width * 0.01,
@@ -378,9 +428,9 @@ const styles = StyleSheet.create({
     marginRight: -26,
   },
   label: {
-    paddingTop: 14,
+    paddingTop: theme.SIZES.BASE * 0.5,
     alignSelf: "flex-start",
-    fontSize: 16,
+    fontSize: 14,
   },
   roundBlock: {
     borderBottomLeftRadius: 34,
@@ -418,30 +468,18 @@ const styles = StyleSheet.create({
   save: {
     backgroundColor: "#00CE30",
     borderRadius: 15,
-    paddingVertical: 10,
-    paddingHorizontal: 50,
+    width: width * 0.35,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 10,
     marginHorizontal: 20,
-  },
-  location: {
-    shadowOpacity: 0.2,
-    shadowColor: "grey",
-    backgroundColor: "white",
-    shadowRadius: 10,
-    elevation: 2,
-    width: width * 0.8,
-    margin: 10,
-    padding: 4,
-  },
-  map: {
-    width: width * 0.8,
-    marginHorizontal: 10,
-    marginBottom: 6,
   },
   description: {
     borderRadius: 10,
     borderWidth: 1,
     borderColor: "grey",
+    color: 'black',
     padding: 10,
     width: width * 0.8,
     height: height * 0.2,
@@ -456,6 +494,20 @@ const styles = StyleSheet.create({
     paddingTop: theme.SIZES.BASE * 2,
     paddingLeft: theme.SIZES.BASE,
   },
+  valiInput: {
+    textTransform: 'capitalize',
+    width: '100%',
+    borderRadius: 9,
+    backgroundColor: 'white',
+    borderColor: 'grey',
+    borderWidth: 1,
+    borderTopLeftRadius: 9,
+    borderTopRightRadius: 9,
+    fontSize: 14,
+    height: 40,
+    padding: 10,
+    borderBottomWidth: 1,
+  }
 });
 
 export default AddPatient;

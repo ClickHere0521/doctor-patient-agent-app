@@ -8,12 +8,14 @@ import {
   Platform,
   TouchableOpacity,
 } from "react-native";
-import { Button, Block, Text, theme, Input, Icon } from "galio-framework";
+import { Button, Block, Text, theme, Icon } from "galio-framework";
 
 import { materialTheme } from "../constants";
 import SwitchButton from "switch-button-react-native";
 import { IMLocalized } from "../src/localization/IMLocalization";
 import * as ImagePicker from "expo-image-picker";
+import { isValid } from '../src/utils/helpers';
+import Input from '../components/InputType2';
 
 const { width, height } = Dimensions.get("screen");
 const thumbMeasure = (width - 48 - 32) / 3;
@@ -41,6 +43,21 @@ const AgentInfo = (props) => {
     if (val == 2) pickImage();
     else setImageUri(null);
   };
+
+
+  const [editFlg, setEditFlg] = useState(false);
+
+  const [userName, setUserName] = useState("");
+  const [email, setEmail] = useState("");
+  const [tel, setTel] = useState("");
+  const [address, setAddress] = useState("");
+
+  const [requested, setRequested] = useState(false);
+
+  const validName = isValid('username', userName);
+  const validEmail = isValid('email', email);
+  const validTel = isValid('tel', tel);
+  const validAddress = isValid('address', address);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -88,7 +105,7 @@ const AgentInfo = (props) => {
     <Block center flex style={styles.profile}>
       {navbar()}
       <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
-        <Block center row style={{marginTop: theme.SIZES.BASE * 3}}>
+        <Block center row style={{ marginTop: theme.SIZES.BASE * 3 }}>
           <Block middle style={{ marginRight: 14 }}>
             {imageUri ? (
               <Image
@@ -119,66 +136,80 @@ const AgentInfo = (props) => {
             activeFontColor="#fff"
           />
         </Block>
-        <Block center style={styles.userInfo}>
+        <Block style={styles.userInfo}>
+
           <Text style={styles.label}>
             Full name <Text color={"red"}>*</Text>
           </Text>
-          <Input
-            borderless
-            color="grey"
-            placeholder="Mark Veronic"
-            type="email-address"
-            autoCapitalize="none"
-            bgColor="transparent"
-            value="Mark Veronic"
-            placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
-            onChangeText={(text) => handleChange("name", text)}
-            style={[styles.input, vals.email ? styles.inputActive : null]}
-          />
+          <Block flex flexDirection="column">
+            <Block flex={1}>
+              <Input
+                label="USERNAME"
+                value={userName}
+                onChangeText={setUserName}
+                editable={editFlg}
+                placeholder="Name"
+                leftIcon=""
+                rightIcon=""
+                validate
+                requested={requested}
+                style={styles.valiInput}
+                underlineColorAndroid="black"
+              />
+            </Block>
+          </Block>
           <Text style={styles.label}>
             Email <Text color={"red"}>*</Text>
           </Text>
+
           <Input
-            borderless
-            color="grey"
-            placeholder="Markveronic@gmail.com"
-            type="email-address"
-            autoCapitalize="none"
-            bgColor="transparent"
-            value="Markveronic@gmail.com"
-            placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
-            onChangeText={(text) => handleChange("email", text)}
-            style={[styles.input, vals.email ? styles.inputActive : null]}
+            label="Email"
+            value={email}
+            onChangeText={setEmail}
+            placeholder="test@gmail.com"
+            editable={editFlg}
+            keyboardType="email-address"
+            leftIcon=""
+            rightIcon=""
+            validate
+            requested={requested}
+            style={styles.valiInput}
+            underlineColorAndroid="black"
           />
           <Text style={styles.label}>
             Tel <Text color={"red"}>*</Text>
           </Text>
-          <Input
-            borderless
-            color="grey"
-            placeholder="+1234567890"
-            type="email-address"
-            autoCapitalize="none"
-            bgColor="transparent"
-            value="+1234567890"
-            placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
-            onChangeText={(text) => handleChange("email", text)}
-            style={[styles.input, vals.email ? styles.inputActive : null]}
-          />
+          <Block style={{ width: '100%' }}>
+            <Input
+              label="Tel"
+              value={tel}
+              onChangeText={setTel}
+              placeholder="14322240139"
+              editable={editFlg}
+              leftIcon=""
+              rightIcon=""
+              validate
+              requested={requested}
+              style={styles.valiInput}
+              underlineColorAndroid="black"
+            />
+          </Block>
           <Text style={{ paddingTop: 10, alignSelf: "flex-start" }}>
             Location <Text color={"red"}>*</Text>
           </Text>
+
           <Input
-            borderless
-            color="grey"
-            placeholder="California, US"
-            type="email-address"
-            autoCapitalize="none"
-            bgColor="transparent"
-            value="California, US"
-            placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
-            onChangeText={(text) => handleChange("email", text)}
-            style={[styles.input, vals.email ? styles.inputActive : null]}
+            label="Address"
+            value={address}
+            onChangeText={setAddress}
+            editable={editFlg}
+            placeholder="Califonia, US"
+            leftIcon=""
+            rightIcon=""
+            validate
+            requested={requested}
+            style={styles.valiInput}
+            underlineColorAndroid="black"
           />
           <Block row style={{ alignSelf: "flex-end" }}>
             <Button
@@ -187,7 +218,9 @@ const AgentInfo = (props) => {
               color="#6E78F7"
               textStyle={styles.optionsButtonText}
               style={styles.optionsButton}
-              onPress={() => handleDelete(item.id)}
+              onPress={() => {
+                setEditFlg(true);
+              }}
             >
               EDIT
             </Button>
@@ -197,7 +230,17 @@ const AgentInfo = (props) => {
               color="#6E78F7"
               textStyle={styles.optionsButtonText}
               style={styles.optionsButton}
-              onPress={() => handleDelete(item.id)}
+              onPress={() => {
+                if (editFlg == true) {
+                  if (validEmail && validName && validAddress && validTel) {
+                    setEditFlg(false)
+                    setRequested(false);
+                  }
+                  else {
+                    setRequested(true);
+                  }
+                }
+              }}
             >
               SAVE
             </Button>
@@ -348,6 +391,15 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: "rgba(112, 112, 112, 0.1)",
   },
+  valiInput: {
+    textTransform: 'capitalize',
+    width: '100%',
+    borderRadius: 9,
+    backgroundColor: 'white',
+    fontSize: 14,
+    height: 40,
+    padding: 10,
+  }
 });
 
 export default AgentInfo;

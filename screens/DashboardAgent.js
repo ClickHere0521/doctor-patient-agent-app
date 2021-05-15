@@ -208,7 +208,7 @@ const DashboardAgent = (props) => {
                   onPress={() => navigation.navigate("CreateCase")}
                   style={{
                     justifyContent: "center",
-                    alignItems: "flex-end", marginLeft: width * 0.6}}
+                    alignItems: "flex-end", marginLeft: width * 0.55}}
                 >
                   <Text color={"white"}>
                     <SvgUri

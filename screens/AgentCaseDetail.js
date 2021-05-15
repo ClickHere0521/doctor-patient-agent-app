@@ -524,7 +524,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     shadowColor: "grey",
     shadowOpacity: 0.2,
-    shadowOpacity: 5,
+    shadowOffset: {
+      width: 0,
+      height: 5
+    },        
     elevation: 2,
     backgroundColor: "#FEFEFE",
     padding: 10,
@@ -566,8 +569,10 @@ const styles = StyleSheet.create({
   save: {
     backgroundColor: "#00CE30",
     borderRadius: 15,
-    paddingVertical: 10,
-    paddingHorizontal: 50,
+    width: width * 0.35,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 10,
     marginHorizontal: 20,
   },

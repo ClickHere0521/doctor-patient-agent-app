@@ -80,8 +80,7 @@
     "redux-persist": "^6.0.0",
     "redux-persist-expo-filesystem": "^2.0.0",
     "redux-thunk": "^2.3.0",
-    "switch-button-react-native": "^1.0.3",
-    "validate-form-in-expo-style": "^1.0.9"
+    "switch-button-react-native": "^1.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.9.0",

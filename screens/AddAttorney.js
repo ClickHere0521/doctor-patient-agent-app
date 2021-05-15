@@ -8,7 +8,9 @@ import {
   TouchableOpacity,
   Platform,
 } from "react-native";
-import { Button, Block, Text, theme, Input, Icon } from "galio-framework";
+import { Button, Block, Text, theme, Icon } from "galio-framework";
+import { isValid } from '../src/utils/helpers';
+import Input from '../components/InputType2';
 
 import { materialTheme } from "../constants";
 import SwitchButton from "switch-button-react-native";
@@ -36,6 +38,28 @@ const AddAttorney = (props) => {
     setVals({ [name]: value });
   };
 
+  const [editFlg, setEditFlg] = useState(false);
+
+  const [userName, setUserName] = useState("");
+  const [email, setEmail] = useState("");
+  const [zipcode, setZipcode] = useState("");
+  const [cityState, setCityState] = useState("");
+  const [tel, setTel] = useState("");
+  const [fax, setFax] = useState("");
+  const [address, setAddress] = useState("");
+  const [description, setDescription] = useState("");
+
+  const [requested, setRequested] = useState(false);
+
+  const validName = isValid('username', userName);
+  const validEmail = isValid('email', email);
+  const validAddress = isValid('address', address);
+  const validCityState = isValid('citystate', cityState);
+  const validZipcode = isValid('zipcode', zipcode);
+  const validTel = isValid('tel', tel);
+  const validFax = isValid('fax', fax);
+  const validDescription = isValid('description', description);
+
   const handleAvatar = (val) => {
     setActiveSwitch(val);
     if (val == 2) pickImage();
@@ -43,7 +67,7 @@ const AddAttorney = (props) => {
   };
 
   const renderUserDetail = (detail) => {
-    let { heading, content } = { ...detail };
+    let { heading, content, handleName, handleValue, handleLabel, handlePlaceholder } = { ...detail };
     return (
       <Block style={styles.detail}>
         <Block row>
@@ -53,7 +77,19 @@ const AddAttorney = (props) => {
           </Text>
         </Block>
         <Block>
-          <Text size={16}>{content}</Text>
+          <Input
+            label={handleLabel}
+            value={handleValue}
+            onChangeText={handleName}
+            editable={editFlg}
+            placeholder={handlePlaceholder}
+            keyboardType="email-address"
+            leftIcon=""
+            rightIcon=""
+            validate
+            requested={requested}
+            style={styles.valiInput}
+          />
         </Block>
       </Block>
     );
@@ -94,11 +130,11 @@ const AddAttorney = (props) => {
         >
           Add Attorney Info
         </Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => { setEditFlg(true) }}>
           <Image
             source={require("../assets/icons/editHeaderWhite.png")}
             alt=""
-            style={{ marginLeft: width * 0.45 }}
+            style={{ marginLeft: width * 0.4 }}
           />
         </TouchableOpacity>
       </Block>
@@ -109,7 +145,7 @@ const AddAttorney = (props) => {
     <Block center flex style={styles.profile}>
       {navbar()}
       <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
-        <Block center row style={{ top: 10 }}>
+        <Block center row style={{ marginTop: 10, top: 10, marginBottom: 20 }}>
           <Block middle style={{ marginRight: 14 }}>
             {imageUri ? (
               <Image
@@ -144,37 +180,66 @@ const AddAttorney = (props) => {
         <Block style={styles.userDetail}>
           {renderUserDetail({
             heading: "Full Name",
-            content: "Zulqurnain Haider",
+            handlePlaceholder: "Zulqurnain Haider",
+            handleName: setUserName,
+            handleValue: userName,
+            handleLabel: "Username",
           })}
           {renderUserDetail({
             heading: "Email",
-            content: "soreno@gmail.com",
+            handlePlaceholder: "soreno@gmail.com",
+            handleName: setEmail,
+            handleValue: email,
+            handleLabel: "Email",
           })}
           {renderUserDetail({
             heading: "Address",
-            content: "Avenue 32",
+            handlePlaceholder: "Avenue 32",
+            handleName: setAddress,
+            handleValue: address,
+            handleLabel: "Address",
           })}
           {renderUserDetail({
             heading: "City/State",
-            content: "California,US",
+            handlePlaceholder: "California,US",
+            handleName: setCityState,
+            handleValue: cityState,
+            handleLabel: "Citystate",
           })}
           {renderUserDetail({
             heading: "Zip Code",
-            content: "098978",
+            handlePlaceholder: "098978",
+            handleName: setZipcode,
+            handleValue: zipcode,
+            handleLabel: "Zipcode",
           })}
           {renderUserDetail({
             heading: "Tel",
-            content: "1208903980",
+            handlePlaceholder: "1208903980",
+            handleName: setTel,
+            handleValue: tel,
+            handleLabel: "Tel",
           })}
           {renderUserDetail({
             heading: "Fax",
-            content: "090834",
+            handlePlaceholder: "090834",
+            handleName: setFax,
+            handleValue: fax,
+            handleLabel: "Fax",
           })}
         </Block>
         <Block row center>
           <TouchableOpacity
             style={styles.save}
-            onPress={() => console.log("save")}
+            onPress={() => {
+              if (validEmail && validName && validAddress && validCityState && validZipcode && validTel && validFax) {
+                setEditFlg(false)
+                setRequested(false);
+              }
+              else {
+                setRequested(true);
+              }
+            }}
           >
             <Text color={"white"} size={16}>
               Save
@@ -182,7 +247,9 @@ const AddAttorney = (props) => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.save}
-            onPress={() => console.log("cancel")}
+            onPress={() => {
+              setEditFlg(false);
+            }}
           >
             <Text color={"white"} size={16}>
               Cancel
@@ -357,8 +424,10 @@ const styles = StyleSheet.create({
   save: {
     backgroundColor: "#00CE30",
     borderRadius: 15,
-    paddingVertical: 10,
-    paddingHorizontal: 50,
+    width: width * 0.35,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 10,
     marginHorizontal: 20,
   },
@@ -394,7 +463,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 24,
     paddingVertical: 20,
-    marginVertical: 10
+    marginVertical: 10,
+    paddingBottom: 0
   },
   asteride: {
     position: "absolute",
@@ -409,6 +479,15 @@ const styles = StyleSheet.create({
     paddingTop: theme.SIZES.BASE * 2,
     paddingLeft: theme.SIZES.BASE,
   },
+  valiInput: {
+    textTransform: 'capitalize',
+    width: '100%',
+    borderRadius: 9,
+    backgroundColor: 'white',
+    fontSize: 14,
+    height: 40,
+    padding: 10,
+  }
 });
 
 export default AddAttorney;

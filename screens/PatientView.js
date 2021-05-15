@@ -210,7 +210,7 @@ const Components = (props) => {
         style={styles.components}
         showsVerticalScrollIndicator={false}
       >
-        <TouchableOpacity onPress={() => navigation.navigate("AddPatient")} style={{width:60}}>
+        <TouchableOpacity onPress={() => navigation.navigate("AddPatient", { editPatient: false })} style={{width:60}}>
           <Image source={require("../assets/images/createCase.png")} />
         </TouchableOpacity> 
         <Text size={10} style={{left: 26}}> Add</Text>

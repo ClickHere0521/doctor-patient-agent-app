@@ -175,10 +175,10 @@ const CreateCase = (props) => {
         </Block>
         <Block row center style={{marginTop: theme.SIZES.BASE}}>
           <TouchableOpacity
-            style={styles.save}
+            style={styles.saveSend}
             onPress={() => console.log("save")}
           >
-            <Text color={"white"} size={16}>
+            <Text color={"white"} size={14}>
               Save and send notification
             </Text>
           </TouchableOpacity>
@@ -186,7 +186,7 @@ const CreateCase = (props) => {
             style={styles.save}
             onPress={() => console.log("cancel")}
           >
-            <Text color={"white"} size={16}>
+            <Text color={"white"} size={14}>
               Cancel
             </Text>
           </TouchableOpacity>
@@ -298,10 +298,22 @@ const styles = StyleSheet.create({
   },
   save: {
     backgroundColor: "#00CE30",
-    borderRadius: 15,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    marginBottom: 80,
+    borderRadius: 20,
+    width: width * 0.2,
+    height: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+    marginHorizontal: 20,
+  },
+  saveSend: {
+    backgroundColor: "#00CE30",
+    borderRadius: 20,
+    width: width * 0.5,
+    height: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
     marginHorizontal: 20,
   },
   navbar: {

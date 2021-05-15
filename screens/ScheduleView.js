@@ -241,7 +241,7 @@ const ScheduleView = (props) => {
         <Block row>
           <TouchableOpacity
             onPress={() => navigation.navigate("CreateDoctorAccount")}
-            style={{ paddingLeft: width * 0.45, padding: 2 }}
+            style={{ paddingLeft: width * 0.4, padding: 2 }}
           >
             <Text color={"white"}>
               <SvgUri
