@@ -4,42 +4,24 @@ import {
   Dimensions,
   ScrollView,
   Image,
-  ImageBackground,
   TouchableOpacity,
-  Platform,
+  Alert,
 } from "react-native";
 import { Button, Block, Text, theme, Icon } from "galio-framework";
 import { isValid } from '../src/utils/helpers';
 import Input from '../components/InputType2';
-
 import { materialTheme } from "../constants";
-import SwitchButton from "switch-button-react-native";
-import * as ImagePicker from "expo-image-picker";
-import { SvgUri } from "react-native-svg";
+import * as firebase from "firebase";
+import 'firebase/firestore';
 
+const firestore = firebase.firestore();
 const { width, height } = Dimensions.get("screen");
 const thumbMeasure = (width - 48 - 32) / 3;
 
 const AddInsurance = (props) => {
   const { navigation } = props;
-
-  const [vals, setVals] = useState({
-    email: "-",
-    password: "-",
-    active: {
-      email: false,
-      password: false,
-    },
-  });
-  const [activeSwitch, setActiveSwitch] = useState(1);
-  const [imageUri, setImageUri] = useState(null);
-  // const imageUri = "../assets/images/avatar.png";
-  const handleChange = (name, value) => {
-    setVals({ [name]: value });
-  };
-
+  const { patientUid } = props.route.params;
   const [editFlg, setEditFlg] = useState(false);
-
   const [userName, setUserName] = useState("");
   const [insurancenumber, setInsurancenumber] = useState("");
   const [zipcode, setZipcode] = useState("");
@@ -47,9 +29,7 @@ const AddInsurance = (props) => {
   const [insuranceadjuster, setInsuranceAdjuster] = useState("");
   const [address, setAddress] = useState("");
   const [description, setDescription] = useState("");
-
   const [requested, setRequested] = useState(false);
-
   const validName = isValid('username', userName);
   const validInsurancePolicyNumber = isValid('insurancenumber', insurancenumber);
   const validAddress = isValid('address', address);
@@ -57,12 +37,6 @@ const AddInsurance = (props) => {
   const validZipcode = isValid('zipcode', zipcode);
   const validInsuranceadjuster = isValid('insuranceadjuster', insuranceadjuster);
   const validDescription = isValid('description', description);
-
-  const handleAvatar = (val) => {
-    setActiveSwitch(val);
-    if (val == 2) pickImage();
-    else setImageUri(null);
-  };
 
   const renderUserDetail = (detail) => {
     let { heading, content, handleName, handleValue, handleLabel, handlePlaceholder } = { ...detail };
@@ -93,19 +67,6 @@ const AddInsurance = (props) => {
     );
   };
 
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [3, 3],
-      quality: 1,
-    });
-
-    if (!result.cancelled) {
-      setImageUri(result.uri);
-    }
-  };
-
   const navbar = () => {
     return (
       <Block row style={styles.navbar} center>
@@ -132,12 +93,56 @@ const AddInsurance = (props) => {
           <Image
             source={require("../assets/icons/editHeaderWhite.png")}
             alt=""
-            style={{ marginLeft: width * 0.45 }}
+            style={{ marginLeft: width * 0.4 }}
           />
         </TouchableOpacity>
       </Block>
     );
   };
+
+  const handleSave = async () => {
+    if (validName && validAddress && validCityState && validZipcode && validInsurancePolicyNumber && validInsuranceadjuster) {
+      let caseId, insuranceId;
+      try {
+        await firestore.collection('Cases').doc(patientUid).collection('Case').get().then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            caseId = doc.id;
+          });
+        });
+        await firestore.collection('Cases').doc(patientUid).collection('Case').doc(caseId).collection('InsuranceInfo').get().then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            insuranceId = doc.id;
+          })
+        });
+      } catch(e) {
+        console.log(e);
+      }
+      let newRef = firestore.collection('Cases').doc(patientUid).collection('Case').doc(caseId).collection('InsuranceInfo').doc(insuranceId);
+      newRef.set({
+        address, cityState, adjuster: insuranceadjuster, companyName: userName, policyNumber: insurancenumber, zipCode: zipcode
+      })
+      .then(() => {
+        Alert.alert(
+          "Success",
+          "You have successfully created the insurance info",
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.navigate("CreateCase")
+            }
+          ]
+        );        
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+        setEditFlg(false)
+        setRequested(false);
+      }
+    else {
+      setRequested(true);
+    }
+  }
 
   return (
     <Block center flex style={styles.profile}>
@@ -191,15 +196,7 @@ const AddInsurance = (props) => {
         <Block row center>
           <TouchableOpacity
             style={styles.save}
-            onPress={() => {
-              if (validName && validAddress && validCityState && validZipcode && validInsurancePolicyNumber && validInsuranceadjuster) {
-                setEditFlg(false)
-                setRequested(false);
-              }
-              else {
-                setRequested(true);
-              }
-            }}
+            onPress={() => handleSave()}
           >
             <Text color={"white"} size={16}>
               Save

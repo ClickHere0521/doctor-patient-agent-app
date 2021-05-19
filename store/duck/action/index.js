@@ -20,4 +20,11 @@ const roleSelector = (role) => {
 
 };
 
-export { roleSelector };
+const patientInfoAction = (pInfo) => {
+	return {
+		type: types.SET_PATIENT_INFO,
+		payload: { pInfo }
+	};
+};
+
+export { roleSelector, patientInfoAction };

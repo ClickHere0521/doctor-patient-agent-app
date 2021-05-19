@@ -119,6 +119,10 @@ const ListItem = (props) => {
                     navigation.navigate("DoctorCaseDetail");
                     break;
                   }
+                  // case "patient": {
+                  //   navigation.navigate("CreateCase");
+                  //   break;
+                  // }
                   default:
                     break;
                 }

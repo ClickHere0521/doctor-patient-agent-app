@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Dimensions,
@@ -9,17 +9,46 @@ import {
 import { Block, Text, theme } from "galio-framework";
 import { Icon } from "../components";
 import SvgUri from "expo-svg-uri";
+import * as firebase from "firebase";
+import 'firebase/firestore';
+import { Alert } from "react-native";
+import { useSelector } from 'react-redux';
 
+const firestore = firebase.firestore();
 const { width, height } = Dimensions.get("screen");
 
 const CreateCase = (props) => {
   const { navigation } = props;
+  const [createdTime, setCreatedTime] = useState('');
+  const [isCompletedPatient, setIsCompletedPatient] = useState(true);
+  const patientUid = useSelector((state) => state.patient.uid);
+  const patientName = useSelector((state) => state.patient.patientName);
+  const patientPhoto = useSelector((state) => state.patient.patientPhoto);
+  const patientDob = useSelector((state) => state.patient.patientDob);
+  useEffect(() => {
+    let createdTimeTemp = new Date().toLocaleDateString();
+    setCreatedTime(createdTimeTemp);
+  });
 
   const Action = (props) => {
     if (props.action == "") return <></>;
     if (props.action == "add")
       return (
-        <TouchableOpacity onPress={() => navigation.navigate(props.link)}>
+        <TouchableOpacity onPress={() => {
+          if (isCompletedPatient)
+            navigation.navigate(props.link, { patientUid: patientUid });
+          else
+            Alert.alert(
+              "Warning",
+              "Please add the patient info",
+              [
+                {
+                  text: "OK",
+                  onPress: () => { },
+                }
+              ]
+            );
+        }}>
           <SvgUri
             width="16"
             height="16"
@@ -29,7 +58,21 @@ const CreateCase = (props) => {
       );
     if (props.action == "edit")
       return (
-        <TouchableOpacity onPress={() => navigation.navigate(props.link)}>
+        <TouchableOpacity onPress={() => {
+          if (isCompletedPatient)
+            navigation.navigate(props.link);
+          else
+            Alert.alert(
+              "Warning",
+              "Please add the patient info",
+              [
+                {
+                  text: "OK",
+                  onPress: () => { },
+                }
+              ]
+            );
+        }}>
           <SvgUri
             width="16"
             height="16"
@@ -89,20 +132,22 @@ const CreateCase = (props) => {
         vertical={true}
         showsVerticalScrollIndicator={false}
       >
-        <TouchableOpacity onPress={() => navigation.navigate("AddPatient", { editPatient: false })} style={{width:60}}>
+        <TouchableOpacity onPress={() => {
+          navigation.navigate("AddPatient", { editPatient: false});
+        }} style={{ width: 60 }}>
           <Image source={require("../assets/images/createCase.png")} />
         </TouchableOpacity>
-        <Block row style={{marginBottom: theme.SIZES.BASE}}>
+        <Block row style={{ marginBottom: theme.SIZES.BASE }}>
           <Text size={10} style={{ left: theme.SIZES.BASE * 1.8 }}>
             Add
-          </Text>       
-          <TouchableOpacity style={{position: "absolute", right: 20}}>
-          <Text size={10} style={{ textDecorationLine: 'underline' }} 
-            onPress={() => navigation.navigate("Cases")}
-          >
-            Choose from current case
           </Text>
-          </TouchableOpacity>   
+          <TouchableOpacity style={{ position: "absolute", right: 20 }}>
+            <Text size={10} style={{ textDecorationLine: 'underline' }}
+              onPress={() => navigation.navigate("Cases")}
+            >
+              Choose from current case
+          </Text>
+          </TouchableOpacity>
         </Block>
 
         <Block row center style={styles.patientHeading}>
@@ -117,7 +162,7 @@ const CreateCase = (props) => {
           </Block>
           <Block column style={{ paddingLeft: width * 0.3 }}>
             <Text style={{ alignSelf: "flex-end" }} color={"#06D81E"}>
-              11:45 AM
+              {/* 11:45 AM */}
             </Text>
             <TouchableOpacity
               onPress={() => navigation.navigate("AddPatient", { editPatient: true })}
@@ -137,13 +182,15 @@ const CreateCase = (props) => {
         <Block>
           <Text
             size={18}
-            style={{padding: theme.SIZES.BASE * 1.5
+            style={{
+              padding: theme.SIZES.BASE * 1.5
             }}
           >
             Case Info
           </Text>
+
           {renderDetils({
-            heading: "Created time:2022.2.14",
+            heading: `Created time:${createdTime}`,
             action: "",
             link: "",
           })}
@@ -173,10 +220,24 @@ const CreateCase = (props) => {
             link: "",
           })}
         </Block>
-        <Block row center style={{marginTop: theme.SIZES.BASE}}>
+        <Block row center style={{ marginTop: theme.SIZES.BASE }}>
           <TouchableOpacity
             style={styles.saveSend}
-            onPress={() => console.log("save")}
+            onPress={() => {
+              if (isCompletedPatient)
+                console.log("Add a case");
+              else
+                Alert.alert(
+                  "Warning",
+                  "Please add the patient info",
+                  [
+                    {
+                      text: "OK",
+                      onPress: () => { },
+                    }
+                  ]
+                );
+            }}
           >
             <Text color={"white"} size={14}>
               Save and send notification

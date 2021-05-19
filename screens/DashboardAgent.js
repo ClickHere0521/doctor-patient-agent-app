@@ -19,6 +19,10 @@ import { IMLocalized } from "../src/localization/IMLocalization";
 import { ScrollView } from "react-native-gesture-handler";
 import { ListItem } from "../components/";
 import SvgUri from "expo-svg-uri";
+import * as firebase from 'firebase'
+import "firebase/firestore";
+import firebaseConfig from "../FirebaseConfig";
+
 
 const { width, height } = Dimensions.get("screen");
 const cardWidth = theme.SIZES.BASE * 4;
@@ -43,18 +47,18 @@ const DashboardAgent = (props) => {
     const userRole = useSelector((state) => state.user.role);
     return (
       <Block style={styles.options}>
-        <Block column space="between" style={styles.events}  flex flexDirection="row">
-            <Block row center style={{padding: theme.SIZES.BASE}} >
-              <Text color={"grey"} size={14}>
-                {eventHeading}
-              </Text>
-              <Text color={"red"}> *</Text>
-            </Block>
-            <Block center style={{paddingRight: theme.SIZES.BASE}}>
-              <Text size={16} color={"black"}>
-                {eventContent}
-              </Text>
-            </Block>
+        <Block column space="between" style={styles.events} flex flexDirection="row">
+          <Block row center style={{ padding: theme.SIZES.BASE }} >
+            <Text color={"grey"} size={14}>
+              {eventHeading}
+            </Text>
+            <Text color={"red"}> *</Text>
+          </Block>
+          <Block center style={{ paddingRight: theme.SIZES.BASE }}>
+            <Text size={16} color={"black"}>
+              {eventContent}
+            </Text>
+          </Block>
         </Block>
       </Block>
     );
@@ -78,10 +82,10 @@ const DashboardAgent = (props) => {
                 paddingHorizontal: theme.SIZES.BASE / 4,
               }}
             >
-              <Block flex flexDirection="row" style={{justifyContent: 'space-between'}}>
-              {sortCategories &&
-                sortCategories.map((item, index) => renderSort(item, index))}
-                </Block>
+              <Block flex flexDirection="row" style={{ justifyContent: 'space-between' }}>
+                {sortCategories &&
+                  sortCategories.map((item, index) => renderSort(item, index))}
+              </Block>
             </ScrollView>
           </Block>
         </Block>
@@ -169,10 +173,10 @@ const DashboardAgent = (props) => {
         style={styles.profileContainer}
         imageStyle={styles.profileImage}
       >
-          <LinearGradient
-            colors={["rgba(110,120,247,0.2)", "rgba(110,120,247,0.3)"]}
-            style={styles.gradient}
-          >
+        <LinearGradient
+          colors={["rgba(110,120,247,0.2)", "rgba(110,120,247,0.3)"]}
+          style={styles.gradient}
+        >
           <Block
           >
             {renderEvents({
@@ -180,7 +184,7 @@ const DashboardAgent = (props) => {
               eventContent: 3000,
             })}
             {renderEvents({
-              eventHeading: IMLocalized("This year"), 
+              eventHeading: IMLocalized("This year"),
               eventContent: 700,
             })}
             {renderEvents({
@@ -188,7 +192,7 @@ const DashboardAgent = (props) => {
               eventContent: 605,
             })}
           </Block>
-          </LinearGradient>
+        </LinearGradient>
       </ImageBackground>
       <Block flex={1.3} style={{ backgroundColor: "#F8F8F8" }}>
         <Block
@@ -199,27 +203,28 @@ const DashboardAgent = (props) => {
           }}
         >
           <Block column space="between">
-              <Block row style={{padding: theme.SIZES.BASE / 2}}>
-                <Text color={"grey"} size={14}>
-                  {IMLocalized("On going case")}
+            <Block row style={{ padding: theme.SIZES.BASE / 2 }}>
+              <Text color={"grey"} size={14}>
+                {IMLocalized("On going case")}
+              </Text>
+              <Text color={"red"}> *</Text>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("CreateCase")}
+                style={{
+                  justifyContent: "center",
+                  alignItems: "flex-end", marginLeft: width * 0.55
+                }}
+              >
+                <Text color={"white"}>
+                  <SvgUri
+                    width="16"
+                    height="16"
+                    source={require("../assets/icons/add.svg")}
+                  />
                 </Text>
-                <Text color={"red"}> *</Text>
-                <TouchableOpacity
-                  onPress={() => navigation.navigate("CreateCase")}
-                  style={{
-                    justifyContent: "center",
-                    alignItems: "flex-end", marginLeft: width * 0.55}}
-                >
-                  <Text color={"white"}>
-                    <SvgUri
-                      width="16"
-                      height="16"
-                      source={require("../assets/icons/add.svg")}
-                    />
-                  </Text>
-                </TouchableOpacity>
+              </TouchableOpacity>
             </Block>
-            
+
           </Block>
         </Block>
         <ScrollView showsVerticalScrollIndicator={false}>
@@ -280,8 +285,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.SIZES.BASE * 0.3,
     paddingVertical: theme.SIZES.BASE * 0.2,
     marginHorizontal: theme.SIZES.BASE,
-    marginBottom: theme.SIZES.BASE ,
-    marginTop: theme.SIZES.BASE ,
+    marginBottom: theme.SIZES.BASE,
+    marginTop: theme.SIZES.BASE,
     borderRadius: 40,
     backgroundColor: theme.COLORS.WHITE,
     shadowColor: "black",
@@ -290,7 +295,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     elevation: 3,
     zIndex: 2,
-    height: theme.SIZES.BASE *3,
+    height: theme.SIZES.BASE * 3,
   },
   gradient: {
     zIndex: 10,

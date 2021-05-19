@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Platform, StatusBar, Image } from 'react-native';
 import AppLoading from 'expo-app-loading';
 import { Asset } from 'expo-asset';
@@ -18,6 +18,8 @@ enableScreens();
 import Screens from './navigation/Screens';
 import { Images, materialTheme } from './constants/';
 import AsyncStorage from '@react-native-community/async-storage';
+import * as firebase from "firebase";
+import firebaseConfig from './FirebaseConfig';
 
 const assetImages = [
   Images.Profile,
@@ -46,6 +48,9 @@ const cacheImages = (images) => {
 
 const App = props => {
 
+  // useEffect(() => {
+  //   firebase.initializeApp(firebaseConfig);
+  // }, []);
 
   const [isLoadingComplete, setIsLoadingComplete] = useState(false)
 

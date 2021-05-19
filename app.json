@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "rn-material-kit-pro",
-    "description": "React Native - Material Kit PRO",
-    "slug": "rn-material-kit-pro",
+    "name": "AMGWF",
+    "description": "AMGWF",
+    "slug": "AMGWF",
     "privacy": "unlisted",
     "platforms": [
       "ios",
@@ -25,7 +25,12 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "com.workforce.androidAgency"
+      "package": "com.workforce.androidAgency",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyAI7Bmf7Kw_ZXiDuUOFYHpjhJForJNprLo"
+        }
+      }
     }
   }
 }

@@ -5,20 +5,12 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Image,
-  ImageBackground,
   Dimensions,
 } from "react-native";
 import { Button, Block, Text, Input, theme } from "galio-framework";
-
 import products from "../constants/images/home";
-import { materialTheme, Images, tabs } from "../constants/";
 import {
-  Select,
   Icon,
-  Header,
-  Product,
-  Switch,
-  Tabs,
   ListItem,
 } from "../components/";
 import { LinearGradient } from "expo-linear-gradient";
@@ -45,35 +37,8 @@ const sortCategories = [
 ];
 
 const Components = (props) => {
-  const [switch1, setSwitch1] = useState(true);
-  const [switch2, setSwitch2] = useState(false);
 
   const { navigation } = props;
-  const renderPatient = (item, index) => {
-
-    return (
-      <TouchableWithoutFeedback
-        style={{ zIndex: 3 }}
-        key={`product-${item.title}`}
-        onPress={() => navigation.navigate("Pro", { product: item })}
-      >
-        <Block center style={styles.productItem}>
-          <Block style={[styles.productRounded]}>
-            <Image
-              resizeMode="cover"
-              style={styles.productImage}
-              source={{ uri: item.image }}
-            />
-          </Block>
-          <Block center>
-            <Text center size={10}>
-              {item.title}
-            </Text>
-          </Block>
-        </Block>
-      </TouchableWithoutFeedback>
-    );
-  };
 
   const renderSort = (item, index) => {
     const { navigation } = props;
@@ -82,7 +47,7 @@ const Components = (props) => {
       <TouchableWithoutFeedback
         style={{ zIndex: 3 }}
         key={`product-${item.title}`}
-        onPress={() => navigation.navigate("Pro", { product: item })}
+        onPress={() => {}}
       >
         <LinearGradient
           start={{ x: 0, y: 0 }}
@@ -98,33 +63,6 @@ const Components = (props) => {
           </Block>
         </LinearGradient>
       </TouchableWithoutFeedback>
-    );
-  };
-
-  const renderPatients = () => {
-    return (
-      <Block flex>
-        <Block flex>
-          <Block flex style={{ marginTop: theme.SIZES.BASE / 2 }}>
-            <ScrollView
-              horizontal={true}
-              pagingEnabled={true}
-              decelerationRate={0}
-              scrollEventThrottle={16}
-              snapToAlignment="center"
-              style={{ width }}
-              showsHorizontalScrollIndicator={false}
-              snapToInterval={cardWidth + theme.SIZES.BASE * 0.375}
-              contentContainerStyle={{
-                paddingHorizontal: theme.SIZES.BASE / 2,
-              }}
-            >
-              {categories &&
-                categories.map((item, index) => renderPatient(item, index))}
-            </ScrollView>
-          </Block>
-        </Block>
-      </Block>
     );
   };
 
@@ -216,7 +154,6 @@ const Components = (props) => {
         <Text size={10} style={{left: 26}}> Add</Text>
         {renderSorts()}
         {renderPatientsList()}
-        {/* {renderAlbum()} */}
       </ScrollView>
     </Block>
   );

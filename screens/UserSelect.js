@@ -15,6 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { roleSelector } from "../store/duck/action";
 import SvgUri from "expo-svg-uri";
 
+
 const { height, width } = Dimensions.get("screen");
 
 const Onboarding = (props) => {

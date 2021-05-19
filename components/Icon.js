@@ -4,7 +4,7 @@ import { createIconSetFromIcoMoon } from '@expo/vector-icons';
 import { Icon } from 'galio-framework';
 
 import GalioConfig from '../assets/fonts/galioExtra';
-const GalioExtra = require('../assets/fonts/galioExtra.ttf');
+const GalioExtra = require('../assets/fonts/Roboto-Regular.ttf');
 const IconGalioExtra = createIconSetFromIcoMoon(GalioConfig, 'GalioExtra');
 
 const IconExtra = props => {

@@ -1,11 +1,12 @@
 
 import { combineReducers } from 'redux';
-import { user, form, language } from './reducers/index'
+import { user, form, language, patient } from './reducers/index'
 
 const reducers = combineReducers({
 	user,
 	form,
-	language
+	language,
+	patient,
 });
 
 export default reducers;

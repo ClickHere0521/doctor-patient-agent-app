@@ -2,56 +2,42 @@ import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Dimensions,
-  KeyboardAvoidingView,
-  Alert,
   ScrollView,
   Platform,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { Block, Button, Text, theme } from "galio-framework";
-
-import { LinearGradient } from "expo-linear-gradient";
 import { materialTheme } from "../constants/";
 import { HeaderHeight } from "../constants/utils";
 import { IMLocalized, init } from "../src/localization/IMLocalization";
 import { useSelector } from "react-redux";
-import { Icon } from "../components";
 import SvgUri from "expo-svg-uri";
 import { CheckBox } from "react-native-elements";
-import { isValid } from '../src/utils/helpers';
-import Input from '../components/InputType1';
+import { isValid } from "../src/utils/helpers";
+import Input from "../components/InputType1";
+import * as firebase from "firebase";
+import "firebase/auth";
+import firebaseConfig from "../FirebaseConfig";
 
-import * as LocalAuthentication from "expo-local-authentication";
-// import { validEmail } from "validate-form-in-expo-style/src/CustomValidationRules";
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
+const auth = firebase.auth();
 
 const { width, height } = Dimensions.get("window");
 
 const SignIn = (props) => {
   const { navigation } = props;
   const userRole = useSelector((state) => state.user.role);
-  const [vals, setVals] = useState({
-    email: "-",
-    password: "-",
-    active: {
-      email: false,
-      password: false,
-    },
-    scanned: false
-  });
-
-  const handleChange = (name, value) => {
-    setVals({ ...vals, [name]: value });
-  };
 
   const [isSelected, setSelected] = useState(false);
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [repeatPassword, setRepeatPassword] = useState("");
-
   const [requested, setRequested] = useState(false);
-  const validemail = isValid('email', email);
-  const validPassword = isValid('password', password);
+  const validemail = isValid("email", email);
+  const validPassword = isValid("password", password);
 
   const SignInHeading = (role) => {
     switch (role) {
@@ -127,6 +113,24 @@ const SignIn = (props) => {
     }
   };
 
+  const handleSignIn = () => {
+    auth
+      .signInWithEmailAndPassword(email, password)
+      .then((res) => {
+        console.log(res);
+        navigation.replace("Biometrics");
+      })
+      .catch((error) => {
+        Alert.alert("Warning", "This email and password is invaild", [
+          {
+            text: "OK",
+            onPress: () => console.log("OK Pressed"),
+            style: "OK",
+          },
+        ]);
+      });
+  };
+
   return (
     <ScrollView>
       <Block
@@ -138,9 +142,9 @@ const SignIn = (props) => {
         {SignInHeading(userRole)}
         <Block flex>
           <Block column flex style={{ margin: theme.SIZES.BASE * 2 }}>
-            <Block >
+            <Block>
               <Input
-                label="USERNAME"
+                label="Email"
                 value={email}
                 onChangeText={setEmail}
                 disabled={false}
@@ -151,7 +155,7 @@ const SignIn = (props) => {
                 requested={requested}
               />
             </Block>
-            <Block >
+            <Block>
               <Input
                 label="PASSWORD"
                 value={password}
@@ -171,24 +175,19 @@ const SignIn = (props) => {
           >
             <TouchableOpacity
               style={styles.signInBtn}
-              // onPress={() => navigation.navigate("AddNotes")}
               onPress={() => {
-                console.log(validemail);
-                if (validemail || validPassword) {
-                  navigation.replace("Biometrics")
+                if (validemail && validPassword) {
+                  handleSignIn();
                   setRequested(false);
-                }
-                else {
+                } else {
                   setRequested(true);
                 }
               }}
-
             >
               <Text
                 size={18}
                 color={theme.COLORS.WHITE}
                 style={{ alignSelf: "center", paddingTop: 7 }}
-
               >
                 {IMLocalized("signIn")}
               </Text>

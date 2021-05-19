@@ -3,46 +3,39 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   Image,
-  ImageBackground,
   Dimensions,
   View,
-  Component,
+  Alert,
+  ActivityIndicator,
 } from "react-native";
 import { Button, Block, Text, theme, Input } from "galio-framework";
 import { IMLocalized } from "../src/localization/IMLocalization";
-import { materialTheme, products, Images, tabs } from "../constants/";
-import {
-  Select,
-  Icon,
-  Header,
-  Product,
-  Switch,
-  Tabs,
-  ListItem,
-} from "../components/";
+import { materialTheme } from "../constants/";
+import { Icon } from "../components/";
 import SwitchButton from "switch-button-react-native";
-import InputNew from "../components/Input";
+import MapView from 'react-native-maps';
+import * as ImagePicker from "expo-image-picker";
+import * as firebase from "firebase";
+import 'firebase/firestore';
+import 'firebase/auth';
+import 'firebase/storage';
 
+const firestore = firebase.firestore();
+const auth = firebase.auth();
+const storage = firebase.storage();
 const { width, height } = Dimensions.get("screen");
 
 const CreateDoctorAccount = (props) => {
   const { navigation } = props;
   const [activeSwitch, setActiveSwitch] = useState(1);
   const [imageUri, setImageUri] = useState(null);
-
-  const [vals, setVals] = useState({
-    user: "-",
-    email: "-",
-    password: "-",
-    active: {
-      user: false,
-      email: false,
-      password: false,
-    },
-  });
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [fullname, setFullname ] = useState("");
+  const [address, setAddress] = useState("");
+  const [description, setDescription] = useState("");
+  const [activity, setActivity] = useState(false);
 
   const handleAvatar = (val) => {
     setActiveSwitch(val);
@@ -59,7 +52,7 @@ const CreateDoctorAccount = (props) => {
     });
 
     if (!result.cancelled) {
-      setImageUri(result.uri);
+      setImageUri(result.uri);  
     }
   };
 
@@ -87,10 +80,49 @@ const CreateDoctorAccount = (props) => {
     );
   };
 
+  const handleCreate = async () => {
+    if(email && password && fullname && address && description && imageUri)
+    {
+      setActivity(true);
+      auth
+        .createUserWithEmailAndPassword(email, password)
+        .then( (userCredential) => {
+          var uid = userCredential.user.uid;
+          firestore.collection('PCDoctors').doc(uid).collection('PCDoctor').doc()
+            .set({
+              email, password, fullName: fullname, address, description
+            })
+            .then( async () => {
+              setActivity(false);
+              const pngRef = storage.ref(`logo/${uid}.png`);
+              await pngRef.put(imageUri);
+              const url = await pngRef.getDownloadURL();
+              console.log("FDFD",url);
+
+              Alert.alert(
+                "Success",
+                "You have successfully created a new doctor account",
+                [
+                  {
+                    text: "OK",
+                    onPress: () => {}
+                  }
+                ]
+              );
+            })
+            .catch((error) => console.log(error));
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }
+
   return (
     <Block flex style={styles.components}>
       {navbar()}
       <ScrollView showsVerticalScrollIndicator={false}>
+        <ActivityIndicator animating={activity} style={{opacity: 0.5}} />
         <Block center>
           <Input
             bgColor="transparent"
@@ -100,7 +132,8 @@ const CreateDoctorAccount = (props) => {
             type="email-address"
             placeholder="Email"
             autoCapitalize="none"
-            style={[styles.input, vals.email ? styles.inputActive : null]}
+            style={styles.input}
+            onChangeText={e => setEmail(e)}
             iconContent={
               <Icon
                 size={16}
@@ -111,15 +144,6 @@ const CreateDoctorAccount = (props) => {
               />
             }
           />
-          {/* <InputNew
-            label="Email"
-            value={email}
-            onChangeText={setEmail}
-            disabled={false}
-            keyboardType="email-address"
-            leftIcon="email"
-            rightIcon="close"          
-          /> */}
           <Input
             bgColor="transparent"
             placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
@@ -129,7 +153,8 @@ const CreateDoctorAccount = (props) => {
             viewPass
             placeholder="Password"
             autoCapitalize="none"
-            style={[styles.input, vals.password ? styles.inputActive : null]}
+            style={styles.input}
+            onChangeText={e => setPassword(e)}
             iconContent={
               <Icon
                 size={16}
@@ -191,11 +216,9 @@ const CreateDoctorAccount = (props) => {
                     borderless
                     color="black"
                     placeholder="Mark Veronic"
+                    onChangeText={e => setFullname(e)}
                     autoCapitalize="none"
-                    style={[
-                      styles.name,
-                      vals.password ? styles.nameActive : null,
-                    ]}
+                    style={styles.name}
                   />
                 </Block>
               </Block>
@@ -211,11 +234,9 @@ const CreateDoctorAccount = (props) => {
                     borderless
                     color="black"
                     placeholder="Markveronic@"
+                    onChangeText={e => setAddress(e)}
                     autoCapitalize="none"
-                    style={[
-                      styles.name,
-                      vals.password ? styles.nameActive : null,
-                    ]}
+                    style={styles.name}
                   />
                 </Block>
               </Block>
@@ -225,10 +246,16 @@ const CreateDoctorAccount = (props) => {
                   <Text color={"red"}>*</Text>
                 </Block>
                 <Block>
-                  <Text size={16}>
-                    Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
-                    diam nonu my eirmod tempor invidun.{" "}
-                  </Text>
+                  <Input
+                    bgColor="transparent"
+                    placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
+                    borderless
+                    color="black"
+                    placeholder="Markveronic@"
+                    onChangeText={e => setDescription(e)}
+                    autoCapitalize="none"
+                    style={styles.name}
+                  />
                 </Block>
               </Block>
             </Block>
@@ -243,16 +270,24 @@ const CreateDoctorAccount = (props) => {
                 92/6, 3rd Floor, Outer Ring Road, Chandra Layout
               </Text>
             </Block>
-            <Image
-              source={require("../assets/images/map.png")}
-              alt=""
-              style={{ margin: width * 0.01, alignSelf: "center" }}
-            />
+            <Block style={{borderRadius: 10}}>
+              <MapView 
+                initialRegion={{
+                  latitude: 37.78825,
+                  longitude: -122.4324,
+                  latitudeDelta: 0.0922,
+                  longitudeDelta: 0.0421,
+                }}
+                style={styles.mapView} 
+              />
+            </Block>
           </Block>
           <Block center style={styles.saveBtn}>
-            <Text color={"white"} size={18}>
-              Create
-            </Text>
+            <TouchableOpacity onPress={() => handleCreate()}>
+              <Text color={"white"} size={18}>
+                Create
+              </Text>
+            </TouchableOpacity>
           </Block>
         </Block>
       </ScrollView>
@@ -265,6 +300,12 @@ const styles = StyleSheet.create({
     paddingBottom: 50,
     paddingHorizontal: width * 0.05,
     backgroundColor: "white",
+  },
+  mapView: {
+    width: width * 0.8, 
+    height: 150, 
+    margin: width * 0.01, 
+    alignSelf: "center" 
   },
   emailPass: {
     padding: 4,
@@ -314,9 +355,7 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
     elevation: 2,
   },
-  inputActive: {
-    borderBottomColor: "black",
-  },
+
   name: {
     marginTop: theme.SIZES.BASE * 0.5,
     width: width * 0.8,
@@ -326,6 +365,12 @@ const styles = StyleSheet.create({
   },
   interval: {
     paddingBottom: 20,
+  },
+  mapView: {
+    width: width * 0.8, 
+    height: 150, 
+    margin: width * 0.01, 
+    alignSelf: "center" 
   },
 });
 

@@ -4,42 +4,31 @@ import {
   Dimensions,
   ScrollView,
   Image,
-  ImageBackground,
   TouchableOpacity,
-  Platform,
+  Alert,
 } from "react-native";
 import { Button, Block, Text, theme, Icon } from "galio-framework";
 import { isValid } from '../src/utils/helpers';
 import Input from '../components/InputType2';
-
 import { materialTheme } from "../constants";
 import SwitchButton from "switch-button-react-native";
 import * as ImagePicker from "expo-image-picker";
-import { SvgUri } from "react-native-svg";
+import * as firebase from "firebase";
+import 'firebase/firestore';
+import 'firebase/storage';
 
 const { width, height } = Dimensions.get("screen");
 const thumbMeasure = (width - 48 - 32) / 3;
 
 const AddAttorney = (props) => {
-  const { navigation } = props;
+  const firestore = firebase.firestore();
+  const storage = firestore.storage();
 
-  const [vals, setVals] = useState({
-    email: "-",
-    password: "-",
-    active: {
-      email: false,
-      password: false,
-    },
-  });
+  const { navigation } = props;
+  const { patientUid } = props.route.params;
   const [activeSwitch, setActiveSwitch] = useState(1);
   const [imageUri, setImageUri] = useState(null);
-  // const imageUri = "../assets/images/avatar.png";
-  const handleChange = (name, value) => {
-    setVals({ [name]: value });
-  };
-
   const [editFlg, setEditFlg] = useState(false);
-
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [zipcode, setZipcode] = useState("");
@@ -48,7 +37,6 @@ const AddAttorney = (props) => {
   const [fax, setFax] = useState("");
   const [address, setAddress] = useState("");
   const [description, setDescription] = useState("");
-
   const [requested, setRequested] = useState(false);
 
   const validName = isValid('username', userName);
@@ -141,6 +129,54 @@ const AddAttorney = (props) => {
     );
   };
 
+  const handleSave = async () => {
+    if (validEmail && validName && validAddress && validCityState && validZipcode && validTel && validFax) {       
+      let caseId, attorneyId;
+      try {
+        await firestore.collection('Cases').doc(patientUid).collection('Case').get().then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            caseId = doc.id;
+          });
+        });
+        await firestore.collection('Cases').doc(patientUid).collection('Case').doc(caseId).collection('attorneyInfo').get().then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            attorneyId = doc.id;
+          })
+        });
+      } catch(e) {
+        console.log(e);
+      }
+      let newRef = firestore.collection('Cases').doc(patientUid).collection('Case').doc(caseId).collection('attorneyInfo').doc(attorneyId);
+      newRef.set({
+        address, cityState, email, fax, userName, tel, zipcode, description, reference: newRef
+      })
+      .then( async () => {
+        const pngRef = storage.ref(`logo/${patientUid}.png`);
+        await pngRef.put(imageUri);
+        const url = await pngRef.getDownloadURL();
+        console.log("FDFD",url);
+        Alert.alert(
+          "Success",
+          "You have successfully created the attorney info",
+          [
+            {
+              text: 'OK',
+              onPress: () => navigation.navigate("CreateCase")
+            }
+          ]
+        );        
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+      setEditFlg(false)
+      setRequested(false);
+    }
+    else {
+      setRequested(true);
+    }
+  }
+
   return (
     <Block center flex style={styles.profile}>
       {navbar()}
@@ -231,15 +267,7 @@ const AddAttorney = (props) => {
         <Block row center>
           <TouchableOpacity
             style={styles.save}
-            onPress={() => {
-              if (validEmail && validName && validAddress && validCityState && validZipcode && validTel && validFax) {
-                setEditFlg(false)
-                setRequested(false);
-              }
-              else {
-                setRequested(true);
-              }
-            }}
+            onPress={() => handleSave()}
           >
             <Text color={"white"} size={16}>
               Save

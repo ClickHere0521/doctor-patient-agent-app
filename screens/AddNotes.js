@@ -2,86 +2,118 @@ import React, { useState } from "react";
 import {
   StyleSheet,
   Dimensions,
-  ScrollView,
   Image,
-  ImageBackground,
   TouchableOpacity,
-  Platform,
+  Alert,
+  ScrollView,
 } from "react-native";
-import { Button, Block, Text, theme, Input, Icon } from "galio-framework";
-
+import { Button, Block, Text, theme, Icon } from "galio-framework";
 import { materialTheme } from "../constants";
-import SwitchButton from "switch-button-react-native";
-import * as ImagePicker from "expo-image-picker";
-import { SvgUri } from "react-native-svg";
+import Input from '../components/InputType2';
+import { isValid } from '../src/utils/helpers';
+import * as firebase from 'firebase';
+import "firebase/firestore";
+import "firebase/auth";
+import firebaseConfig from "../FirebaseConfig";
 
 const { width, height } = Dimensions.get("screen");
 const thumbMeasure = (width - 48 - 32) / 3;
 
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
+const auth = firebase.auth();
+
+const dbh = firebase.firestore();
+
 const AddNotes = (props) => {
+
   const { navigation } = props;
+  const { patientUid } = props.route.params;
 
-  const [vals, setVals] = useState({
-    email: "-",
-    password: "-",
-    active: {
-      email: false,
-      password: false,
-    },
-  });
-  const [activeSwitch, setActiveSwitch] = useState(1);
-  const [imageUri, setImageUri] = useState(null);
-  // const imageUri = "../assets/images/avatar.png";
-  const handleChange = (name, value) => {
-    setVals({ [name]: value });
-  };
-
-  const handleAvatar = (val) => {
-    setActiveSwitch(val);
-    if (val == 2) pickImage();
-    else setImageUri(null);
-  };
+  const [title, setTitle] = useState("");
+  const [authorName, setAuthorName] = useState("");
+  const [dob, setDob] = useState("");
+  const [description, setDescription] = useState("");
+  const [editFlg, setEditFlg] = useState(false);
+  const [requested, setRequested] = useState(false);
+  const validName = isValid('title', title);
+  const validDob = isValid('date', dob);
+  const validAuthorName = isValid('username', authorName);
+  const validDescription = isValid('description', description);
 
   const renderUserDetail = (detail) => {
-    let { author, heading, content, note } = { ...detail };
-    if(author){
-      return (
-        <Block style={styles.detail}>
-          <Text>{author}</Text>
-        </Block>
-      )
-    }
-    else if(note) {
-      return (
-        <Block style={styles.shadow}>
-          <Text>{note}</Text>
-        </Block>
-      )
+    let { heading, content, handleValue, handleName, handleLabel, handlePlaceholder } = { ...detail };
+    return (
+      <Block style={styles.detailStyle}>
+        <Input
+          label={handleLabel}
+          value={handleValue}
+          onChangeText={handleName}
+          editable={editFlg}
+          placeholder={handlePlaceholder}
+          keyboardType="email-address"
+          leftIcon=""
+          rightIcon=""
+          validate
+          requested={requested}
+          style={styles.valiInput}
+        />
+      </Block>
+    );
+
+  };
+
+
+  const handleSave = async () => {
+    if (validName && validDob && validAuthorName && validDescription) {
+      let caseId, noteId;
+      try {
+        await dbh.collection('Cases').doc(patientUid).collection('Case').get().then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            caseId = doc.id;
+          });
+        });
+        await dbh.collection('Cases').doc(patientUid).collection('Case').doc(caseId).collection('notes').get().then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            noteId = doc.id;
+          })
+        });
+      } catch (e) {
+        console.log(e);
+      }
+      let newRef = dbh.collection('Cases').doc(patientUid).collection('Case').doc(caseId).collection('notes').doc();
+      newRef.set({
+        title: title,
+        description: description,
+        createDate: dob,
+        authorName: authorName,
+        reference: newRef
+      })
+        .then(() => {
+          Alert.alert(
+            "Success",
+            "You have successfully created the attorney info",
+            [
+              {
+                text: 'OK',
+                onPress: () => navigation.navigate("CreateCase")
+              }
+            ]
+          );
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      setEditFlg(false)
+      setRequested(false);
     }
     else {
-        return (
-            <Block style={styles.detail}>
-              <Block row>
-                <Text color={"black"}>{heading}:</Text>
-                <Text color={"grey"} size={12} style={styles.content} >{content}</Text>
-              </Block>
-            </Block>
-          );
+      setRequested(true);
     }
-  };
-
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [3, 3],
-      quality: 1,
-    });
-
-    if (!result.cancelled) {
-      setImageUri(result.uri);
-    }
-  };
+  }
 
   const navbar = () => {
     return (
@@ -105,51 +137,81 @@ const AddNotes = (props) => {
         >
           Add Notes
         </Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={
+          () => setEditFlg(true)
+        }>
           <Image
             source={require("../assets/icons/editHeaderWhite.png")}
             alt=""
-            style={{ marginLeft: width * 0.6 }}
+            style={{ marginLeft: width * 0.55 }}
           />
         </TouchableOpacity>
       </Block>
     );
   };
-  
+
   return (
     <Block center flex style={styles.profile}>
       {navbar()}
       <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
-        <Block center style={styles.userDetail}>
+        <Block style={styles.userDetail}>
           {renderUserDetail({
-            author: "General Physician @99"
+            heading: "General Physician @99",
+            handlePlaceholder: "Fill with Note Title",
+            handleName: setTitle,
+            handleValue: title,
+            handleLabel: "Title",
           })}
           {renderUserDetail({
-            heading: "Create Date",
-            content: "14/03/2021",
+            heading: "General Physician @99",
+            handlePlaceholder: "Fill with note create date",
+            handleName: setDob,
+            handleValue: dob,
+            handleLabel: "Date",
           })}
           {renderUserDetail({
-            heading: "Author name",
-            content: "***********",
+            heading: "General Physician @99",
+            handlePlaceholder: "Fill with author Name",
+            handleName: setAuthorName,
+            handleValue: authorName,
+            handleLabel: "Username",
           })}
-          {renderUserDetail({
-            note: "Cold, fever, cough or flu? Chat with a doctor now.Cold, fever, cough or flu? Chat with a doctor now.Cold, fever, cough or flu? Chat with a doctor now.Cold, fever, cough or flu? Chat with a doctor now.Cold, fever, cough or flu? Chat with a doctor now.Cold, fever, cough or flu? Chat with a doctor now.Cold, fever, cough or flu? Chat with a doctor now.Cold, fever, cough or flu? Chat with a doctor now.Coldfever, cough or flu? Chat with a doctor now.Cold, fever, cough or flu? Chat with a doctor now.Cold, fevercough or flu?"
-          })}
-        </Block>      
-        <Block row style={{marginTop: 20, alignSelf: 'flex-end'}}>
+          <Block style={[styles.detailStyle, { height: theme.SIZES.BASE * 10 }]}>
+            <Input
+              label="Description"
+              value={description}
+              onChangeText={setDescription}
+              editable={editFlg}
+              placeholder="Write descriptions here."
+              leftIcon=""
+              rightIcon=""
+              validate
+              requested={requested}
+              multiline={true}
+              style={styles.valiInput}
+            />
+          </Block>
+        </Block>
+        <Block row style={{ marginTop: 20, alignSelf: 'flex-end' }}>
           <TouchableOpacity
             style={styles.save}
-            onPress={() => console.log("save")}
+            onPress={() => handleSave()}
           >
-            <Text color={"#3A58FC"} size={14} style={{alignSelf: 'center'}}>
+            <Text color={"#3A58FC"} size={14} style={{ alignSelf: 'center' }}>
               Save
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.save}
-            onPress={() => console.log("cancel")}
+            onPress={() => {
+              setEditFlg(false);
+              setTitle("");
+              setDob("");
+              setAuthorName("");
+              setDescription("");
+            }}
           >
-            <Text color={"#3A58FC"} size={14} style={{alignSelf: 'center'}}>
+            <Text color={"#3A58FC"} size={14} style={{ alignSelf: 'center' }}>
               Cancel
             </Text>
           </TouchableOpacity>
@@ -160,6 +222,14 @@ const AddNotes = (props) => {
 };
 
 const styles = StyleSheet.create({
+  detailStyle: {
+    borderWidth: 1,
+    borderRadius: theme.SIZES.BASE,
+    borderColor: 'grey',
+    padding: theme.SIZES.BASE * 1.2,
+    paddingBottom: 0,
+    marginVertical: theme.SIZES.BASE,
+  },
   profile: {
     // marginTop: Platform.OS === "android" ? height * 0.02 : height * 0.02,
     backgroundColor: "white",
@@ -328,7 +398,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     width: 90,
     marginBottom: 10,
-    marginHorizontal: 10,        
+    marginHorizontal: 10,
   },
   location: {
     shadowOpacity: 0.2,
@@ -363,8 +433,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 24,
     paddingVertical: 20,
-    marginVertical: 10,   
-    width: width * 0.9 
+    marginVertical: 10,
+    width: width * 0.9
   },
   asteride: {
     position: "absolute",
@@ -378,7 +448,7 @@ const styles = StyleSheet.create({
     shadowColor: 'grey',
     shadowRadius: 30,
     shadowOpacity: 0.2,
-    shadowOffset: {width: 10, height: 10},
+    shadowOffset: { width: 10, height: 10 },
     backgroundColor: 'white',
     elevation: 2,
     borderRadius: 20,
@@ -386,8 +456,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 24,
     paddingVertical: 20,
-    marginVertical: 10,   
-    width: width * 0.9 
+    marginVertical: 10,
+    width: width * 0.9
   },
   navbar: {
     backgroundColor: "#6E78F7",

@@ -66,7 +66,7 @@ const PrimaryCareDoctorView = (props) => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => navigation.openDrawer()}
+            onPress={() => {}}
             style={{ paddingLeft: width * 0.02, padding: 2 }}
           >
             <Text color={"white"}>
@@ -79,7 +79,7 @@ const PrimaryCareDoctorView = (props) => {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={() => navigation.openDrawer()}
+            onPress={() => {}}
             style={{ paddingLeft: width * 0.02 }}
           >
             <Text color={"white"}>

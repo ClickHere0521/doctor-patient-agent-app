@@ -8,7 +8,7 @@ export default {
     text: 'Please enter your valid address',
   },
   zipcode: {
-    regex: /^\d{5}[-\s]?(?:\d{4})?$/,
+    regex: /^\d{6}[-\s]?(?:\d{4})?$/,
     text: 'Please enter your ZipCode as Placeholder',
   },
   insurancenumber: {
@@ -16,8 +16,8 @@ export default {
     text: 'Please enter your Insurance Policy Number as Placeholder',
   },
   insuranceadjuster: {
-    regex: /^[a-zA-Z0-9]{5,}$/,
-    text: 'Please enter your Insurance Policy Number as Placeholder',
+    regex: /^(?!\s)[A-Za-z0-9\s]+$/,
+    text: 'Please enter your Insurance Adjuster as Placeholder',
   },
   tel: {
     regex: /^\(?([0-9]{4})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
@@ -38,6 +38,10 @@ export default {
   description: {
     regex: /^/,
     text: 'Fill description.',
+  },
+  title: {
+    regex: /^/,
+    text: 'Write the note title.',
   },
   ssn: {
     regex: /^([0-9][0-9][0-9]|[0-9][0-9]|3[01])[- /.]/,

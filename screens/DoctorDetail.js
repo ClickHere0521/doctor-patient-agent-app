@@ -8,6 +8,7 @@ import materialTheme from "../constants/Theme";
 import { IMLocalized, init } from "../src/localization/IMLocalization";
 import { Icon } from "../components/";
 import { ScrollView } from "react-native-gesture-handler";
+import MapView from 'react-native-maps';
 
 const DoctorDetail = (props) => {
   const { navigation } = props;
@@ -81,11 +82,17 @@ const DoctorDetail = (props) => {
                 92/6, 3rd Floor, Outer Ring Road, Chandra Layout
               </Text>
             </Block>
-            <Image
-              source={require("../assets/images/map.png")}
-              alt=""
-              style={{ margin: width * 0.01, alignSelf: "center" }}
-            />
+            <Block style={{borderRadius: 10}}>
+              <MapView 
+                initialRegion={{
+                  latitude: 37.78825,
+                  longitude: -122.4324,
+                  latitudeDelta: 0.0922,
+                  longitudeDelta: 0.0421,
+                }}
+                style={styles.mapView} 
+              />
+            </Block>
             <Block row style={{ margin: 10 }}>
               <Text color="black" style={{ alignSelf: "flex-start" }}>
                 Tel
@@ -283,6 +290,12 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     margin: 10,
     marginBottom: 0,
+  },
+  mapView: {
+    width: width * 0.8, 
+    height: 150, 
+    margin: width * 0.01, 
+    alignSelf: "center" 
   },
 });
 

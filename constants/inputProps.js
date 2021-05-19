@@ -21,6 +21,7 @@ export default [
   { label: 'Ssn', ...text },
   { label: 'Date', ...text },
   { label: 'Email', ...text },
+  { label: 'Title', ...text},
   { label: 'ProfileName', ...text },
   { label: 'Username', ...text },
   { label: 'Code', ...text, keyboardType: 'decimal-pad' },

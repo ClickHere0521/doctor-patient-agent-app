@@ -16,6 +16,9 @@ import { materialTheme } from "../constants/";
 import { HeaderHeight } from "../constants/utils";
 import { IMLocalized, init } from "../src/localization/IMLocalization";
 import { Select, Icon, Header, Product, Switch, Tabs } from "../components/";
+import * as firebase from "firebase";
+import "firebase/auth";
+import firebaseConfig from "../FirebaseConfig";
 
 const { height, width } = Dimensions.get("window");
 
@@ -42,6 +45,24 @@ const SignUp = (props) => {
     active[name] = !active[name];
 
     setVals({ active });
+  };
+
+  const handleSignUp = () => {
+    auth
+      .createUserWithEmailAndPassword(email, password)
+      .then((res) => {
+        console.log(res);
+        navigation.replace("Biometrics");
+      })
+      .catch((error) => {
+        Alert.alert("Warning", "This email and password is invaild", [
+          {
+            text: "OK",
+            onPress: () => console.log("OK Pressed"),
+            style: "OK",
+          },
+        ]);
+      });
   };
 
   const [isSelected, setSelection] = useState(false);
@@ -145,9 +166,9 @@ const SignUp = (props) => {
                   family="font-awesome"
                 />
               }
-              // onChangeText={text => handleChange('user', text)}
-              // onBlur={() => toggleActive('user')}
-              // onFocus={() => toggleActive('user')}
+            // onChangeText={text => handleChange('user', text)}
+            // onBlur={() => toggleActive('user')}
+            // onFocus={() => toggleActive('user')}
             />
             <Text
               color="grey"
@@ -197,6 +218,9 @@ const SignUp = (props) => {
               shadowless
               style={{ height: 48, borderRadius: 16, width: width * 0.6 }}
               color={"#00CE30"}
+              onPress={() => {
+                handleSignUp();
+              }}
             >
               SIGN UP
             </Button>

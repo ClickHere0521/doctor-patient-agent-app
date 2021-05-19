@@ -1,12 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Dimensions,
   ScrollView,
   Image,
-  ImageBackground,
-  Platform,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { Button, Block, Text, theme, Icon } from "galio-framework";
 
@@ -16,27 +15,21 @@ import { IMLocalized } from "../src/localization/IMLocalization";
 import * as ImagePicker from "expo-image-picker";
 import { isValid } from '../src/utils/helpers';
 import Input from '../components/InputType2';
+import * as firebase from "firebase";
+import 'firebase/firestore';
+import 'firebase/auth';
+import 'firebase/storage';
 
 const { width, height } = Dimensions.get("screen");
 const thumbMeasure = (width - 48 - 32) / 3;
 
 const AgentInfo = (props) => {
   const { navigation } = props;
-
-  const [vals, setVals] = useState({
-    email: "-",
-    password: "-",
-    active: {
-      email: false,
-      password: false,
-    },
-  });
   const [activeSwitch, setActiveSwitch] = useState(1);
   const [imageUri, setImageUri] = useState(null);
-  // const imageUri = "../assets/images/avatar.png";
-  const handleChange = (name, value) => {
-    setVals({ [name]: value });
-  };
+  const firestore = firebase.firestore();
+  const auth = firebase.auth();
+  const storage = firebase.storage();
 
   const handleAvatar = (val) => {
     setActiveSwitch(val);
@@ -44,17 +37,13 @@ const AgentInfo = (props) => {
     else setImageUri(null);
   };
 
-
   const [editFlg, setEditFlg] = useState(false);
-
-  const [userName, setUserName] = useState("");
+  const [fullname, setFullname] = useState("");
   const [email, setEmail] = useState("");
   const [tel, setTel] = useState("");
   const [address, setAddress] = useState("");
-
   const [requested, setRequested] = useState(false);
-
-  const validName = isValid('username', userName);
+  const validName = isValid('fullname', fullname);
   const validEmail = isValid('email', email);
   const validTel = isValid('tel', tel);
   const validAddress = isValid('address', address);
@@ -66,8 +55,6 @@ const AgentInfo = (props) => {
       aspect: [3, 3],
       quality: 1,
     });
-
-    console.log(result);
 
     if (!result.cancelled) {
       setImageUri(result.uri);
@@ -100,6 +87,86 @@ const AgentInfo = (props) => {
       </Block>
     );
   };
+
+  const handleSave = async () => {
+    const agentUid = auth.currentUser.uid;
+
+    if (editFlg == true) {
+      if (validName && validEmail && validTel && validAddress) {
+        let businessAgentId;
+        try {
+          await firestore.collection('Agents').doc(agentUid).collection('BusinessAgent').get().then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+              businessAgentId = doc.id;
+            });
+          });
+        } catch(e) {
+          console.log(e);
+        }
+        let newRef = firestore.collection('Agents').doc(agentUid).collection('BusinessAgent').doc(businessAgentId);
+        newRef.set({
+          email, fullName: fullname, phone: tel, location: address, role: "agent"
+        })
+        .then( async () => {
+          const pngRef = storage.ref(`logo/${agentUid}.png`);
+          await pngRef.put(imageUri);
+          const url = await pngRef.getDownloadURL();
+          console.log("FDFD",url);
+
+          Alert.alert(
+            "Success",
+            "You have successfully edited the agent info",
+            [
+              {
+                text: 'OK',
+                onPress: () => {}
+              }
+            ]
+          );        
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+          setEditFlg(false)
+          setRequested(false);
+        }
+      else {
+        setRequested(true);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const agentUid = auth.currentUser.uid;
+      try {
+        let businessAgentId;
+        try {
+          await firestore.collection('Agents').doc(agentUid).collection('BusinessAgent').get().then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+              businessAgentId = doc.id;
+            });
+          });
+        } catch(e) {
+          console.log(e);
+        }
+        firestore.collection('Agents').doc(agentUid).collection('BusinessAgent').doc(businessAgentId).get()
+          .then((doc) => {
+            setFullname(doc.data().fullName);
+            setEmail(doc.data().email);
+            setTel(doc.data().phone);
+            setAddress(doc.data().location);
+            // console.log(`agent data ${doc.data()}`);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      } catch (e) {
+        console.log(e);
+      }
+    }
+    fetchData();    
+  }, []);
 
   return (
     <Block center flex style={styles.profile}>
@@ -139,16 +206,16 @@ const AgentInfo = (props) => {
         <Block style={styles.userInfo}>
 
           <Text style={styles.label}>
-            Full name <Text color={"red"}>*</Text>
+            Full Name <Text color={"red"}>*</Text>
           </Text>
           <Block flex flexDirection="column">
             <Block flex={1}>
               <Input
-                label="USERNAME"
-                value={userName}
-                onChangeText={setUserName}
+                label="FULLNAME"
+                value={fullname}
+                onChangeText={setFullname}
                 editable={editFlg}
-                placeholder="Name"
+                placeholder={fullname}
                 leftIcon=""
                 rightIcon=""
                 validate
@@ -166,7 +233,7 @@ const AgentInfo = (props) => {
             label="Email"
             value={email}
             onChangeText={setEmail}
-            placeholder="test@gmail.com"
+            placeholder={email}
             editable={editFlg}
             keyboardType="email-address"
             leftIcon=""
@@ -184,7 +251,7 @@ const AgentInfo = (props) => {
               label="Tel"
               value={tel}
               onChangeText={setTel}
-              placeholder="14322240139"
+              placeholder={tel}
               editable={editFlg}
               leftIcon=""
               rightIcon=""
@@ -203,7 +270,7 @@ const AgentInfo = (props) => {
             value={address}
             onChangeText={setAddress}
             editable={editFlg}
-            placeholder="Califonia, US"
+            placeholder={address}
             leftIcon=""
             rightIcon=""
             validate
@@ -230,17 +297,7 @@ const AgentInfo = (props) => {
               color="#6E78F7"
               textStyle={styles.optionsButtonText}
               style={styles.optionsButton}
-              onPress={() => {
-                if (editFlg == true) {
-                  if (validEmail && validName && validAddress && validTel) {
-                    setEditFlg(false)
-                    setRequested(false);
-                  }
-                  else {
-                    setRequested(true);
-                  }
-                }
-              }}
+              onPress={() => handleSave()}
             >
               SAVE
             </Button>

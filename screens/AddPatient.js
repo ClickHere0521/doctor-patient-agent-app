@@ -16,21 +16,28 @@ import * as ImagePicker from "expo-image-picker";
 import { SvgUri } from "react-native-svg";
 import { isValid } from '../src/utils/helpers';
 import Input from '../components/InputType2';
+import { useDispatch } from 'react-redux';
+import { patientInfoAction } from '../store/duck/action';
+import * as firebase from 'firebase';
+import "firebase/firestore";
+import "firebase/auth";
+import firebaseConfig from "../FirebaseConfig";
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+
+const auth = firebase.auth();
+
+const dbh = firebase.firestore();
 
 const { width, height } = Dimensions.get("screen");
 const thumbMeasure = (width - 48 - 32) / 3;
 
 const AddPatient = (props) => {
   const { route, navigation } = props;
-  const { editPatient } = route.params;
-  const [vals, setVals] = useState({
-    email: "-",
-    password: "-",
-    active: {
-      email: false,
-      password: false,
-    },
-  });
+  const { editPatient, patientUid } = route.params;
+  const patientInfoDispatch = useDispatch();
   const [activeSwitch, setActiveSwitch] = useState(1);
   const [imageUri, setImageUri] = useState(null);
 
@@ -44,7 +51,7 @@ const AddPatient = (props) => {
 
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState("abcABC123");
   const [dob, setDob] = useState("");
   const [cityState, setCityState] = useState("");
   const [ssn, setSsn] = useState("");
@@ -59,7 +66,7 @@ const AddPatient = (props) => {
   const validSsn = isValid('ssn', ssn);
   const validDescription = isValid('description', description);
 
-
+  const userId = "";
   const handleAvatar = (val) => {
     setActiveSwitch(val);
     if (val == 2) pickImage();
@@ -80,7 +87,6 @@ const AddPatient = (props) => {
       setImageUri(result.uri);
     }
   };
-
   const navbar = () => {
     return (
       <Block row style={styles.navbar} center>
@@ -278,13 +284,41 @@ const AddPatient = (props) => {
         <Block row center>
           <TouchableOpacity
             style={styles.save}
-            onPress={() => {
+            onPress={async () => {
               if (validEmail && validName && validSsn && validCityState && validDate && validDescription) {
-                setEditFlg(false)
-                setRequested(false);
-              }
-              else {
-                setRequested(true);
+                if (!editPatient) {
+                  console.log("email & password signUp");
+                  await auth
+                    .createUserWithEmailAndPassword(email, password)
+                    .then((res) => {
+                      dbh.collection('Patients').doc(res.user.uid).collection("Patient").doc().collection("Profile").add({
+                        address: "",
+                        avatar: "",
+                        cityState: cityState,
+                        description: description,
+                        dob: dob,
+                        email: email,
+                        geoLocation: "",
+                        name: userName,
+                        phone: "",
+                        scheduleRelatedID: "",
+                        ssn: ssn
+                      }).
+                        then(() => {
+                          console.log('user Add');
+                        });
+                      patientInfoDispatch(patientInfoAction(res.user.uid));
+                    })
+                    .catch((error) => {
+                      console.log(">>>Error>>>")
+                    });
+
+                  setEditFlg(false);
+                  setRequested(false);
+                }
+                else {
+                  setRequested(true);
+                }
               }
             }}
           >
@@ -294,7 +328,15 @@ const AddPatient = (props) => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.save}
-            onPress={() => console.log("cancel")}
+            onPress={() => {
+              setUserName("");
+              setDob("");
+              setCityState("");
+              setEmail("");
+              setSsn("");
+              setDescription("");
+              setEditFlg(false);
+            }}
           >
             <Text color={"white"} size={16}>
               Cancel

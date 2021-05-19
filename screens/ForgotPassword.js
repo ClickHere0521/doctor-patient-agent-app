@@ -1,69 +1,55 @@
 import React, { useEffect, useState } from "react";
 import {
-  Image,
   StyleSheet,
   Dimensions,
-  View,
   TouchableOpacity,
   ScrollView,
-  Modal
+  Modal,
+  Alert,
 } from "react-native";
-// import { Block, Button, Text, theme, Input } from "galio-framework";
 import { Block, Button, Text, theme } from "galio-framework";
 import materialTheme from "../constants/Theme";
 import { IMLocalized, init } from "../src/localization/IMLocalization";
-import { useFonts } from "expo-font";
-import AppLoading from "expo-app-loading";
-import { useDispatch, useSelector } from "react-redux";
-import { roleSelector } from "../store/duck/action";
-import SvgUri from "expo-svg-uri";
 import { Icon } from "../components";
-// import { Form, InputText } from 'validate-form-in-expo-style';
-import { FontAwesome, Feather } from "@expo/vector-icons"
-import { Ionicons } from '@expo/vector-icons';
-import { isValid } from '../src/utils/helpers';
-import Input from '../components/Input';
+import { isValid } from "../src/utils/helpers";
+import Input from "../components/Input";
+import * as firebase from "firebase";
+
+const auth = firebase.auth();
+
 const { height, width } = Dimensions.get("screen");
 
 const ForgotPassword = (props) => {
   const { navigation } = props;
 
   const [modalVisible, setModalVisible] = useState(0);
-  const [vals, setVals] = useState({
-    user: "-",
-    email: "-",
-    password: "-",
-    active: {
-      user: false,
-      email: false,
-      password: false,
-    },
-  });
-
-
-  const [firstName, setFristName] = useState('');
-  // const handleLastName = (last_name) => {
-  //     setLastName(last_name);
-  // }
-  // const handleNumber = (number) => {
-  //     setNumber(number);
-  // }
-  const [number, setNumber] = useState("");
-  const [last_name, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [repeatPassword, setRepeatPassword] = useState("");
-
   const [requested, setRequested] = useState(false);
-  const validemail = isValid('email', email);
-  const validPassword = isValid('password', password);
-  const validRepeatPassword = isValid('password', repeatPassword);
-
-  const submit = () => {
-    alert("form submit, thank you.")
-  }
+  const validemail = isValid("email", email);
+  const validPassword = isValid("password", password);
+  const validRepeatPassword = isValid("password", repeatPassword);
 
   const [request, setRequest] = useState(1);
+
+  const handleRequestResent = () => {
+    if (validemail) {
+      auth.sendPasswordResetEmail(email).then(() => {
+        // setRequest(2);
+        setRequested(false);
+        Alert.alert("Success", `We have sent a link to ${email}`, [
+          {
+            text: "OK",
+            onPress: () => navigation.navigate("SignIn"),
+            style: "OK",
+          },
+        ]);
+      });
+    } else {
+      setRequested(true);
+    }
+  };
 
   const navbar = () => {
     return (
@@ -93,16 +79,30 @@ const ForgotPassword = (props) => {
     return (
       <Block flex style={{ backgroundColor: "white", height: height * 0.84 }}>
         <Block middle style={{ padding: theme.SIZES.BASE }}>
-          <Block middle style={{ marginTop: theme.SIZES.BASE * 8  , paddingBottom: theme.SIZES.BASE}}>
-            <Text size={14} bold style={{ color: '#3B3E51'}}>
+          <Block
+            middle
+            style={{
+              marginTop: theme.SIZES.BASE * 8,
+              paddingBottom: theme.SIZES.BASE,
+            }}
+          >
+            <Text size={14} bold style={{ color: "#3B3E51" }}>
               Reset Your Password
             </Text>
-            <Text size={14} bold style={{ textAlign: "center", color: '#3B3E51'}}>
+            <Text
+              size={14}
+              bold
+              style={{ textAlign: "center", color: "#3B3E51" }}
+            >
               Please Provide your account email address to request a password
-              reset code.
+              reset link.
             </Text>
-            <Text size={14} bold style={{ textAlign: "center", color: '#3B3E51'}}>
-              You will receive your a code to your email{"\n"} address if it is
+            <Text
+              size={14}
+              bold
+              style={{ textAlign: "center", color: "#3B3E51" }}
+            >
+              You will receive a link to your email{"\n"} address if it is
               valid.
             </Text>
           </Block>
@@ -128,21 +128,14 @@ const ForgotPassword = (props) => {
                 borderWidth: 1,
                 borderColor: "#707070",
                 width: theme.SIZES.BASE * 12,
-                paddingVertical: theme.SIZES.BASE
+                paddingVertical: theme.SIZES.BASE,
+                justifyContent: "center",
+                alignItems: "center",
               }}
-              onPress={() => {
-                console.log(validemail);
-                if (validemail) {
-                  setRequest(2);
-                  setRequested(false);
-                }
-                else {
-                  setRequested(true);
-                }
-              }}
+              onPress={() => handleRequestResent()}
             >
               <Text size={17} bold>
-                Request Resent Code
+                Request Reset
               </Text>
             </Button>
           </Block>
@@ -155,11 +148,23 @@ const ForgotPassword = (props) => {
     return (
       <Block flex style={{ backgroundColor: "white", height: height * 0.84 }}>
         <Block middle style={{ padding: theme.SIZES.BASE }}>
-          <Block middle style={{ marginTop: theme.SIZES.BASE * 8}}>
-            <Text size={14} bold style={{ paddingBottom: theme.SIZES.BASE , color: '#3B3E51'}}>
+          <Block middle style={{ marginTop: theme.SIZES.BASE * 8 }}>
+            <Text
+              size={14}
+              bold
+              style={{ paddingBottom: theme.SIZES.BASE, color: "#3B3E51" }}
+            >
               Reset Your Password
             </Text>
-            <Text size={14} bold style={{ textAlign: "center", paddingBottom: theme.SIZES.BASE , color: '#3B3E51'}}>
+            <Text
+              size={14}
+              bold
+              style={{
+                textAlign: "center",
+                paddingBottom: theme.SIZES.BASE,
+                color: "#3B3E51",
+              }}
+            >
               Input the code sent to your email address.
             </Text>
           </Block>
@@ -190,8 +195,7 @@ const ForgotPassword = (props) => {
                 if (validPassword) {
                   setRequest(3);
                   setRequested(false);
-                }
-                else {
+                } else {
                   setRequested(true);
                 }
               }}
@@ -215,11 +219,21 @@ const ForgotPassword = (props) => {
     return (
       <Block flex style={{ backgroundColor: "white", height: height * 0.84 }}>
         <Block middle style={{ padding: theme.SIZES.BASE }}>
-          <Block middle style={{ marginTop: theme.SIZES.BASE * 8, marginBottom: theme.SIZES.BASE }}>
+          <Block
+            middle
+            style={{
+              marginTop: theme.SIZES.BASE * 8,
+              marginBottom: theme.SIZES.BASE,
+            }}
+          >
             <Text size={14} bold st>
               Reset Your Password
             </Text>
-            <Text size={14} bold style={{ textAlign: "center", marginBottom: theme.SIZES.BASE }}>
+            <Text
+              size={14}
+              bold
+              style={{ textAlign: "center", marginBottom: theme.SIZES.BASE }}
+            >
               Successfully verified.Input a new password
             </Text>
           </Block>
@@ -248,10 +262,9 @@ const ForgotPassword = (props) => {
               onPress={() => {
                 console.log(validRepeatPassword);
                 if (validRepeatPassword) {
-                  setModalVisible(true)
+                  setModalVisible(true);
                   setRequested(false);
-                }
-                else {
+                } else {
                   setRequested(true);
                 }
               }}
@@ -272,12 +285,33 @@ const ForgotPassword = (props) => {
             transparent={true}
             visible={modalVisible}
             onRequestClose={() => {
-              Alert.alert('Modal has been closed.');
-            }}>
-            <Block style={{ marginTop: height * 0.3, backgroundColor: 'rgba(255,255,255,0.6)', width: width, height: height * 0.3 }} center middle>
+              Alert.alert("Modal has been closed.");
+            }}
+          >
+            <Block
+              style={{
+                marginTop: height * 0.3,
+                backgroundColor: "rgba(255,255,255,0.6)",
+                width: width,
+                height: height * 0.3,
+              }}
+              center
+              middle
+            >
               <Block style={styles.innerModal} center middle>
-                <Text size={16}>{IMLocalized('You have succefully reset your password.')}</Text>
-                <Button color="white" style={styles.modalButton} onPress={() => { setModalVisible(1); navigation.navigate('SignIn') }}><Text size={18}>OK</Text></Button>
+                <Text size={16}>
+                  {IMLocalized("You have succefully reset your password.")}
+                </Text>
+                <Button
+                  color="white"
+                  style={styles.modalButton}
+                  onPress={() => {
+                    setModalVisible(1);
+                    navigation.navigate("SignIn");
+                  }}
+                >
+                  <Text size={18}>OK</Text>
+                </Button>
               </Block>
             </Block>
           </Modal>
@@ -286,13 +320,6 @@ const ForgotPassword = (props) => {
     );
   };
 
-  const checkForm = () => {
-
-    return (
-      <ScrollView>
-      </ScrollView>
-    );
-  };
   const resetPasswordStep = (request) => {
     switch (request) {
       case 1:
@@ -307,11 +334,11 @@ const ForgotPassword = (props) => {
   return (
     <Block>
       {navbar()}
-      {/* {checkForm()} */}
       <ScrollView>{resetPasswordStep(request)}</ScrollView>
     </Block>
   );
 };
+
 const styles = StyleSheet.create({
   modalButton: {
     width: width * 0.25,
@@ -319,15 +346,18 @@ const styles = StyleSheet.create({
     borderRadius: 17,
     borderWidth: 0.5,
     borderColor: "#C7C7C7",
-    marginTop: theme.SIZES.BASE
+    marginTop: theme.SIZES.BASE,
   },
   innerModal: {
-    backgroundColor: 'rgba(255,255,255,0.99)', width: width * 0.8, borderRadius: 15, height: height * 0.15,
+    backgroundColor: "rgba(255,255,255,0.99)",
+    width: width * 0.8,
+    borderRadius: 15,
+    height: height * 0.15,
     shadowColor: theme.COLORS.BLACK,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 3,
     shadowOpacity: 0.1,
-    elevation: 5
+    elevation: 5,
   },
   navbar: {
     backgroundColor: "#6E78F7",
@@ -349,4 +379,5 @@ const styles = StyleSheet.create({
     borderBottomColor: "black",
   },
 });
+
 export default ForgotPassword;
