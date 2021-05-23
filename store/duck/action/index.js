@@ -1,4 +1,5 @@
 import types from './types';
+import firebase from 'firebase';
 
 const roleSelector = (role) => {
 	switch (role) {

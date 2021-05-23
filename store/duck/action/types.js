@@ -12,6 +12,7 @@ const types = {
 	SET_ATTORNEY_INFO	:     'SET_ATTORNEY_INFO',
 	SET_INSURANCE_INFO	:     'SET_INSURANCE_INFO',
 	SET_NOTE_INFO		:     'SET_NOTE_INFO',
+	SET_DOCTORS			:	  'SET_DOCTORS'
 };
 
 export default types;

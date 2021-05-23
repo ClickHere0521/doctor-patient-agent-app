@@ -21,38 +21,16 @@ const { width, height } = Dimensions.get("window");
 
 const Biometrics = (props) => {
   const { navigation } = props;
+  const { bioTypeProp } = props.route.params;
   const userRole = useSelector((state) => state.user.role);  
   const [scanned, setScanned] = useState(false);
   const [bioType, setBioType] = useState('');
 
   useEffect(() => {
-    AsyncStorage.getItem(
-      'bio',
-      (err, result) => {
-        var tmp = JSON.parse(result);
-        if (!tmp) {
-          navigation.replace("App");
-        }
-        if (tmp && tmp.bio == 'none') 
-          {
-            navigation.replace("App");
-          }
-        if (tmp && tmp.bio == 'touch')
-          {
-            setBioType('touch');
-            checkDeviceForHardware();
-            checkForBiometrics();
-            if (!scanned) handleLoginPress();
-          }  
-        if (tmp && tmp.bio == 'face')
-          {
-            setBioType('face');
-            checkDeviceForHardware();
-            checkForBiometrics();
-            if (!scanned) handleLoginPress();
-          }
-      }
-    )
+    setBioType(bioType);
+    checkDeviceForHardware();
+    checkForBiometrics();
+    if (!scanned) handleLoginPress();
   }, []);
 
   const checkDeviceForHardware = async () => {

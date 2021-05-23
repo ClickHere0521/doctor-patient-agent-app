@@ -1,17 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ScrollView,
   StyleSheet,
   Dimensions,
   TouchableHighlight,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { Button, Block, Text, Input, theme } from "galio-framework";
 import { Icon } from "../components";
 import { LinearGradient } from "expo-linear-gradient";
 import { IMLocalized } from "../src/localization/IMLocalization";
 import { useSelector } from "react-redux";
-// import DocumentScanner from 'react-native-documentscanner-android';
+import * as FileSystem from 'expo-file-system';
+import * as firebase from 'firebase';
+import * as ImagePicker from 'expo-image-picker';
 
 const { width, height } = Dimensions.get("screen");
 
@@ -32,72 +35,33 @@ const sortCategories = [
   },
 ];
 
-const caseFiles = [
-  {
-    label: "Eddie",
-    author: "Wilson",
-    uploadTime: "11:00 AM",
-    file: "url",
-  },
-  {
-    label: "Malcol",
-    author: "Milk",
-    uploadTime: "11:00 AM",
-    file: "url",
-  },
-  {
-    label: "John",
-    author: "Wonder",
-    uploadTime: "11:00 AM",
-    file: "url",
-  },
-  {
-    label: "Elif",
-    author: "Jin",
-    uploadTime: "11:00 AM",
-    file: "url",
-  },
-  {
-    label: "John",
-    author: "Wonder",
-    uploadTime: "11:00 AM",
-    file: "url",
-  },
-  {
-    label: "Elif",
-    author: "Jin",
-    uploadTime: "11:00 AM",
-    file: "url",
-  },
-  {
-    label: "John",
-    author: "Wonder",
-    uploadTime: "11:00 AM",
-    file: "url",
-  },
-  {
-    label: "Elif",
-    author: "Jin",
-    uploadTime: "11:00 AM",
-    file: "url",
-  },
-  {
-    label: "Boy",
-    author: "Wonder",
-    uploadTime: "11:00 AM",
-    file: "url",
-  },
-  {
-    label: "Girl",
-    author: "Wonder",
-    uploadTime: "11:00 AM",
-    file: "url",
-  },
-];
-
-const PatientView = (props) => {
+const PatientCaseFile = (props) => {
   const userRole = useSelector((state) => state.user.role);
   const { navigation } = props;
+  // const { agentID, patientID, caseID } = props.route.params;
+  const agentID = '6hQ6yTAGNXNihOuFfQku05BK1SJ2';
+  const patientID = '6hQ6yTAGNXNihOuFfQku05BK1SJ2';
+  const caseID = '9OrscCF5Sww521UBck7W';
+  const firestore = firebase.firestore();
+  const storage = firebase.storage();
+  const [imageUri, setImageUri] = useState("");
+  const [caseFiles, setCaseFiles] = useState();
+  const [sortDirection, setSortDirection] = useState({
+    label: true, 
+    author: true, 
+    uptime: true, 
+  });
+
+  useEffect(() => {
+    firestore.collection('Cases').doc(patientID).collection('Case').get().then((querySnapShot) => {
+      var tmpCaseFiles;
+      querySnapShot.forEach((doc) => {
+        tmpCaseFiles = doc.data().CaseFiles;
+      });
+      setCaseFiles(tmpCaseFiles);
+    }); 
+  }, []);
+
   const navbar = () => {
     return (
       <Block>
@@ -114,7 +78,7 @@ const PatientView = (props) => {
           <Text
             color="black"
             style={{ paddingLeft: theme.SIZES.BASE }}
-            size={22}
+            size={20}
             fontWeight="semiBold"
           >
             {IMLocalized("Case File")}
@@ -138,13 +102,45 @@ const PatientView = (props) => {
   };
 
   const renderSort = (item, index) => {
-    const { navigation } = props;
-
+    const sortting = () => {
+      switch (item.title) {
+        case 'Label':
+          const sortArray = [...caseFiles].sort((a, b) => {
+            if (a.label < b.label) return (sortDirection.label ? -1 : 1);
+            if (a.label > b.label) return (sortDirection.label ? 1 : -1);
+            return 0;
+          });
+          setCaseFiles(sortArray);
+          let temSort1 = { ...sortDirection };
+          setSortDirection({...temSort1, label: !temSort1.label})
+          break;
+        case 'Author':
+          const sortArray1 = [...caseFiles].sort((a, b) => {
+            if (a.author < b.author) return (sortDirection.author ? -1 : 1);
+            if (a.author > b.author) return (sortDirection.author ? 1 : -1);
+            return 0;
+          });
+          setCaseFiles(sortArray1);
+          let temSort2 = { ...sortDirection };
+          setSortDirection({...temSort2, author: !temSort2.author})
+          break;
+        case 'Upload Time':
+          const sortArray2 = [...caseFiles].sort((a, b) => {
+            if (a.UploadTime < b.UploadTime) return (sortDirection.uptime ? -1 : 1);
+            if (a.UploadTime > b.UploadTime) return (sortDirection.uptime ? 1 : -1);
+            return 0;
+          });
+          setCaseFiles(sortArray2);
+          let temSort3 = { ...sortDirection };
+          setSortDirection({...temSort3, uptime: !temSort3.uptime})
+          break;
+      }
+    }
     return (
-      <TouchableHighlight
+      <TouchableOpacity
         style={{ zIndex: 3 }}
         key={`product-${item.title}`}
-        // onPress={}
+        onPress={() => sortting()}
       >
         <LinearGradient
           start={{ x: 0, y: 0 }}
@@ -159,50 +155,9 @@ const PatientView = (props) => {
             </Text>
           </Block>
         </LinearGradient>
-      </TouchableHighlight>
+      </TouchableOpacity>
     );
   };
-
-  const fileListItem = (vals, index) => {
-    let { label, author, uploadTime, file, approved } = vals;
-    return (
-      <Block key={index}>
-        <TouchableHighlight
-          style={{ zIndex: 3 }}
-          // onPress={}
-        >
-          <LinearGradient
-            start={{ x: 0, y: 0 }}
-            end={{ x: 0.25, y: 1.1 }}
-            locations={[0.2, 1]}
-            colors={["#EFEFEF", "#FFF"]}
-            style={styles.caseItem}
-          >
-            <Block flex flexDirection="row" middle>
-              <Block flex={1} style={{ alignItems: "flex-start" }}>
-                <Text center size={15} fontWeight="semiBold">
-                  {IMLocalized(label)}
-                </Text>
-              </Block>
-              <Block flex={1}>
-                <Text center size={15} fontWeight="semiBold">
-                  {IMLocalized(author)}
-                </Text>
-              </Block>
-              <Block flex={1}>
-                <Text center size={15} fontWeight="semiBold">
-                  {IMLocalized(uploadTime)}
-                </Text>
-              </Block>
-              <Block flex={1} style={{ alignItems: "flex-end" }}>
-                <Icon name="paperclip" family="font-awesome" size={20}></Icon>
-              </Block>
-            </Block>
-          </LinearGradient>
-        </TouchableHighlight>
-      </Block>
-    )
-  }
 
   const scanAndUpload = () => {
     if (userRole != "doctor") {
@@ -212,9 +167,9 @@ const PatientView = (props) => {
             horizontal={true}
             style={{ marginLeft: width * 0.2, marginBottom: theme.SIZES.BASE }}
           >
-            <TouchableHighlight
+            <TouchableOpacity
               style={{ zIndex: 3 }}
-              // onPress={}
+              onPress={() => scanFile()}
             >
               <LinearGradient
                 start={{ x: 0, y: 0 }}
@@ -229,8 +184,8 @@ const PatientView = (props) => {
                   </Text>
                 </Block>
               </LinearGradient>
-            </TouchableHighlight>
-            <TouchableHighlight
+            </TouchableOpacity>
+            <TouchableOpacity
               style={{ zIndex: 3 }}
               // onPress={}
             >
@@ -247,7 +202,7 @@ const PatientView = (props) => {
                   </Text>
                 </Block>
               </LinearGradient>
-            </TouchableHighlight>
+            </TouchableOpacity>
           </ScrollView>
         </Block>
       );
@@ -310,20 +265,66 @@ const PatientView = (props) => {
       );
     }
   };
+
+  const scanFile = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [3, 3],
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      var curTime = new Date().getTime();
+      var curUTCTime = (new Date(curTime)).toUTCString();
+      var caseFiles;
+      const ref = storage.ref(`caseFiles/${caseID}/caseFiles/fakeFile${curTime}.png`);
+      await ref.put(imageUri);
+      const scanFileUrl = await ref.getDownloadURL();
+      await firestore.collection('Cases').doc(patientID).collection('Case').get().then((querySnapShot) => {
+        querySnapShot.forEach((doc) => {
+          caseFiles = doc.data().CaseFiles;
+        })
+      })
+      var uploadFiles = [...caseFiles, { 
+        UploadTime: curUTCTime,
+        author: userRole == 'agent' ? agentID : patientID,
+        authorReference: '',
+        label: `fakeFile${curTime}`,
+        scanFileUrl,
+      }];
+      await firestore.collection('Cases').doc(patientID).collection('Case').doc(caseID).update({ CaseFiles : uploadFiles});      
+      Alert.alert(
+        "Success",
+        "You have successfully edited the agent info",
+        [
+          {
+            text: 'OK',
+            onPress: () => {}
+          }
+        ]
+      );  
+    }
+  };
+
+  const onDownloadImagePress = (url, label) => {
+    FileSystem.downloadAsync(
+      url,
+      FileSystem.documentDirectory + `${label}.png`
+    )
+      .then(({ uri }) => {
+        console.log('Finished downloading to ', uri);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  };
+
   return (
     <Block flex style={styles.components}>
       {navbar()}
       {scanAndUpload()}
       {renderSorts()}
-      {/* <View>
-        <DocumentScanner
-          onPictureTaken={data => {
-            console.log(data.path);
-          }}
-          enableTorch={false}
-          detectionCountBeforeCapture={5}
-        />
-      </View> */}
       <ScrollView
         vertical={true}
         pagingEnabled={true}
@@ -335,7 +336,49 @@ const PatientView = (props) => {
         snapToInterval={cardWidth + theme.SIZES.BASE * 0.375}
         style={{ padding: theme.SIZES.BASE / 2 }}
       >
-        {caseFiles && caseFiles.map((vals, index) => fileListItem(vals, index))}
+        {caseFiles && caseFiles.map((vals, index) => {
+          const time = new Date(vals.UploadTime.seconds * 1000 + vals.UploadTime.nanoseconds/1000000);
+          const timeDis = time.toDateString();
+          return (
+            <Block key={index}>
+              <TouchableHighlight
+                style={{ zIndex: 3 }}
+                // onPress={}
+              >
+                <LinearGradient
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 0.25, y: 1.1 }}
+                  locations={[0.2, 1]}
+                  colors={["#EFEFEF", "#FFF"]}
+                  style={styles.caseItem}
+                >
+                  <Block flex flexDirection="row" middle>
+                    <Block flex={1} style={{ alignItems: "flex-start" }}>
+                      <Text center size={15} fontWeight="semiBold">
+                        {vals.label}
+                      </Text>
+                    </Block>
+                    <Block flex={1}>
+                      <Text center size={15} fontWeight="semiBold">
+                        {vals.author}
+                      </Text>
+                    </Block>
+                    <Block flex={1}>
+                      <Text center size={15} fontWeight="semiBold">
+                        {timeDis}
+                      </Text>
+                    </Block>
+                    <Block flex={0.3} style={{ alignItems: "flex-end" }}>
+                      <TouchableOpacity onPress={() => onDownloadImagePress(vals.scanFileUrl, vals.label)}>
+                        <Icon name="paperclip" family="font-awesome" size={20} ></Icon>
+                      </TouchableOpacity>
+                    </Block>
+                  </Block>
+                </LinearGradient>
+              </TouchableHighlight>
+            </Block>
+          );
+        })}
       </ScrollView>
       {returnButtons()}
     </Block>
@@ -346,7 +389,7 @@ const styles = StyleSheet.create({
   navbar: {
     backgroundColor: "white",
     width: width,
-    height: height * 0.16,
+    height: height * 0.1,
     paddingTop: theme.SIZES.BASE * 2,
     paddingLeft: theme.SIZES.BASE,
     borderBottomWidth: 1,
@@ -469,4 +512,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PatientView;
+export default PatientCaseFile;

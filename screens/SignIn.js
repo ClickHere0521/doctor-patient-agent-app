@@ -39,17 +39,6 @@ const SignIn = (props) => {
   const validemail = isValid("email", email);
   const validPassword = isValid("password", password);
 
-  useEffect(() => {
-    AsyncStorage.getItem(
-      'reminder',
-      (err, result) => {
-        var tmp = JSON.parse(result);
-        if (tmp && tmp.reminder)
-          navigation.replace("Biometrics");
-      }
-    )
-  });
-
   const SignInHeading = (role) => {
     switch (role) {
       case "agent":
@@ -125,17 +114,29 @@ const SignIn = (props) => {
   };
 
   const handleSignIn = () => {
+    var tmpBio;
     auth
       .signInWithEmailAndPassword(email, password)
-      .then((res) => {
-        if (isSelected) {
-          AsyncStorage.setItem(
+      .then(async (res) => {
+        await isSelected && AsyncStorage.setItem(
             'reminder',
             JSON.stringify({ reminder: true }),
             () => {}
           )
-        }
-        navigation.replace("Biometrics");
+        AsyncStorage.getItem(
+          'bio',
+          (err, result) => {
+            tmpBio = JSON.parse(result);
+            if (!tmpBio) 
+              navigation.replace("App");
+            if (tmpBio && tmpBio.bio == 'none') 
+              navigation.replace("App");
+            if (tmpBio && tmpBio.bio == 'touch')
+              navigation.navigate("Biometrics", {bioTypeProp: 'touch'});
+            if (tmpBio && tmpBio.bio == 'face')
+              navigation.navigate("Biometrics", {bioTypeProp: 'face'});
+          }
+        );
       })
       .catch((error) => {
         Alert.alert("Warning", "This email and password is invaild", [

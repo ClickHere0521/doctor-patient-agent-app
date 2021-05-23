@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ScrollView,
   StyleSheet,
   Dimensions,
   TouchableHighlight,
-  TouchableOpacity
+  TouchableOpacity,
+  Alert,
 } from "react-native";
 import { Button, Block, Text, Input, theme } from "galio-framework";
 import { Icon } from "../components";
@@ -12,86 +13,27 @@ import { LinearGradient } from "expo-linear-gradient";
 import { IMLocalized } from "../src/localization/IMLocalization";
 import { useSelector } from "react-redux";
 import { CheckBox } from "react-native-elements";
+import * as FileSystem from 'expo-file-system';
+import * as firebase from 'firebase';
 const { width, height } = Dimensions.get("screen");
 const cardWidth = theme.SIZES.BASE * 4;
 
 const UploadCaseFiles = (props) => {
-  const [caseFiles, setCaseFiles] = useState([
-    {
-      label: "Eddie",
-      author: "John",
-      approved: false,
-      uploadTime: "11:00 AM",
-      file: "url",
-    },
-    {
-      label: "Malcol",
-      author: "John",
-      approved: true,
-      uploadTime: "11:00 AM",
-      file: "url",
-    },
-    {
-      label: "John",
-      author: "Max",
-      approved: false,
-      uploadTime: "11:00 AM",
-      file: "url",
-    },
-    {
-      label: "Elif",
-      author: "Cool",
-      approved: true,
-      uploadTime: "11:00 AM",
-      file: "url",
-    },
-    {
-      label: "John",
-      approved: false,
-      uploadTime: "11:00 AM",
-      file: "url",
-    },
-    {
-      label: "Elif",
-      approved: false,
-      uploadTime: "11:00 AM",
-      file: "url",
-    },
-    {
-      label: "John",
-      approved: true,
-      uploadTime: "11:00 AM",
-      file: "url",
-    },
-    {
-      label: "Elif",
-      approved: true,
-      uploadTime: "11:00 AM",
-      file: "url",
-    },
-    {
-      label: "Boy",
-      approved: true,
-      uploadTime: "11:00 AM",
-      file: "url",
-    },
-    {
-      label: "Girl",
-      approved: true,
-      uploadTime: "11:00 AM",
-      file: "url",
-    },
-  ]);
-
-  const handleCheck = (index) => {
-    let tempCaseFiles = [...caseFiles];
-    tempCaseFiles[index].approved = !tempCaseFiles[index].approved;
-    setCaseFiles(tempCaseFiles);
-  };
-
   const userRole = useSelector(state => state.user.role);
   const { navigation } = props;
-
+  const [caseFiles, setCaseFiles] = useState([]);
+  // const { agentID, patientID, caseID } = props.route.params;
+  const agentID = '6hQ6yTAGNXNihOuFfQku05BK1SJ2';
+  const patientID = '6hQ6yTAGNXNihOuFfQku05BK1SJ2';
+  const caseID = '9OrscCF5Sww521UBck7W';
+  const firestore = firebase.firestore();
+  const storage = firebase.storage();
+  const [imageUri, setImageUri] = useState("");
+  const [sortDirection, setSortDirection] = useState({
+    label: true, 
+    author: true, 
+    uptime: true, 
+  });
   const sortCategories = [
     {
       title: IMLocalized("Label"),
@@ -125,6 +67,22 @@ const UploadCaseFiles = (props) => {
     },
   ];
 
+  useEffect(() => {
+    firestore.collection('Cases').doc(patientID).collection('Case').get().then((querySnapShot) => {
+      var tmpCaseFiles;
+      querySnapShot.forEach((doc) => {
+        tmpCaseFiles = doc.data().patientUploadFile;
+      });
+      setCaseFiles(tmpCaseFiles);
+    }); 
+  }, []);
+
+  const handleCheck = (index) => {
+    let tempCaseFiles = [...caseFiles];
+    tempCaseFiles[index].isApproved = !tempCaseFiles[index].isApproved;
+    setCaseFiles(tempCaseFiles);
+  };
+
   const navbar = () => {
     return (
       <Block>
@@ -138,7 +96,7 @@ const UploadCaseFiles = (props) => {
                 style={styles.chevronLeft}
                 />
             </TouchableOpacity>
-            <Text color="black" style={{paddingLeft: theme.SIZES.BASE}} size={22} fontWeight="semiBold">{IMLocalized('Upload Case File')}</Text>
+            <Text color="black" style={{paddingLeft: theme.SIZES.BASE}} size={20} fontWeight="semiBold">{IMLocalized('Upload Case File')}</Text>
         </Block>
         <Block style={{borderTopWidth:1, borderColor: 'white'}}></Block>
       </Block>
@@ -146,12 +104,46 @@ const UploadCaseFiles = (props) => {
   }
 
   const renderSort = (item, index) => {
-    const { navigation } = props;
+    const sortting = () => {
+      switch (item.title) {
+        case 'Label':
+          const sortArray = [...caseFiles].sort((a, b) => {
+            if (a.label < b.label) return (sortDirection.label ? -1 : 1);
+            if (a.label > b.label) return (sortDirection.label ? 1 : -1);
+            return 0;
+          });
+          setCaseFiles(sortArray);
+          let temSort1 = { ...sortDirection };
+          setSortDirection({...temSort1, label: !temSort1.label})
+          break;
+        case 'Author':
+          const sortArray1 = [...caseFiles].sort((a, b) => {
+            if (a.author < b.author) return (sortDirection.author ? -1 : 1);
+            if (a.author > b.author) return (sortDirection.author ? 1 : -1);
+            return 0;
+          });
+          setCaseFiles(sortArray1);
+          let temSort2 = { ...sortDirection };
+          setSortDirection({...temSort2, author: !temSort2.author})
+          break;
+        case 'Upload Time':
+          const sortArray2 = [...caseFiles].sort((a, b) => {
+            if (a.uploadTime < b.uploadTime) return (sortDirection.uptime ? -1 : 1);
+            if (a.uploadTime > b.uploadTime) return (sortDirection.uptime ? 1 : -1);
+            return 0;
+          });
+          setCaseFiles(sortArray2);
+          let temSort3 = { ...sortDirection };
+          setSortDirection({...temSort3, uptime: !temSort3.uptime})
+          break;
+      }
+    }
 
     return (
-      <TouchableHighlight
+      <TouchableOpacity
         style={{ zIndex: 3 }}
         key={`product-${item.title}`}
+        onPress={() => sortting()}
       >
         <LinearGradient
           start={{ x: 0, y: 0 }}
@@ -166,107 +158,15 @@ const UploadCaseFiles = (props) => {
             </Text>
           </Block>
         </LinearGradient>
-      </TouchableHighlight>
+      </TouchableOpacity>
     );
   };
-
-  const fileListItem = (vals, index) => {
-    let {label, author, uploadTime, file, approved} = vals;
-
-    if(userRole == 'agent'){
-      return (
-        <Block key={index}>
-          <TouchableHighlight
-            style={{ zIndex: 3 }}
-            // onPress={}
-            >
-            <LinearGradient
-              start={{ x: 0, y: 0 }}
-              end={{ x: 0.25, y: 1.1 }}
-              locations={[0.2, 1]}
-              colors={["#EFEFEF", "#FFF"]}
-              style={styles.caseItem}
-            >
-              <Block flex flexDirection="row" middle>
-                <Block flex={1}  style={{alignItems: 'flex-start'}}>
-                  <Text center size={15} fontWeight="semiBold">
-                    {IMLocalized(label)}
-                  </Text>
-                </Block>
-                <Block flex={1}  style={{alignItems: 'flex-start'}}>
-                  <Text center size={15} bold color='grey' fontWeight="semiBold">
-                    {IMLocalized(author)}
-                  </Text>
-                </Block>
-                <Block flex={1} >
-                  <Text center size={15} fontWeight="semiBold">
-                    {IMLocalized(uploadTime)}
-                  </Text>
-                </Block>
-                <Block flex={1} style={{alignItems: 'flex-end'}}>
-                  <Icon name="paperclip" family="font-awesome" size={20}></Icon>
-                </Block>
-                <Block flex={1} style={{alignItems: 'flex-end'}}>
-                  <CheckBox
-                    checked={vals.approved}
-                    containerStyle={{ backgroundColor: "white", borderWidth: 0 }}
-                    onPress={() => handleCheck(index)}
-                  />
-                </Block>
-              </Block>
-            </LinearGradient>
-          </TouchableHighlight>
-        </Block>
-      )
-    }
-    else{
-      return (
-        <Block key={index}>
-          <TouchableHighlight
-            style={{ zIndex: 3 }}
-            // onPress={}
-            >
-            <LinearGradient
-              start={{ x: 0, y: 0 }}
-              end={{ x: 0.25, y: 1.1 }}
-              locations={[0.2, 1]}
-              colors={["#EFEFEF", "#FFF"]}
-              style={styles.caseItem}
-            >
-              <Block flex flexDirection="row" middle>
-                <Block flex={1}  style={{alignItems: 'flex-start'}}>
-                  <Text center size={15} fontWeight="semiBold">
-                    {IMLocalized(label)}
-                  </Text>
-                </Block>
-                <Block flex={1} >
-                  <Text center size={15} fontWeight="semiBold">
-                    {IMLocalized(uploadTime)}
-                  </Text>
-                </Block>
-                <Block flex={1} style={{alignItems: 'flex-end'}}>
-                  <Icon name="paperclip" family="font-awesome" size={20}></Icon>
-                </Block>
-                <Block flex={1} style={{alignItems: 'flex-end'}}>
-                  <CheckBox
-                    checked={vals.approved}
-                    containerStyle={{ backgroundColor: "white", borderWidth: 0 }}
-                  />
-                </Block>
-              </Block>
-            </LinearGradient>
-          </TouchableHighlight>
-        </Block>
-      )
-    }
-    
-  }
 
   const returnButtons = () => {
     if(userRole == "agent"){
       return (
         <Block>
-          <Button style={{borderRadius: 16, width: width * 0.95}} color="#00CE30">{IMLocalized('save')}</Button>
+          <Button style={{borderRadius: 16, width: width * 0.95}} color="#00CE30" onPress={() => handleSave()}>{IMLocalized('save')}</Button>
         </Block>
       )
     }
@@ -276,6 +176,7 @@ const UploadCaseFiles = (props) => {
       )
     }
   }
+
   const renderSorts = () => {
     if(userRole == "agent")
     {
@@ -320,6 +221,32 @@ const UploadCaseFiles = (props) => {
     };
   }
 
+  const onDownloadImagePress = (url, label) => {
+    FileSystem.downloadAsync(
+      url,
+      FileSystem.documentDirectory + `${label}.png`
+    )
+      .then(({ uri }) => {
+        console.log('Finished downloading to ', uri);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  };
+
+  const handleSave = async () => {
+    await firestore.collection('Cases').doc(patientID).collection('Case').doc(caseID).update({ patientUploadFile : caseFiles});      
+    Alert.alert(
+      "Success",
+      "You have successfully updated the file info",
+      [
+        {
+          text: 'OK',
+          onPress: () => {}
+        }
+      ]
+    );  
+  };
 
   return (
     <Block flex
@@ -339,7 +266,98 @@ const UploadCaseFiles = (props) => {
           style={{padding: theme.SIZES.BASE/2}}
         >
           {caseFiles &&
-            caseFiles.map((vals, index) => fileListItem(vals, index))}
+            caseFiles.map((vals, index) => {
+              const time = new Date(vals.uploadTime.seconds * 1000 + vals.uploadTime.nanoseconds/1000000);
+              const timeDis = time.toDateString()
+              if(userRole == 'agent'){
+                return (
+                  <Block key={index}>
+                    <TouchableHighlight
+                      style={{ zIndex: 3 }}
+                      // onPress={}
+                      >
+                      <LinearGradient
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 0.25, y: 1.1 }}
+                        locations={[0.2, 1]}
+                        colors={["#EFEFEF", "#FFF"]}
+                        style={styles.caseItem}
+                      >
+                        <Block flex flexDirection="row" middle>
+                          <Block flex={1}  style={{alignItems: 'flex-start'}}>
+                            <Text center size={15} fontWeight="semiBold">
+                              {vals.label}
+                            </Text>
+                          </Block>
+                          <Block flex={1}  style={{alignItems: 'flex-start'}}>
+                            <Text center size={15} bold color='grey' fontWeight="semiBold">
+                              {vals.author}
+                            </Text>
+                          </Block>
+                          <Block flex={1} >
+                            <Text center size={15} fontWeight="semiBold">
+                              {timeDis}
+                            </Text>
+                          </Block>
+                          <Block flex={1} style={{alignItems: 'flex-end'}}>
+                            <TouchableOpacity onPress={() => onDownloadImagePress(vals.scanFileUrl, vals.label)}>
+                              <Icon name="paperclip" family="font-awesome" size={20}></Icon>
+                            </TouchableOpacity>
+                          </Block>
+                          <Block flex={1} style={{alignItems: 'flex-end'}}>
+                            <CheckBox
+                              checked={vals.isApproved}
+                              containerStyle={{ backgroundColor: "white", borderWidth: 0 }}
+                              onPress={() => handleCheck(index)}
+                            />
+                          </Block>
+                        </Block>
+                      </LinearGradient>
+                    </TouchableHighlight>
+                  </Block>
+                )
+              }
+              else{
+                return (
+                  <Block key={index}>
+                    <TouchableHighlight
+                      style={{ zIndex: 3 }}
+                      // onPress={}
+                      >
+                      <LinearGradient
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 0.25, y: 1.1 }}
+                        locations={[0.2, 1]}
+                        colors={["#EFEFEF", "#FFF"]}
+                        style={styles.caseItem}
+                      >
+                        <Block flex flexDirection="row" middle>
+                          <Block flex={1}  style={{alignItems: 'flex-start'}}>
+                            <Text center size={15} fontWeight="semiBold">
+                            {vals.label}
+                            </Text>
+                          </Block>
+                          <Block flex={1} >
+                            <Text center size={15} fontWeight="semiBold">
+                            {timeDis}
+                            </Text>
+                          </Block>
+                          <Block flex={1} style={{alignItems: 'flex-end'}}>
+                            <Icon name="paperclip" family="font-awesome" size={20}></Icon>
+                          </Block>
+                          <Block flex={1} style={{alignItems: 'flex-end'}}>
+                            <CheckBox
+                              checked={vals.isApproved}
+                              containerStyle={{ backgroundColor: "white", borderWidth: 0 }}
+                            />
+                          </Block>
+                        </Block>
+                      </LinearGradient>
+                    </TouchableHighlight>
+                  </Block>
+                )
+              }
+            })}
         </ScrollView>
         {returnButtons()}
     </Block>
@@ -350,7 +368,7 @@ const styles = StyleSheet.create({
   navbar: {
       backgroundColor: "white",
       width: width,
-      height: height * 0.16,
+      height: height * 0.1,
       paddingTop: theme.SIZES.BASE * 2,
       paddingLeft: theme.SIZES.BASE,
       borderBottomWidth: 1,

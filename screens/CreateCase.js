@@ -71,7 +71,7 @@ const CreateCase = (props) => {
     console.log("attorneyInfo: ", addAttorInfo);
     console.log("insuranceInfo: ", addInsurInfo);
     console.log("noteInfo: ", addNoteInfo);
-    addPInfo.map((item, index) => {
+    addPInfo && addPInfo.map((item, index) => {
       setPatientName(item.name);
       SetPatientDob(item.dob);
       setPatientAvatar(item.avatar);
@@ -79,7 +79,7 @@ const CreateCase = (props) => {
       setPatientEmail(item.email);
       setPatientSsn(item.ssn);
     });
-    addAttorInfo.map((item, index) => {
+    addAttorInfo && addAttorInfo.map((item, index) => {
       setAttorAddress(item.attorAddress);
       setAttorCityState(item.attorCityState);
       setAttorEmail(item.attorEmail);
@@ -89,7 +89,7 @@ const CreateCase = (props) => {
       setAttorReference("");
       setAttorZip(item.attorZipcode);
     });
-    addInsurInfo.map((item, index) => {
+    addInsurInfo && addInsurInfo.map((item, index) => {
       setInsurAddress(item.insurAddress);
       setInsurCompany(item.insurCompanyName);
       setInsurZipCode(item.insurZipcode);
@@ -97,7 +97,7 @@ const CreateCase = (props) => {
       setInsurAdjuster(item.insurAdjuster);
       setInsurPolicyNum(item.insurPolicyNumber);
     });
-    addNoteInfo.map((item, index) => {
+    addNoteInfo && addNoteInfo.map((item, index) => {
       setNoteAuthorName(item.noteAuthorName);
       setNoteCreateDate(item.noteCreateDate);
       setNoteDescription(item.description);
@@ -244,20 +244,25 @@ const CreateCase = (props) => {
               {patientDob}
             </Text>
           </Block>
-          <Block column style={{ paddingLeft: width * 0.4 }}>
+          <Block column style={{ paddingLeft: width * 0.4 }} >
             <Text style={{ alignSelf: "flex-end" }} color={"#06D81E"}>
               {/* 11:45 AM */}
             </Text>
-            <TouchableOpacity
-              onPress={() => navigation.navigate("AddPatient", { editPatient: true })}
-              style={{ backgroundColor: 'white' }}
-            >
-              <SvgUri
-                width="20"
-                height="20"
-                source={require("../assets/icons/editGreen.svg")}
-              />
-            </TouchableOpacity>
+            {
+              !patientName ? <></> :
+                <TouchableOpacity
+                  onPress={() => navigation.navigate("AddPatient", { editPatient: true })}
+                  style={{ backgroundColor: 'white' }}
+                >
+                  {
+                    <SvgUri
+                      width="20"
+                      height="20"
+                      source={require("../assets/icons/editGreen.svg")}
+                    />
+                  }
+                </TouchableOpacity>
+            }
           </Block>
         </Block>
         <Block>
@@ -325,7 +330,7 @@ const CreateCase = (props) => {
                       geoLocation: "",
                       name: patientName,
                       phone: "",
-                  });
+                    });
                   })
                   .catch((error) => {
                     console.log(">>>Error>>>", error)
@@ -336,11 +341,14 @@ const CreateCase = (props) => {
                     pDocId = doc.id;
                   });
                 });
-                console.log("pDocId->",pDocId);
+                console.log("pDocId->", pDocId);
                 const patientLinks = {
                   businessUserID: pUid,
                   patientProfileID: pDocId
                 };
+                
+                firestore.collection('Cases').doc(pUid).set({});
+                firestore.collection('Patients').doc(pUid).set({});
                 firestore.collection('Patients').doc(pUid).collection("PatientProfileLink").doc().set(patientLinks);
                 firestore.collection('Cases').doc(pUid).collection("Case").doc().set({
                   InsuranceInfo: {
@@ -370,7 +378,7 @@ const CreateCase = (props) => {
                   caseID: '',
                   caseStatus: 'New Case',
                   caseWarning: {
-                    '0' : 'PATIENT_FILE_WAITING_REVIEW',
+                    '0': 'PATIENT_FILE_WAITING_REVIEW',
                   },
                   dateOfInjury: "2020-12-1",
                   note: [
@@ -378,7 +386,7 @@ const CreateCase = (props) => {
                       authorName: noteAuthorName,
                       authorReference: "",
                       createDate: 'noteCreateDate',//not compete : noteCreateDate
-                      noteDescription : 'noteDescription',
+                      noteDescription: 'noteDescription',
                     },
                   ],
                   patientInfo: {
@@ -404,7 +412,7 @@ const CreateCase = (props) => {
                     scheduleReference: '',
                     scheduleTime: '',
                   }
-                })
+                });
               }
               else
                 Alert.alert(
@@ -425,7 +433,8 @@ const CreateCase = (props) => {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.save}
-            onPress={() => console.log("cancel")}
+            // onPress={() => {
+            // }}
           >
             <Text color={"white"} size={14}>
               Cancel
@@ -563,8 +572,8 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 24,
     borderBottomLeftRadius: 24,
     width: width,
-    height: height * 0.16,
-    paddingTop: theme.SIZES.BASE * 2,
+    height: height * 0.1,
+    paddingTop: theme.SIZES.BASE,
     paddingLeft: theme.SIZES.BASE,
   },
 });

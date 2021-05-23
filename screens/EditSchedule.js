@@ -240,19 +240,9 @@ const EditSchedule = (props) => {
         <Block center style={{ paddingTop: 10 }}>
           <Block>
             <Image
-              source={require("../assets/images/grayscale-photo-of-man2.png")}
+              source={require("../assets/images/userDefault.png")}
               style={styles.imageStyle}
             ></Image>
-            <SvgUri
-              width="20"
-              height="20"
-              source={require("../assets/icons/dot.svg")}
-              style={{
-                position: "absolute",
-                right: 0,
-                top: 0,
-              }}
-            />
           </Block>
           <Text size={20}>{doctor.name}</Text>
           <Text>{doctor.address}</Text>

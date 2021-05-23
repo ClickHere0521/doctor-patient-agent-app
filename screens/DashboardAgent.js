@@ -55,6 +55,55 @@ const DashboardAgent = (props) => {
 
   const firestore = firebase.firestore();
   const storage = firebase.storage();
+  const [caseSort, setCaseSort] = useState(true);
+  const [dateSort, setDateSort] = useState(true);
+  const [statusSort, setStatusSort] = useState(true);
+  
+  const [activeCases, setActiveCases] = useState(0);
+  const [thisYear, setThisYear] = useState(0);
+  const [resolvedYear, setResolvedYear] = useState(0);
+
+  const [sortDirection, setSortDirection] = useState({
+    patientName: true, 
+    caseCreateTime: true, 
+    caseStatus: true, 
+  });
+
+  useEffect(() => {
+    firestore
+      .collection("Cases")
+      .get()
+      .then((querySnapshot) => {
+        const caseArrayPromise = querySnapshot.docs.map((doc) => {
+          return firestore
+            .collection("Cases")
+            .doc(doc.id)
+            .collection("Case")
+            .get()
+            .then((querySnapshot) => {
+              const caseId = doc.id;
+              var caseData = {};
+              querySnapshot.forEach((caseDoc) => {
+                const { patientName, avatar, patientReference, caseStatus, caseCreateTime, caseID, caseWarning, docId } =
+                  caseDoc.data();
+                if(caseDoc.data().caseStatus != 'DISCHARGED')
+                {
+                  console.log("->",caseDoc.data().caseStatus)
+                  setActiveCases(activeCases + 1);
+                  setThisYear(thisYear + 1);
+                  setResolvedYear(resolvedYear + 1);
+                  console.log("1->",activeCases)
+                }
+                caseData = { ...caseDoc.data() };
+              });
+              return caseData;
+            });
+        });
+        Promise.all(caseArrayPromise).then((usersArray) => {
+          setCases(usersArray);
+        });
+      });
+  }, []);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -93,40 +142,6 @@ const DashboardAgent = (props) => {
       };
     }, []),
   );
-
-  useEffect(() => {
-
-    firestore.collection('Cases').get().then((querySnapshot) => {
-      console.log(querySnapshot);
-      querySnapshot.forEach((doc) => {
-        console.log("DocIDS->", doc.id);
-        firestore.collection('Cases').doc(doc.id).collection('Case').get().then((querySnapshot) => {
-          querySnapshot.forEach((caseDoc) => {
-            // console.log("name->", caseDoc.data().patientInfo.patientName);
-            // console.log("avatar->", caseDoc.data().patientInfo.avatar);
-            // console.log("refer->", caseDoc.data().patientInfo.patientReference);
-            // console.log("caseStatus->", caseDoc.data().caseStatus);
-            // console.log("caseCreateTime->", caseDoc.data().caseCreateTime);
-            // console.log("caseID->", caseDoc.data().caseID);
-            // console.log('warning->', caseDoc.data().caseWarning);
-            // console.log('docid->', doc.id);
-            caseLists.push({
-              patientName: caseDoc.data().patientInfo.patientName,
-              avatar: caseDoc.data().patientInfo.avatar,
-              patientReference: caseDoc.data().patientInfo.patientReference,
-              caseStatus: caseDoc.data().caseStatus,
-              caseCreateTime: caseDoc.data().caseCreateTime,
-              caseID: caseDoc.data().caseID,
-              caseWarning: caseDoc.data().caseWarning,
-              docId: doc.id
-            });
-          });
-          setCases(cases => [...cases, caseLists]);
-          console.log(caseLists);
-        });
-      });
-    });
-  }, []);
 
   const renderEvents = (events) => {
     let { eventHeading, eventContent } = { ...events };
@@ -176,43 +191,46 @@ const DashboardAgent = (props) => {
   };
 
   const renderSort = (item, index) => {
-
-    
     const sortting = () => {
       switch (item.title) {
         case 'Case':
           const sortArray = [...cases].sort((a, b) => {
-            if (a.patientName < b.patientName) return -1;
-            if (a.patientName > b.patientName) return 1;
+            if (a.patientName < b.patientName) return (sortDirection.patientName ? -1 : 1);
+            if (a.patientName > b.patientName) return (sortDirection.patientName ? 1 : -1);
             return 0;
           });
           setCases(sortArray);
+          let temSort1 = { ...sortDirection };
+          setSortDirection({...temSort1, patientName: !temSort1.patientName})
           break;
         case 'Date':
           const sortArray1 = [...cases].sort((a, b) => {
-            if (a.caseCreateTime < b.caseCreateTime) return -1;
-            if (a.caseCreateTime > b.caseCreateTime) return 1;
+            if (a.caseCreateTime < b.caseCreateTime) return (sortDirection.caseCreateTime ? -1 : 1);
+            if (a.caseCreateTime > b.caseCreateTime) return (sortDirection.caseCreateTime ? 1 : -1);
             return 0;
           });
           setCases(sortArray1);
+          let temSort2 = { ...sortDirection };
+          setSortDirection({...temSort2, caseCreateTime: !temSort2.caseCreateTime})
           break;
         case 'Current Status':
           const sortArray2 = [...cases].sort((a, b) => {
-            if (a.caseStatus < b.caseStatus) return -1;
-            if (a.caseStatus > b.caseStatus) return 1;
+            if (a.caseStatus < b.caseStatus) return (sortDirection.caseStatus ? -1 : 1);
+            if (a.caseStatus > b.caseStatus) return (sortDirection.caseStatus ? 1 : -1);
             return 0;
           });
           setCases(sortArray2);
+          let temSort3 = { ...sortDirection };
+          setSortDirection({...temSort3, caseStatus: !temSort3.caseStatus})
           break;
       }
-      console.log(cases);
     }
+
     return (
       <TouchableOpacity
         style={{ zIndex: 3, marginHorizontal: theme.SIZES.BASE }}
         key={`product-${item.title}`}
         onPress={() => {
-          console.log("sortting");
           sortting();
         }}
       >
@@ -239,9 +257,11 @@ const DashboardAgent = (props) => {
         <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
 
           {cases.length === 0 ? <></> :
-            cases.map((val, index) => (
-              <ListItem key={index} category={val[index]} product={products[0]} horizontal role="agentDashboard" />
-            ))
+            cases.map((val, index) =>
+            (
+              <ListItem key={index} category={val} product={products[0]} horizontal role="agentDashboard" />
+            )
+            )
           }
 
         </ScrollView>
@@ -294,15 +314,15 @@ const DashboardAgent = (props) => {
           >
             {renderEvents({
               eventHeading: IMLocalized("Total active case"),
-              eventContent: 3000,
+              eventContent: activeCases,
             })}
             {renderEvents({
               eventHeading: IMLocalized("This year"),
-              eventContent: 700,
+              eventContent: thisYear,
             })}
             {renderEvents({
               eventHeading: IMLocalized("Case resolved this year"),
-              eventContent: 605,
+              eventContent: resolvedYear,
             })}
           </Block>
         </LinearGradient>

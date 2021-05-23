@@ -13,7 +13,7 @@ import Accordion from "react-native-collapsible/Accordion";
 import { IMLocalized } from "../src/localization/IMLocalization";
 import SvgUri from "expo-svg-uri";
 import { useSelector } from "react-redux";
-import firebase from 'firebase';
+import firebase from "firebase";
 
 const { width, height } = Dimensions.get("screen");
 
@@ -23,42 +23,44 @@ const PrimaryCareDoctorView = (props) => {
   const { navigation } = props;
   const [activeSections, setActiveSections] = useState([0]);
   const [doctors, setDoctors] = useState([]);
-  let doctorsList = [];
+  let doctorId;
 
   useEffect(() => {
-    firestore.collection('PCDoctors').get().then(async(querySnapshot) => {
-      await querySnapshot.docs.map(async(doc) => {
-        console.log("=============",doc.data())
-        await firestore.collection('PCDoctors').doc(doc.id).collection('PCDoctor').get().then((querySnapshot) => {
-          const doctorId = doc.id;
-          querySnapshot.forEach((doctorDoc) => {
-            const { address, city_state, email, name, phone, description } = doctorDoc.data();
-            
-            doctorsList.push({
-              name,
-              phone,
-              address,
-              city_state,
-              description,     
-              doctorId,             
+    firestore
+      .collection("PCDoctors")
+      .get()
+      .then((querySnapshot) => {
+        const doctorArrayPromise = querySnapshot.docs.map((doc) => {
+          return firestore
+            .collection("PCDoctors")
+            .doc(doc.id)
+            .collection("PCDoctor")
+            .get()
+            .then((querySnapshot) => {
+              doctorId = doc.id;
+              var doctorData = {};
+              querySnapshot.forEach((doctorDoc) => {
+                const { address, city_state, email, name, phone, description } =
+                  doctorDoc.data();
+                doctorData = { ...doctorDoc.data(), doctorId };
+              });
+              return doctorData;
             });
-            
-          })
-          console.log('---doctorlist---', doctorsList);
-          setDoctors(doctorsList);
-          
+        });
+        Promise.all(doctorArrayPromise).then((usersArray) => {
+          setDoctors(usersArray);
         });
       });
-      
-    });
   }, []);
 
   const navbarIcons = () => {
-    if(userRole == "agent"){
+    if (userRole == "agent") {
       return (
         <Block row>
           <TouchableOpacity
-            onPress={() => navigation.navigate("CreateDoctorAccount", { doctorId: null })}
+            onPress={() =>
+              navigation.navigate("CreateDoctorAccount", { doctorId: null })
+            }
             style={{ paddingLeft: width * 0.6, padding: 2 }}
           >
             <Text color={"white"}>
@@ -96,10 +98,10 @@ const PrimaryCareDoctorView = (props) => {
             </Text>
           </TouchableOpacity> */}
         </Block>
-      )
+      );
     }
-  }
-  
+  };
+
   const navbar = () => {
     return (
       <Block>
@@ -123,7 +125,7 @@ const PrimaryCareDoctorView = (props) => {
             {IMLocalized("Doctors")}
           </Text>
           {navbarIcons()}
-          </Block>
+        </Block>
         <Block style={{ borderTopWidth: 1, borderColor: "white" }}></Block>
       </Block>
     );
@@ -136,8 +138,7 @@ const PrimaryCareDoctorView = (props) => {
           <Block style={[styles.picBox]}>
             <Image
               source={{
-                uri:
-                  "https://firebasestorage.googleapis.com/v0/b/amgwf-70a28.appspot.com/o/avatar%2Fvlcsnap-00002%20(2).jpg?alt=media&token=328edbad-458b-4a6a-a4ac-963e38928619",
+                uri: "https://firebasestorage.googleapis.com/v0/b/amgwf-70a28.appspot.com/o/avatar%2Fvlcsnap-00002%20(2).jpg?alt=media&token=328edbad-458b-4a6a-a4ac-963e38928619",
               }}
               style={[
                 styles.picBox,
@@ -151,7 +152,7 @@ const PrimaryCareDoctorView = (props) => {
           <Block flex style={styles.ml_3}>
             <Text size={22}>{section.name}</Text>
             <Text size={14} muted>
-            {IMLocalized("Phone")}: {section.phone}{" "}
+              {IMLocalized("Phone")}: {section.phone}{" "}
             </Text>
           </Block>
           <Block center>
@@ -167,7 +168,9 @@ const PrimaryCareDoctorView = (props) => {
         </Block>
         <Block style={{ paddingTop: 10 }}>
           <Text size={16}>
-          {IMLocalized("address")}: {section.address}{", "}{IMLocalized("City/State")}: {section.city_state}
+            {IMLocalized("address")}: {section.address}
+            {", "}
+            {IMLocalized("City/State")}: {section.city_state}
           </Text>
         </Block>
       </Block>
@@ -175,14 +178,14 @@ const PrimaryCareDoctorView = (props) => {
   };
 
   const _renderContent = (section) => {
-    if(userRole == 'agent')
-    {
+    if (userRole == "agent") {
       return (
         <Block flex style={[styles.contentContainer]}>
           <Block flex style={{ flexDirection: "column" }}>
             <Block flex>
               <Text size={16}>
-                <Text bold>{IMLocalized("description")}:</Text>{section.description}
+                <Text bold>{IMLocalized("description")}:</Text>
+                {section.description}
               </Text>
             </Block>
           </Block>
@@ -190,7 +193,11 @@ const PrimaryCareDoctorView = (props) => {
             shadowless
             color={"#00CE30"}
             style={[styles.button]}
-            onPress={() => navigation.navigate("AgentDoctorDetail", { doctorId: section.doctorId })}
+            onPress={() =>
+              navigation.navigate("AgentDoctorDetail", {
+                doctorId: section.doctorId,
+              })
+            }
           >
             <Text size={15} color={"white"}>
               {IMLocalized("Detail")}
@@ -198,9 +205,7 @@ const PrimaryCareDoctorView = (props) => {
           </Button>
         </Block>
       );
-    }
-    else
-    {
+    } else {
       return (
         <Block flex style={[styles.contentContainer]}>
           <Block flex style={{ flexDirection: "column" }}>
@@ -236,7 +241,7 @@ const PrimaryCareDoctorView = (props) => {
               renderHeader={_renderHeader}
               renderContent={_renderContent}
               onChange={onChangeHandle}
-              style={{backgroundColor: 'white'}}
+              style={{ backgroundColor: "white" }}
             />
           )}
         </ScrollView>

@@ -63,10 +63,8 @@ const Components = (props) => {
   const storage = firebase.storage();
 
   useEffect(() => {
-    console.log(category);
     // firestore.collection('Cases').doc(category.docId).collection('Case').doc(category.caseId).data();
     return () => {
-      
     }
   }, []);
 
@@ -192,16 +190,16 @@ const Components = (props) => {
             source={require("../assets/images/patient1.png")}
             style={{ width: 60, height: 60 }}
           /> */}
-          <Image source={{ uri: category.avatar }} style={styles.avatar} />
+          <Image source={{ uri: category.patientInfo.avatar }} style={styles.avatar} />
           <Block column style={{ paddingLeft: 10, width: width * 0.55 }}>
             <Text size={16}>
-              {category.patientName}
+              {category.patientInfo.patientName}
             </Text>
             <Text
               color={"#909CA1"}
               style={{ paddingTop: theme.SIZES.BASE * 0.5 }}
             >
-             {category.caseCreateTime.toDate().toDateString()}
+              {category.caseCreateTime.toDate().toDateString()}
             </Text>
           </Block>
         </Block>
@@ -223,13 +221,13 @@ const Components = (props) => {
 
           <Block column style={{ paddingLeft: 10, width: width * 0.55 }}>
             <Text size={16}>
-              Edie Sparks
+              {category.pcDoctorInfo.name}
             </Text>
             <Text
               color={"#909CA1"}
               style={{ paddingTop: theme.SIZES.BASE * 0.5 }}
             >
-              1993/04/29
+              {category.pcDoctorInfo.phone}
             </Text>
           </Block>
         </Block>
@@ -237,8 +235,8 @@ const Components = (props) => {
           <Text bold size={18} style={{ paddingLeft: width * 0.05 }}>
             Status
           </Text>
-          <Text size={16} style={styles.startTimeRight}>
-            Case start time：2020.09.23
+          <Text size={14} style={styles.startTimeRight}>
+            Case start time：{category.caseCreateTime.toDate().toDateString()}
           </Text>
         </Block>
         <Block center>
@@ -305,7 +303,8 @@ const Components = (props) => {
             Date of Injury
           </Text>
           <Text size={16} style={styles.startTime}>
-            23.09.2020
+
+            {category.dateOfInjury.toDate().toDateString()}
           </Text>
         </Block>
         <Block row style={styles.interval}>
@@ -375,7 +374,7 @@ const Components = (props) => {
           <Text bold size={18} style={{ paddingLeft: width * 0.05 }}>
             Notes
           </Text>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={{
               right: theme.SIZES.BASE * 1,
               top: theme.SIZES.BASE * 0.3,
@@ -391,22 +390,18 @@ const Components = (props) => {
                 source={require("../assets/icons/add.svg")}
               />
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </Block>
+
         {renderNotes({
-          author: "DR.Adila Tahir",
-          date: "21/02/2021",
-          content: "Please don't say that...",
+          author: category.notes[0].authorName,
+          date: category.notes[0].createDate.toDate().toDateString(),
+          content: category.notes[0].note,
         })}
         {renderNotes({
-          author: "DR.Adila Tahir",
-          date: "21/02/2021",
-          content: "Please don't say that...",
-        })}
-        {renderNotes({
-          author: "DR.Adila Tahir",
-          date: "21/02/2021",
-          content: "Please don't say that...",
+          author: category.notes[1].authorName,
+          date: category.notes[1].createDate.toDate().toDateString(),
+          content: category.notes[1].note,
         })}
         <Block style={{ marginBottom: 50 }}></Block>
       </ScrollView>
@@ -573,7 +568,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 24,
     width: width,
     height: height * 0.1,
-    paddingTop: theme.SIZES.BASE ,
+    paddingTop: theme.SIZES.BASE,
     paddingLeft: theme.SIZES.BASE,
   },
   textCenter: {

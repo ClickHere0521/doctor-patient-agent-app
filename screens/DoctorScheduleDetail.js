@@ -57,7 +57,7 @@ const DoctorScheduleDetail = (props) => {
   const tempSchedule = [];
   const childDayList = [];
   let tempDoctor = {};
-
+  console.log('fdsfdsfds', doctorId);
   useEffect(() => {
     firestore.collection('PCDoctors').doc(doctorId).collection('PCDoctor').get().then((querySnapShot) => {
       querySnapShot.forEach((doctorDoc) => {
@@ -71,6 +71,9 @@ const DoctorScheduleDetail = (props) => {
               patientName,
               time: time.toUTCString(),
               caseID,
+              year: time.getFullYear(),
+              month: time.getMonth(),
+              day: time.getDate(),
             });
           })
         })
@@ -289,7 +292,7 @@ const DoctorScheduleDetail = (props) => {
         <Block row style={styles.Container}>
           <Text style={styles.schedules}>Schedules</Text>
           <TouchableOpacity
-            onPress={() => navigation.navigate("Calendar", {childDay})}
+            onPress={() => navigation.navigate("Calendar", {childDay, schedule})}
           >
             <Text style={styles.calendar}>Calendar</Text>
           </TouchableOpacity>
@@ -481,8 +484,8 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 24,
     borderBottomLeftRadius: 24,
     width: width,
-    height: height * 0.16,
-    paddingTop: theme.SIZES.BASE * 2,
+    height: height * 0.1,
+    paddingTop: theme.SIZES.BASE,
     paddingLeft: theme.SIZES.BASE,
   },
 });

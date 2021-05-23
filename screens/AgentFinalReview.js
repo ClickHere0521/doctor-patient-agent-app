@@ -81,7 +81,7 @@ const AgentReview = (props) => {
           <Text
             color="black"
             style={{ paddingLeft: theme.SIZES.BASE }}
-            size={22}
+            size={20}
             fontWeight="semiBold"
           >
             {IMLocalized("Case Final Review")}
@@ -171,8 +171,8 @@ const styles = StyleSheet.create({
   navbar: {
     backgroundColor: "white",
     width: width,
-    height: height * 0.16,
-    paddingTop: theme.SIZES.BASE * 2,
+    height: height * 0.1,
+    paddingTop: theme.SIZES.BASE,
     paddingLeft: theme.SIZES.BASE,
     borderBottomWidth: 1,
     borderColor: "rgba(112, 112, 112, 0.1)",

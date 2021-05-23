@@ -30,6 +30,8 @@
     "expo": "^40.0.0",
     "expo-app-loading": "^1.0.1",
     "expo-asset": "~8.2.1",
+    "expo-camera": "~9.1.0",
+    "expo-file-system": "^11.0.2",
     "expo-firebase-core": "~1.3.0",
     "expo-font": "^8.4.0",
     "expo-fontawesome": "^0.1.2",

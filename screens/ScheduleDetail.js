@@ -17,7 +17,7 @@ const { width, height } = Dimensions.get("screen");
 
 const ScheduleDetail = (props) => {
   const { navigation } = props;
-  const { name, doctorId, doctorDocId } = props.route.params.section;
+  const { name, doctorId } = props.route.params.section;
   const [isOpenCalendar, setIsOpenCalendar] = useState(false);
   const [schedules, setSchedules] = useState([]);
   const [childDays, setChildDays] = useState([]);
@@ -25,22 +25,25 @@ const ScheduleDetail = (props) => {
   const firestore = firebase.firestore();
   const scheduleList = [];
   const childDayList = [];
-
   useEffect(() => {
-    firestore.collection('PCDoctors').doc(doctorId).collection('PCDoctor').doc(doctorDocId).collection('ScheduleInfo').get().then((querySnapshot) => {
-      querySnapshot.forEach((res) => {
-        const { caseID, caseReference, scheduleTime, patientName, patientReference } = res.data();
-        const time = new Date(scheduleTime.seconds * 1000 + scheduleTime.nanoseconds/1000000);
-        childDayList.push(`${time.getFullYear()}-${time.getMonth()<10 ? 0 : null}${time.getMonth()+1}-${time.getDate()}`);
-        scheduleList.push({
-          patientName,
-          time: time.toUTCString(),
-          caseID,
-        });
+    firestore.collection('PCDoctors').doc(doctorId).collection('PCDoctor').get().then((querySnapshot) => {
+      querySnapshot.forEach((doctorDoc) => {
+        firestore.collection('PCDoctors').doc(doctorId).collection('PCDoctor').doc(doctorDoc.id).collection('ScheduleInfo').get().then((querySnapshot) => {
+          querySnapshot.forEach((res) => {
+            const { caseID, caseReference, scheduleTime, patientName, patientReference } = res.data();
+            const time = new Date(scheduleTime.seconds * 1000 + scheduleTime.nanoseconds/1000000);
+            childDayList.push(`${time.getFullYear()}-${time.getMonth()<10 ? 0 : null}${time.getMonth()+1}-${time.getDate()}`);
+            scheduleList.push({
+              patientName,
+              time: time.toUTCString(),
+              caseID,
+            });
+          })
+          setChildDays(childDayList);
+          setSchedules(scheduleList);
+        })
       })
-      setChildDays(childDayList);
-      setSchedules(scheduleList);
-    })
+    })    
   }, []);
 
   const renderDetils = (details) => {
@@ -50,7 +53,7 @@ const ScheduleDetail = (props) => {
     return (
       <Block style={styles.schedule} key={index}>
         <TouchableOpacity
-          onPress={() => navigation.navigate("AgentCaseDetail", {caseID})}
+          // onPress={() => navigation.navigate("AgentCaseDetail", {caseID})}
         >
           <Block row>
             <Image

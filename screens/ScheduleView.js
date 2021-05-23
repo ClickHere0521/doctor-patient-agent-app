@@ -25,6 +25,7 @@ const ScheduleView = (props) => {
   const [schedule, setSchedule] = useState([]);
   const scheduleList = [];
   let time;
+  let doctorId;
 
   const [weekState, setWeekState] = useState([
     {
@@ -58,32 +59,31 @@ const ScheduleView = (props) => {
   ]);
 
   useEffect(() => {
-    firestore.collection('PCDoctors').get().then((querySnapshot) => {
-      querySnapshot.forEach((doc) => {
-        firestore.collection('PCDoctors').doc(doc.id).collection('PCDoctor').get().then((querySnapshot) => {
-          const doctorId = doc.id;
-          querySnapshot.forEach((doctorDoc) => {
-            const { address, city_state, email, name, phone, description } = doctorDoc.data();
-            firestore.collection('PCDoctors').doc(doc.id).collection('PCDoctor').doc(doctorDoc.id).collection('ScheduleInfo').get().then((querySnapshot) => {
-              querySnapshot.forEach((res) => {
-                const { caseID, caseReference, scheduleTime, patientName, patientReference } = res.data();
-                time = new Date(scheduleTime.seconds * 1000 + scheduleTime.nanoseconds/1000000);
-              })
-            })
-            scheduleList.push({
-              name,
-              phone,
-              address,
-              city_state,
-              description,     
-              doctorId,     
-              doctorDocId: doctorDoc.id,
+    firestore
+      .collection("PCDoctors")
+      .get()
+      .then((querySnapshot) => {
+        const doctorArrayPromise = querySnapshot.docs.map((doc) => {
+          return firestore
+            .collection("PCDoctors")
+            .doc(doc.id)
+            .collection("PCDoctor")
+            .get()
+            .then((querySnapshot) => {
+              doctorId = doc.id;
+              var doctorData = {};
+              querySnapshot.forEach((doctorDoc) => {
+                const { address, city_state, email, name, phone, description } =
+                  doctorDoc.data();
+                doctorData = { ...doctorDoc.data(), doctorId };
+              });
+              return doctorData;
             });
-          })
-          setSchedule(scheduleList);
+        });
+        Promise.all(doctorArrayPromise).then((usersArray) => {
+          setSchedule(usersArray);
         });
       });
-    });
   }, []);
 
   const weekBar = () => {

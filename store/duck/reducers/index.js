@@ -6,5 +6,6 @@ import patient from './patient';
 import attorney from './attorney';
 import insurance from './insurance';
 import note from './note';
+import doctors from './doctors'
 
-export { user, form, language, patient, attorney, insurance, note };
+export { user, form, language, patient, attorney, insurance, note, doctors };

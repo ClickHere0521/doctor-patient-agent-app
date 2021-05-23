@@ -76,7 +76,7 @@ const AgentDoctorDetail = (props) => {
         });
         setDoctor(tempDoc);
       });
-  }, []);
+  }, [doctorId]);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({

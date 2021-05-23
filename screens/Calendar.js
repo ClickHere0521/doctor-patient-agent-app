@@ -18,6 +18,7 @@ import { IMLocalized, init } from "../src/localization/IMLocalization";
 import DateTime from "./DateTime";
 import _, { stubString } from "lodash";
 import { setStatusBarNetworkActivityIndicatorVisible } from "expo-status-bar";
+import { CameraPermissionResponse } from "expo-image-picker";
 
 const { width, height } = Dimensions.get("screen");
 
@@ -30,7 +31,8 @@ const Calendar = (props) => {
   const onChangeDate = async (date) => {
     let tempMeetings = [];
     
-    await schedule.map((val) => {      
+    await schedule && schedule.map((val) => {   
+      console.log(val.year);
       if (val.year == date.substring(0,4) && (val.month+1) == date.substring(5,7) && val.day == date.substring(8,10))
       {
         tempMeetings.push(val);

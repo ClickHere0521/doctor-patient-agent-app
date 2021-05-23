@@ -14,6 +14,7 @@ import { useFonts } from "expo-font";
 import AppLoading from "expo-app-loading";
 import { useDispatch, useSelector } from "react-redux";
 import { roleSelector } from "../store/duck/action";
+import AsyncStorage from '@react-native-community/async-storage';
 import SvgUri from "expo-svg-uri";
 import { defer } from "lodash";
 
@@ -36,9 +37,34 @@ const Onboarding = (props) => {
     init(setLang);
   }, [setLang]);
 
-  const handleRole = (role) => {
+  const handleRole = async (role) => {
     dispatch(roleSelector(role));
-    navigation.navigate("SignIn");
+    var tmpReminder, tmpBio;
+    await AsyncStorage.getItem(
+      'reminder',
+      (err, result) => {
+        tmpReminder = JSON.parse(result);
+      }
+    );
+    await AsyncStorage.getItem(
+      'bio',
+      (err, result) => {
+        tmpBio = JSON.parse(result);
+      }
+    );
+    if (tmpReminder && tmpReminder.reminder) {
+      if (!tmpBio) 
+        navigation.replace("App");
+      if (tmpBio && tmpBio.bio == 'none') 
+        navigation.replace("App");
+      if (tmpBio && tmpBio.bio == 'touch')
+        navigation.navigate("Biometrics", {bioTypeProp: 'touch'});
+      if (tmpBio && tmpBio.bio == 'face')
+        navigation.navigate("Biometrics", {bioTypeProp: 'face'});
+    }
+    else {
+      navigation.navigate("SignIn");
+    }
   };
 
   const handlePress = useCallback(async () => {

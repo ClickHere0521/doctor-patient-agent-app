@@ -75,9 +75,9 @@ const ListItem = (props) => {
             middle
             style={{
               borderRadius: 50,
-              backgroundColor: "#06D81E",
-              width: theme.SIZES.BASE * 1.3,
-              height: theme.SIZES.BASE * 1.3,
+              backgroundColor: "#FFC875",
+              width: theme.SIZES.BASE,
+              height: theme.SIZES.BASE,
               position: "absolute",
               right: -5,
               top: -5,
@@ -87,8 +87,8 @@ const ListItem = (props) => {
               name="check"
               family="font-awesome"
               color={theme.COLORS.WHITE}
-              size={theme.SIZES.BASE}
-              style={{ paddingLeft: 3, paddingTop: 0 }}
+              size={theme.SIZES.BASE * 0.8}
+              style={{ justifyContent: 'center', paddingLeft: 1.5 }}
             >
               {" "}
             </Icon>
@@ -100,7 +100,6 @@ const ListItem = (props) => {
   };
 
   const renderButtons = (role) => {
-    console.log(role);
     switch (role) {
       case "agentPatient":
         return (
@@ -266,13 +265,13 @@ const ListItem = (props) => {
         onPress={() => ("Product", { product: product })}
       >
         <Block style={[styles.imageContainer, styles.shadow]}>
-          <Image source={{ uri: category.avatar }} style={imageStyles} />
+          <Image source={{ uri: (category && category.patientInfo.avatar) || 'https://firebasestorage.googleapis.com/v0/b/amgwf-70a28.appspot.com/o/avatar%2Fvlcsnap-00002%20(2).jpg?alt=media&token=328edbad-458b-4a6a-a4ac-963e38928619' }} style={imageStyles} />
         </Block>
       </TouchableWithoutFeedback>
       <TouchableWithoutFeedback onPress={() => console.log("Patient Pressed")}>
         <Block flex={2}>
           <Text size={12} style={styles.userName}>
-            {category.patientName}
+            {category && category.patientInfo.patientName}
           </Text>
           <Text
             size={11}
@@ -280,7 +279,7 @@ const ListItem = (props) => {
             color={priceColor}
             style={styles.content}
           >
-            {role != "schedulePatientList" && category.caseStatus}
+            {role != "schedulePatientList" && category && category.caseStatus}
           </Text>
         </Block>
       </TouchableWithoutFeedback>
@@ -288,6 +287,8 @@ const ListItem = (props) => {
         <Block flex={1}>
           <Text size={11} style={styles.times} color={"#06D81E"}>
             {category.caseCreateTime.toDate().toDateString()}
+            {/* { console.log("createData:", category.caseCreateTime)} */}
+            {/* {category.caseCreateTime} */}
           </Text>
           {renderButtons(role)}
         </Block>
@@ -362,9 +363,8 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
   createBtn: {
-    marginBottom: theme.SIZES.BASE,
     width: theme.SIZES.BASE * 3.5,
-    height: theme.SIZES.BASE * 1.5,
+    height: theme.SIZES.BASE * 1.2,
     position: "absolute",
     right: theme.SIZES.BASE * 4,
     borderRadius: 40,
