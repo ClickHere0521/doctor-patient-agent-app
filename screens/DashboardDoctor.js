@@ -4,8 +4,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  Image,
-  ImageBackground,
+  BackHandler,
+  Alert,
   Dimensions,
 } from "react-native";
 import { Button, Block, Text, Input, theme } from "galio-framework";
@@ -20,6 +20,9 @@ import {
   Tabs,
   HorizontalListItem,
 } from "../components";
+import {
+  useFocusEffect
+ } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get("screen");
 
@@ -28,6 +31,44 @@ const cardWidth = width - theme.SIZES.BASE * 2;
 
 const Components = (props) => {
   
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+       Alert.alert(
+        "Are you sure?",
+        "Do you want to really log out?",
+        [
+          {
+            text: "OK",
+            onPress: () => {navigation.navigate("UserSelectStack")}
+          },
+          {
+            text: "Cancel",
+            onPress: () => {}
+          }
+        ]
+       );
+        // Return true to stop default back navigaton
+        // Return false to keep default back navigaton
+        return true;
+      };
+
+      // Add Event Listener for hardwareBackPress
+      BackHandler.addEventListener(
+        'hardwareBackPress',
+        onBackPress
+      );
+
+      return () => {
+        // Once the Screen gets blur Remove Event Listener
+        BackHandler.removeEventListener(
+          'hardwareBackPress',
+          onBackPress
+        );
+      };
+    }, []),
+  );
+
   const { navigation } = props;
   const cardBox = () => {
     return (

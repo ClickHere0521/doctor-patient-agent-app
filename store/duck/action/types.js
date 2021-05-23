@@ -9,6 +9,9 @@ const types = {
 	DOCTOR_ROLE			:  	  'DOCTOR_ROLE',
 	SET_LAN			    :  	  'SET_LAN',
 	SET_PATIENT_INFO	:     'SET_PATINET_INFO',
+	SET_ATTORNEY_INFO	:     'SET_ATTORNEY_INFO',
+	SET_INSURANCE_INFO	:     'SET_INSURANCE_INFO',
+	SET_NOTE_INFO		:     'SET_NOTE_INFO',
 };
 
 export default types;

@@ -19,13 +19,13 @@ import Input from "../components/InputType1";
 import * as firebase from "firebase";
 import "firebase/auth";
 import firebaseConfig from "../FirebaseConfig";
+import AsyncStorage from '@react-native-community/async-storage';
 
 if (!firebase.apps.length) {
   firebase.initializeApp(firebaseConfig);
 }
 
 const auth = firebase.auth();
-
 const { width, height } = Dimensions.get("window");
 
 const SignIn = (props) => {
@@ -38,6 +38,17 @@ const SignIn = (props) => {
   const [requested, setRequested] = useState(false);
   const validemail = isValid("email", email);
   const validPassword = isValid("password", password);
+
+  useEffect(() => {
+    AsyncStorage.getItem(
+      'reminder',
+      (err, result) => {
+        var tmp = JSON.parse(result);
+        if (tmp && tmp.reminder)
+          navigation.replace("Biometrics");
+      }
+    )
+  });
 
   const SignInHeading = (role) => {
     switch (role) {
@@ -117,7 +128,13 @@ const SignIn = (props) => {
     auth
       .signInWithEmailAndPassword(email, password)
       .then((res) => {
-        console.log(res);
+        if (isSelected) {
+          AsyncStorage.setItem(
+            'reminder',
+            JSON.stringify({ reminder: true }),
+            () => {}
+          )
+        }
         navigation.replace("Biometrics");
       })
       .catch((error) => {
@@ -197,7 +214,9 @@ const SignIn = (props) => {
             <CheckBox
               checked={isSelected}
               containerStyle={{ backgroundColor: "rgba(0,0,0,0)", width: 10 }}
-              onPress={() => setSelected(!isSelected)}
+              onPress={() => {
+                setSelected(!isSelected);
+              }}
             />
             <Text style={styles.label}>{IMLocalized("Remember Me")}</Text>
             <TouchableOpacity

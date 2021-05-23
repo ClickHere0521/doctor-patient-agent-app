@@ -10,7 +10,6 @@ import {
 import { Button, Block, Text, theme, Icon } from "galio-framework";
 
 import { materialTheme } from "../constants";
-import SwitchButton from "switch-button-react-native";
 import { IMLocalized } from "../src/localization/IMLocalization";
 import * as ImagePicker from "expo-image-picker";
 import { isValid } from '../src/utils/helpers';
@@ -25,28 +24,21 @@ const thumbMeasure = (width - 48 - 32) / 3;
 
 const AgentInfo = (props) => {
   const { navigation } = props;
-  const [activeSwitch, setActiveSwitch] = useState(1);
-  const [imageUri, setImageUri] = useState(null);
+  const [imageUri, setImageUri] = useState("https://firebasestorage.googleapis.com/v0/b/amgwf-70a28.appspot.com/o/avatar%2Fvlcsnap-00002%20(2).jpg?alt=media&token=328edbad-458b-4a6a-a4ac-963e38928619");
   const firestore = firebase.firestore();
   const auth = firebase.auth();
   const storage = firebase.storage();
-
-  const handleAvatar = (val) => {
-    setActiveSwitch(val);
-    if (val == 2) pickImage();
-    else setImageUri(null);
-  };
 
   const [editFlg, setEditFlg] = useState(false);
   const [fullname, setFullname] = useState("");
   const [email, setEmail] = useState("");
   const [tel, setTel] = useState("");
-  const [address, setAddress] = useState("");
+  const [role, setRole] = useState("");
   const [requested, setRequested] = useState(false);
   const validName = isValid('fullname', fullname);
   const validEmail = isValid('email', email);
   const validTel = isValid('tel', tel);
-  const validAddress = isValid('address', address);
+  const validAddress = isValid('address', role);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -77,7 +69,7 @@ const AgentInfo = (props) => {
           <Text
             color="black"
             style={{ paddingLeft: theme.SIZES.BASE }}
-            size={22}
+            size={16}
             fontWeight="semiBold"
           >
             {IMLocalized("Agent Info")}
@@ -89,7 +81,7 @@ const AgentInfo = (props) => {
   };
 
   const handleSave = async () => {
-    const agentUid = auth.currentUser.uid;
+    const agentUid = '6hQ6yTAGNXNihOuFfQku05BK1SJ2';
 
     if (editFlg == true) {
       if (validName && validEmail && validTel && validAddress) {
@@ -104,8 +96,8 @@ const AgentInfo = (props) => {
           console.log(e);
         }
         let newRef = firestore.collection('Agents').doc(agentUid).collection('BusinessAgent').doc(businessAgentId);
-        newRef.set({
-          email, fullName: fullname, phone: tel, location: address, role: "agent"
+        newRef.update({
+          email, name: fullname, phone: tel, role: role,
         })
         .then( async () => {
           const pngRef = storage.ref(`logo/${agentUid}.png`);
@@ -138,7 +130,8 @@ const AgentInfo = (props) => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const agentUid = auth.currentUser.uid;
+      // const agentUid = auth.currentUser.uid;
+      const agentUid = '6hQ6yTAGNXNihOuFfQku05BK1SJ2';
       try {
         let businessAgentId;
         try {
@@ -152,10 +145,10 @@ const AgentInfo = (props) => {
         }
         firestore.collection('Agents').doc(agentUid).collection('BusinessAgent').doc(businessAgentId).get()
           .then((doc) => {
-            setFullname(doc.data().fullName);
+            setFullname(doc.data().Name); console.log(doc.data().name);
             setEmail(doc.data().email);
             setTel(doc.data().phone);
-            setAddress(doc.data().location);
+            setRole(doc.data().role);
             // console.log(`agent data ${doc.data()}`);
           })
           .catch((error) => {
@@ -172,36 +165,31 @@ const AgentInfo = (props) => {
     <Block center flex style={styles.profile}>
       {navbar()}
       <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
-        <Block center row style={{ marginTop: theme.SIZES.BASE * 3 }}>
-          <Block middle style={{ marginRight: 14 }}>
-            {imageUri ? (
-              <Image
-                source={{ uri: imageUri }}
-                style={{ width: 50, height: 50 }}
-              />
-            ) : (
-              <Image
-                source={require("../assets/images/userDefault.png")}
-                style={{ width: 50, height: 50 }}
-              />
-            )}
+        <Block center row style={{ marginTop: theme.SIZES.BASE }}>
+          <Block middle>
+            <TouchableOpacity
+              onPress={() => pickImage()}
+            >
+              {imageUri ? (
+                <Image
+                  source={{ uri: imageUri }}
+                  style={{ width: 80, height: 80, borderRadius: 50, borderWidth: 3, borderColor: "white" }}
+                />
+              ) : (
+                <Image
+                  source={require("../assets/images/userDefault.png")}
+                  style={{ width: 80, height: 80, borderRadius: 50, borderWidth: 3, borderColor: "white" }}
+                />
+              )}
+            </TouchableOpacity>
+            <Icon
+              name="camera"
+              family="font-awesome"
+              color="#555"
+              size={20}
+              style={{position: 'absolute', bottom: 4, right: 4}}
+            />
           </Block>
-          <SwitchButton
-            onValueChange={handleAvatar}
-            text1="Remove"
-            text2="Upload"
-            switchWidth={120}
-            switchHeight={30}
-            switchdirection="rtl"
-            switchBorderRadius={100}
-            switchSpeedChange={500}
-            switchBorderColor="#3B3E51"
-            switchBackgroundColor="#fff"
-            btnBorderColor="#3B3E51"
-            btnBackgroundColor="#3B3E51"
-            fontColor="#3B3E51"
-            activeFontColor="#fff"
-          />
         </Block>
         <Block style={styles.userInfo}>
 
@@ -262,15 +250,15 @@ const AgentInfo = (props) => {
             />
           </Block>
           <Text style={{ paddingTop: 10, alignSelf: "flex-start" }}>
-            Location <Text color={"red"}>*</Text>
+            Role <Text color={"red"}>*</Text>
           </Text>
 
           <Input
             label="Address"
-            value={address}
-            onChangeText={setAddress}
+            value={role}
+            onChangeText={setRole}
             editable={editFlg}
-            placeholder={address}
+            placeholder={role}
             leftIcon=""
             rightIcon=""
             validate
@@ -442,7 +430,7 @@ const styles = StyleSheet.create({
   navbar: {
     backgroundColor: "white",
     width: width,
-    height: height * 0.16,
+    height: height * 0.1,
     paddingTop: theme.SIZES.BASE * 2,
     paddingLeft: theme.SIZES.BASE,
     borderBottomWidth: 1,

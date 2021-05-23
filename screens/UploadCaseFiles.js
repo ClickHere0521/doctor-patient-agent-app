@@ -2,29 +2,18 @@ import React, { useState } from "react";
 import {
   ScrollView,
   StyleSheet,
-  TouchableWithoutFeedback,
   Dimensions,
   TouchableHighlight,
   TouchableOpacity
 } from "react-native";
 import { Button, Block, Text, Input, theme } from "galio-framework";
 import { Icon } from "../components";
-
-import products from "../constants/images/home";
-import { ListItem } from "../components";
 import { LinearGradient } from "expo-linear-gradient";
-import SwitchButton from "switch-button-react-native";
 import { IMLocalized } from "../src/localization/IMLocalization";
 import { useSelector } from "react-redux";
 import { CheckBox } from "react-native-elements";
-
-import SvgUri from "expo-svg-uri";
 const { width, height } = Dimensions.get("screen");
-
 const cardWidth = theme.SIZES.BASE * 4;
-
-
-
 
 const UploadCaseFiles = (props) => {
   const [caseFiles, setCaseFiles] = useState([
@@ -100,11 +89,9 @@ const UploadCaseFiles = (props) => {
     setCaseFiles(tempCaseFiles);
   };
 
-  
   const userRole = useSelector(state => state.user.role);
   const { navigation } = props;
 
-  
   const sortCategories = [
     {
       title: IMLocalized("Label"),
@@ -165,7 +152,6 @@ const UploadCaseFiles = (props) => {
       <TouchableHighlight
         style={{ zIndex: 3 }}
         key={`product-${item.title}`}
-        // onPress={}
       >
         <LinearGradient
           start={{ x: 0, y: 0 }}

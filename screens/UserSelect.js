@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Image,
   StyleSheet,
   Dimensions,
   View,
   TouchableOpacity,
+  Linking
 } from "react-native";
 import { Block, Button, Text, theme } from "galio-framework";
 import materialTheme from "../constants/Theme";
@@ -14,13 +15,14 @@ import AppLoading from "expo-app-loading";
 import { useDispatch, useSelector } from "react-redux";
 import { roleSelector } from "../store/duck/action";
 import SvgUri from "expo-svg-uri";
-
+import { defer } from "lodash";
 
 const { height, width } = Dimensions.get("screen");
 
 const Onboarding = (props) => {
   const { navigation } = props;
   const dispatch = useDispatch();
+  const supportedURL = "https://binance.com";
 
   let [fontsLoaded] = useFonts({
     "Inter-Black": require("../assets/fonts/LeagueSpartan-Bold.otf"),
@@ -39,12 +41,25 @@ const Onboarding = (props) => {
     navigation.navigate("SignIn");
   };
 
+  const handlePress = useCallback(async () => {
+    // Checking if the link is supported for links with custom URL scheme.
+    const supported = await Linking.canOpenURL(supportedURL);
+
+    if (supported) {
+      // Opening the link with some app, if the URL scheme is "http" the web link should be opened
+      // by some browser in the mobile
+      await Linking.openURL(supportedURL);
+    } else {
+      Alert.alert(`Don't know how to open this URL: ${supportedURL}`);
+    }
+  }, [supportedURL]);
+
   if (!fontsLoaded) {
     return <AppLoading />;
   } else {
     return (
       <Block flex style={styles.container}>
-        <Block middle style={{ height: height / 1.8 }}>
+        <Block middle style={{ height: height / 2}}>
           <Image
             source={require("../assets/images/doctor.png")}
             style={styles.doctorImage}
@@ -123,13 +138,15 @@ const Onboarding = (props) => {
             >
               {IMLocalized("doctor")}
             </Button>
-
-            <Text color="grey" size={10} style={{marginTop: theme.SIZES.BASE}}>
-              {IMLocalized("agreeTerm")}
-            </Text>
+            <TouchableOpacity onPress={() => {
+              handlePress();
+            }}>
+              <Text color="grey" size={10} style={{marginTop: theme.SIZES.BASE}}>
+                {IMLocalized("agreeTerm")}
+              </Text>
+            </TouchableOpacity>
           </Block>
         </Block>
-        <View style={styles.circle} />
       </Block>
     );
   }

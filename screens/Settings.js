@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Switch,
@@ -11,6 +11,8 @@ import {
 import { Block, Text, theme, Icon } from "galio-framework";
 import { IMLocalized } from "../src/localization/IMLocalization";
 import materialTheme from "../constants/Theme";
+import AsyncStorage from '@react-native-community/async-storage';
+
 const { width, height } = Dimensions.get("screen");
 
 const Settings = (props) => {
@@ -20,9 +22,12 @@ const Settings = (props) => {
     { title: IMLocalized("Font"), id: "Font", type: "button" },
   ];
 
-  const account = [
-    { title: IMLocalized("IOS : face ID"), id: "Face", type: "switch" },
-    { title: IMLocalized("Android : Touch ID"), id: "Touch", type: "switch" },
+  const accountAndroid = [
+    { title: IMLocalized("Android : Touch ID"), id: "android", type: "switch" },
+  ];
+
+  const accountIOS = [
+    { title: IMLocalized("IOS : face ID"), id: "ios", type: "switch" },
   ];
 
   const privacy = [
@@ -31,35 +36,110 @@ const Settings = (props) => {
     { title: IMLocalized("Contact Us"), id: "ContactUs", type: "button" },
   ];
 
-  const [itemID, setItemID] = useState({});
+  const [touch, setTouch] = useState(false);
+  const [face, setFace] = useState(false);
 
-  const toggleSwitch = (switchNumber) =>
-    setItemID({ [switchNumber]: !itemID[switchNumber] });
+  useEffect(() => {
+    AsyncStorage.getItem(
+      'bio',
+      (err, result) => {
+        var tmp = JSON.parse(result);
+        if (!tmp) {
+          setTouch(false);
+          setFace(false);
+        }
+        if (tmp && tmp.bio == 'none') 
+          {
+            setTouch(false);
+            setFace(false);
+          }
+        if (tmp && tmp.bio == 'touch')
+          {
+            setTouch(true);
+            setFace(false);
+          }  
+        if (tmp && tmp.bio == 'face')
+          {
+            setTouch(false);
+            setFace(true);
+          }
+      }
+    )
+  }, []);
+
+  
+
+  useEffect(() => {
+    if (touch)
+      AsyncStorage.setItem(
+        'bio',
+        JSON.stringify({ bio : 'touch' }),
+        () => {}
+      )
+    if (face)
+      AsyncStorage.setItem(
+        'bio',
+        JSON.stringify({ bio : 'face' }),
+        () => {}
+      )
+    if (!touch && !face)
+      AsyncStorage.setItem(
+        'bio',
+        JSON.stringify({ bio : 'none' }),
+        () => {}
+      )
+  }, [touch, face]);
 
   const renderItem = ({ item }) => {
     const { navigate } = props.navigation;
 
     switch (item.type) {
       case "switch":
-        return (
-          <Block row middle space="between" style={styles.rows}>
-            <Text size={14}>{item.title}</Text>
-            <Switch
-              onValueChange={() => toggleSwitch(item.id)}
-              ios_backgroundColor={materialTheme.COLORS.SWITCH_OFF}
-              thumbColor={
-                Platform.OS === "android"
-                  ? materialTheme.COLORS.SWITCH_OFF
-                  : null
-              }
-              trackColor={{
-                false: materialTheme.COLORS.SWITCH_OFF,
-                true: materialTheme.COLORS.SWITCH_ON,
-              }}
-              value={itemID[item.id]}
-            />
-          </Block>
-        );
+        {          
+          if (Platform.OS == 'android' && item.id == 'android') {
+            return (
+              <Block row middle space="between" style={styles.rows}>
+                <Text size={14}>{item.title}</Text>
+                <Switch
+                  onValueChange={() => setTouch(previousState => !previousState)}
+                  ios_backgroundColor={materialTheme.COLORS.SWITCH_OFF}
+                  thumbColor={
+                    Platform.OS === "android"
+                      ? materialTheme.COLORS.SWITCH_OFF
+                      : null
+                  }
+                  trackColor={{
+                    false: materialTheme.COLORS.SWITCH_OFF,
+                    true: materialTheme.COLORS.SWITCH_ON,
+                  }}
+                  value={touch}
+                />
+              </Block>
+            );
+          }
+          if (Platform.OS == 'ios' && item.id == 'ios') {
+            return (
+              <Block row middle space="between" style={styles.rows}>
+                <Text size={14}>{item.title}</Text>
+                <Switch
+                  onValueChange={() => setFace(previousState => !previousState)}
+                  ios_backgroundColor={materialTheme.COLORS.SWITCH_OFF}
+                  thumbColor={
+                    Platform.OS === "android"
+                      ? materialTheme.COLORS.SWITCH_OFF
+                      : null
+                  }
+                  trackColor={{
+                    false: materialTheme.COLORS.SWITCH_OFF,
+                    true: materialTheme.COLORS.SWITCH_ON,
+                  }}
+                  value={face}
+                />
+              </Block>
+            );
+          }
+          break;
+        }
       case "button":
         return (
           <Block style={styles.rows}>
@@ -139,7 +219,13 @@ const Settings = (props) => {
       </Block>
 
       <FlatList
-        data={account}
+        data={accountAndroid}
+        keyExtractor={(item, index) => item.id}
+        renderItem={renderItem}
+      />
+
+      <FlatList
+        data={accountIOS}
         keyExtractor={(item, index) => item.id}
         renderItem={renderItem}
       />
@@ -197,7 +283,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 24,
     borderBottomLeftRadius: 24,
     width: width,
-    height: height * 0.16,
+    height: height * 0.1,
     paddingTop: theme.SIZES.BASE * 2,
     paddingLeft: theme.SIZES.BASE,
   },

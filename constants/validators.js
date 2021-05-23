@@ -20,7 +20,7 @@ export default {
     text: 'Please enter your Insurance Adjuster as Placeholder',
   },
   tel: {
-    regex: /^\(?([0-9]{4})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
+    regex: /^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$/,
     text: 'Please enter your tel as Placeholder',
   },
   fax: {

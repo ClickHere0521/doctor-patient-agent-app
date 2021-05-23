@@ -3,21 +3,12 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   Image,
-  ImageBackground,
   Dimensions,
-  Touchable,
 } from "react-native";
 import { Button, Block, Text, Input, theme } from "galio-framework";
-import { materialTheme, products, Images, tabs } from "../constants/";
 import {
-  Select,
   Icon,
-  Header,
-  Product,
-  Switch,
-  Tabs,
   ListItem,
 } from "../components/";
 import { launchCamera, launchImageLibrary } from "react-native-image-picker";
@@ -25,11 +16,17 @@ import { SliderBox } from "react-native-image-slider-box";
 import SvgUri from "expo-svg-uri";
 import { CheckBox } from "react-native-elements";
 import { weekdays } from "moment";
+import * as firebase from "firebase";
+import 'firebase/firestore';
+import 'firebase/storage';
+import firebaseConfig from "../FirebaseConfig";
+
 
 const { width, height } = Dimensions.get("screen");
 
 const Components = (props) => {
   const { navigation } = props;
+  const { category } = props.route.params;
   const [imageSource, setImageSource] = useState(null);
   const [weekState, setWeekState] = useState([
     {
@@ -62,6 +59,17 @@ const Components = (props) => {
     },
   ]);
 
+  const firestore = firebase.firestore();
+  const storage = firebase.storage();
+
+  useEffect(() => {
+    console.log(category);
+    // firestore.collection('Cases').doc(category.docId).collection('Case').doc(category.caseId).data();
+    return () => {
+      
+    }
+  }, []);
+
   const options = {
     title: "Load Photo",
     customButtons: [
@@ -78,7 +86,7 @@ const Components = (props) => {
     const handleWeekbar = index => {
       weekState.map((value, indexTemp) => {
         weekState[indexTemp].status = (index == indexTemp) ? true : false;
-      })        
+      })
       setWeekState([...weekState]);
     }
     return (
@@ -94,7 +102,7 @@ const Components = (props) => {
       >
         {weekState.map((value, index) => {
           return (
-            <TouchableOpacity key={index} onPress={() => {handleWeekbar(index)}} style={value.status ? styles.dateActive : styles.dateInActive}>
+            <TouchableOpacity key={index} onPress={() => { handleWeekbar(index) }} style={value.status ? styles.dateActive : styles.dateInActive}>
               <Text size={16} color={value.status ? "white" : "black"}>
                 {value.date}
               </Text>
@@ -110,17 +118,17 @@ const Components = (props) => {
     return (
       <Block row center style={styles.patientHeading}>
 
-          <Block>
-            <Image
-              source={require("../assets/images/grayscale-photo-of-man2.png")}
-              style={{ width: 60, height: 60 }}
-            />
-            <Image
-              source={require("../assets/images/ok.png")}
-              style={{ position: "absolute", right: 0 }}
-            />
-          </Block>
-          <TouchableOpacity
+        <Block>
+          <Image
+            source={require("../assets/images/grayscale-photo-of-man2.png")}
+            style={{ width: 60, height: 60 }}
+          />
+          <Image
+            source={require("../assets/images/ok.png")}
+            style={{ position: "absolute", right: 0 }}
+          />
+        </Block>
+        <TouchableOpacity
           onPress={() => navigation.navigate("Note")}
         >
           <Block column style={{ paddingLeft: 10, width: width * 0.7 }}>
@@ -169,7 +177,6 @@ const Components = (props) => {
       </Block>
     );
   };
-
   return (
     <Block flex style={styles.agentCaseDetail}>
       {navbar()}
@@ -181,32 +188,21 @@ const Components = (props) => {
           Patient
         </Text>
         <Block row center style={styles.patientHeading}>
-          <Image
+          {/* <Image
             source={require("../assets/images/patient1.png")}
             style={{ width: 60, height: 60 }}
-          />
+          /> */}
+          <Image source={{ uri: category.avatar }} style={styles.avatar} />
           <Block column style={{ paddingLeft: 10, width: width * 0.55 }}>
-            <Text bold size={16}>
-              Edie Sparks Turie
+            <Text size={16}>
+              {category.patientName}
             </Text>
             <Text
               color={"#909CA1"}
               style={{ paddingTop: theme.SIZES.BASE * 0.5 }}
             >
-              1993/04/29
+             {category.caseCreateTime.toDate().toDateString()}
             </Text>
-          </Block>
-          <Block column>
-            <Text style={{ alignSelf: "flex-end" }} color={"#06D81E"}></Text>
-            <SvgUri
-              width="20"
-              height="20"
-              source={require("../assets/icons/editGreen.svg")}
-              style={{
-                right: -theme.SIZES.BASE * 2,
-                paddingTop: theme.SIZES.BASE,
-              }}
-            />
           </Block>
         </Block>
 
@@ -226,7 +222,7 @@ const Components = (props) => {
           </Block>
 
           <Block column style={{ paddingLeft: 10, width: width * 0.55 }}>
-            <Text bold size={16}>
+            <Text size={16}>
               Edie Sparks
             </Text>
             <Text
@@ -235,18 +231,6 @@ const Components = (props) => {
             >
               1993/04/29
             </Text>
-          </Block>
-          <Block column>
-            <Text style={{ alignSelf: "flex-end" }} color={"#06D81E"}></Text>
-            <SvgUri
-              width="20"
-              height="20"
-              source={require("../assets/icons/editGreen.svg")}
-              style={{
-                right: -theme.SIZES.BASE * 2,
-                paddingTop: theme.SIZES.BASE,
-              }}
-            />
           </Block>
         </Block>
         <Block style={styles.interval}>
@@ -269,7 +253,7 @@ const Components = (props) => {
                 </Block>
               </Block>
               <Block row>
-                <CheckBox checked={true} />
+                <CheckBox checked={false} />
                 <Block style={styles.textCenter}>
                   <Text size={16} style={styles.text}>
                     Waiting Schedule
@@ -277,7 +261,7 @@ const Components = (props) => {
                 </Block>
               </Block>
               <Block row>
-                <CheckBox checked={true} />
+                <CheckBox checked={false} />
                 <Block style={styles.textCenter}>
                   <Text size={16} style={styles.text}>
                     Schedules
@@ -287,7 +271,7 @@ const Components = (props) => {
             </Block>
             <Block>
               <Block row>
-                <CheckBox checked={true} />
+                <CheckBox checked={false} />
                 <Block style={styles.textCenter}>
                   <Text size={16} style={styles.text}>
                     Treatment
@@ -295,7 +279,7 @@ const Components = (props) => {
                 </Block>
               </Block>
               <Block row>
-                <CheckBox checked={true} />
+                <CheckBox checked={false} />
                 <TouchableOpacity
                   onPress={() => navigation.navigate("AgentReview")}
                   style={styles.textCenter}
@@ -306,7 +290,7 @@ const Components = (props) => {
                 </TouchableOpacity>
               </Block>
               <Block row>
-                <CheckBox checked={true} />
+                <CheckBox checked={false} />
                 <Block style={styles.textCenter}>
                   <Text color="black" size={16} style={styles.text}>
                     Discharged
@@ -431,6 +415,11 @@ const Components = (props) => {
 };
 
 const styles = StyleSheet.create({
+  avatar: {
+    width: 60,
+    height: 60,
+    borderRadius: 15
+  },
   components: {
     paddingTop: theme.SIZES.BASE,
     backgroundColor: "white",
@@ -501,15 +490,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     marginLeft: theme.SIZES.BASE * 2,
   },
-  roundBlock: {
-    borderBottomLeftRadius: 34,
-    borderBottomRightRadius: 34,
-    backgroundColor: "rgba(100, 120, 247, 0.84)",
-    height: height * 0.16,
-    width: width,
-    top: -10,
-    zIndex: 2,
-  },
   heading: {
     marginTop: height * 0.08,
     paddingHorizontal: theme.SIZES.BASE * 0.5,
@@ -527,7 +507,7 @@ const styles = StyleSheet.create({
     shadowOffset: {
       width: 0,
       height: 5
-    },        
+    },
     elevation: 2,
     backgroundColor: "#FEFEFE",
     padding: 10,
@@ -592,8 +572,8 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 24,
     borderBottomLeftRadius: 24,
     width: width,
-    height: height * 0.16,
-    paddingTop: theme.SIZES.BASE * 2,
+    height: height * 0.1,
+    paddingTop: theme.SIZES.BASE ,
     paddingLeft: theme.SIZES.BASE,
   },
   textCenter: {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Dimensions,
@@ -6,7 +6,8 @@ import {
   Platform,
   TouchableWithoutFeedback,
   TouchableOpacity,
-  Image,
+  BackHandler,
+  Alert,
 } from "react-native";
 import { Block, Text, theme, Icon } from "galio-framework";
 import { LinearGradient } from "expo-linear-gradient";
@@ -19,10 +20,15 @@ import { IMLocalized } from "../src/localization/IMLocalization";
 import { ScrollView } from "react-native-gesture-handler";
 import { ListItem } from "../components/";
 import SvgUri from "expo-svg-uri";
-import * as firebase from 'firebase'
-import "firebase/firestore";
-import firebaseConfig from "../FirebaseConfig";
 
+import * as firebase from "firebase";
+import 'firebase/firestore';
+import 'firebase/storage';
+import _ from "lodash";
+
+import {
+  useFocusEffect
+} from '@react-navigation/native';
 
 const { width, height } = Dimensions.get("screen");
 const cardWidth = theme.SIZES.BASE * 4;
@@ -39,8 +45,88 @@ const sortCategories = [
   },
 ];
 
+
 const DashboardAgent = (props) => {
+
+  const [cases, setCases] = useState([]);
+
+  let caseLists = [];
   const { navigation } = props;
+
+  const firestore = firebase.firestore();
+  const storage = firebase.storage();
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+        Alert.alert(
+          "Are you sure?",
+          "Do you want to really log out?",
+          [
+            {
+              text: "OK",
+              onPress: () => { navigation.navigate("UserSelectStack") }
+            },
+            {
+              text: "Cancel",
+              onPress: () => { }
+            }
+          ]
+        );
+        // Return true to stop default back navigaton
+        // Return false to keep default back navigaton
+        return true;
+      };
+
+      // Add Event Listener for hardwareBackPress
+      BackHandler.addEventListener(
+        'hardwareBackPress',
+        onBackPress
+      );
+
+      return () => {
+        // Once the Screen gets blur Remove Event Listener
+        BackHandler.removeEventListener(
+          'hardwareBackPress',
+          onBackPress
+        );
+      };
+    }, []),
+  );
+
+  useEffect(() => {
+
+    firestore.collection('Cases').get().then((querySnapshot) => {
+      console.log(querySnapshot);
+      querySnapshot.forEach((doc) => {
+        console.log("DocIDS->", doc.id);
+        firestore.collection('Cases').doc(doc.id).collection('Case').get().then((querySnapshot) => {
+          querySnapshot.forEach((caseDoc) => {
+            // console.log("name->", caseDoc.data().patientInfo.patientName);
+            // console.log("avatar->", caseDoc.data().patientInfo.avatar);
+            // console.log("refer->", caseDoc.data().patientInfo.patientReference);
+            // console.log("caseStatus->", caseDoc.data().caseStatus);
+            // console.log("caseCreateTime->", caseDoc.data().caseCreateTime);
+            // console.log("caseID->", caseDoc.data().caseID);
+            // console.log('warning->', caseDoc.data().caseWarning);
+            // console.log('docid->', doc.id);
+            caseLists.push({
+              patientName: caseDoc.data().patientInfo.patientName,
+              avatar: caseDoc.data().patientInfo.avatar,
+              patientReference: caseDoc.data().patientInfo.patientReference,
+              caseStatus: caseDoc.data().caseStatus,
+              caseCreateTime: caseDoc.data().caseCreateTime,
+              caseID: caseDoc.data().caseID,
+              caseWarning: caseDoc.data().caseWarning,
+              docId: doc.id
+            });
+          });
+          setCases(cases => [...cases, caseLists]);
+          console.log(caseLists);
+        });
+      });
+    });
+  }, []);
 
   const renderEvents = (events) => {
     let { eventHeading, eventContent } = { ...events };
@@ -66,39 +152,69 @@ const DashboardAgent = (props) => {
 
   const renderSorts = () => {
     return (
-      <Block flex>
-        <Block flex>
-          <Block flex style={{ marginTop: theme.SIZES.BASE / 2 }}>
-            <ScrollView
-              horizontal={true}
-              pagingEnabled={true}
-              decelerationRate={0}
-              scrollEventThrottle={16}
-              snapToAlignment="center"
-              style={{ width }}
-              showsHorizontalScrollIndicator={false}
-              snapToInterval={cardWidth + theme.SIZES.BASE * 0.375}
-              contentContainerStyle={{
-                paddingHorizontal: theme.SIZES.BASE / 4,
-              }}
-            >
-              <Block flex flexDirection="row" style={{ justifyContent: 'space-between' }}>
-                {sortCategories &&
-                  sortCategories.map((item, index) => renderSort(item, index))}
-              </Block>
-            </ScrollView>
+      <Block style={{ marginTop: theme.SIZES.BASE / 2 }}>
+        <ScrollView
+          horizontal={true}
+          pagingEnabled={true}
+          decelerationRate={0}
+          scrollEventThrottle={16} azzz
+          snapToAlignment="center"
+          style={{ width: width }}
+          showsHorizontalScrollIndicator={false}
+          snapToInterval={cardWidth + theme.SIZES.BASE * 0.375}
+          contentContainerStyle={{
+            paddingHorizontal: theme.SIZES.BASE / 4,
+          }}
+        >
+          <Block flexDirection="row" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
+            {sortCategories &&
+              sortCategories.map((item, index) => renderSort(item, index))}
           </Block>
-        </Block>
+        </ScrollView>
       </Block>
     );
   };
 
   const renderSort = (item, index) => {
+
+    
+    const sortting = () => {
+      switch (item.title) {
+        case 'Case':
+          const sortArray = [...cases].sort((a, b) => {
+            if (a.patientName < b.patientName) return -1;
+            if (a.patientName > b.patientName) return 1;
+            return 0;
+          });
+          setCases(sortArray);
+          break;
+        case 'Date':
+          const sortArray1 = [...cases].sort((a, b) => {
+            if (a.caseCreateTime < b.caseCreateTime) return -1;
+            if (a.caseCreateTime > b.caseCreateTime) return 1;
+            return 0;
+          });
+          setCases(sortArray1);
+          break;
+        case 'Current Status':
+          const sortArray2 = [...cases].sort((a, b) => {
+            if (a.caseStatus < b.caseStatus) return -1;
+            if (a.caseStatus > b.caseStatus) return 1;
+            return 0;
+          });
+          setCases(sortArray2);
+          break;
+      }
+      console.log(cases);
+    }
     return (
-      <TouchableWithoutFeedback
-        style={{ zIndex: 3 }}
+      <TouchableOpacity
+        style={{ zIndex: 3, marginHorizontal: theme.SIZES.BASE }}
         key={`product-${item.title}`}
-        onPress={() => console.log("Sort pressed")}
+        onPress={() => {
+          console.log("sortting");
+          sortting();
+        }}
       >
         <LinearGradient
           start={{ x: 0, y: 0 }}
@@ -108,12 +224,12 @@ const DashboardAgent = (props) => {
           style={styles.sortItem}
         >
           <Block center>
-            <Text center size={15} fontWeight="semiBold">
+            <Text center size={13} fontWeight="semiBold">
               {item.title}
             </Text>
           </Block>
         </LinearGradient>
-      </TouchableWithoutFeedback>
+      </TouchableOpacity>
     );
   };
 
@@ -121,16 +237,13 @@ const DashboardAgent = (props) => {
     return (
       <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
         <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
-          <ListItem product={products[0]} horizontal role="agentDashboard" />
-          <ListItem product={products[1]} horizontal role="agentDashboard" />
-          <ListItem product={products[2]} horizontal role="agentDashboard" />
-          <ListItem product={products[3]} horizontal role="agentDashboard" />
-          <ListItem product={products[4]} horizontal role="agentDashboard" />
-          <ListItem product={products[0]} horizontal role="agentDashboard" />
-          <ListItem product={products[1]} horizontal role="agentDashboard" />
-          <ListItem product={products[2]} horizontal role="agentDashboard" />
-          <ListItem product={products[3]} horizontal role="agentDashboard" />
-          <ListItem product={products[4]} horizontal role="agentDashboard" />
+
+          {cases.length === 0 ? <></> :
+            cases.map((val, index) => (
+              <ListItem key={index} category={val[index]} product={products[0]} horizontal role="agentDashboard" />
+            ))
+          }
+
         </ScrollView>
       </Block>
     );
@@ -154,7 +267,7 @@ const DashboardAgent = (props) => {
           <Text
             color="black"
             style={{ paddingLeft: theme.SIZES.BASE }}
-            size={22}
+            size={16}
             fontWeight="semiBold"
           >
             {IMLocalized("Dashboard")}
@@ -203,7 +316,7 @@ const DashboardAgent = (props) => {
           }}
         >
           <Block column space="between">
-            <Block row style={{ padding: theme.SIZES.BASE / 2 }}>
+            <Block row style={{ padding: theme.SIZES.BASE / 3 }}>
               <Text color={"grey"} size={14}>
                 {IMLocalized("On going case")}
               </Text>
@@ -227,8 +340,8 @@ const DashboardAgent = (props) => {
 
           </Block>
         </Block>
+        {renderSorts()}
         <ScrollView showsVerticalScrollIndicator={false}>
-          {renderSorts()}
           {renderPatientsList()}
         </ScrollView>
       </Block>
@@ -249,7 +362,7 @@ const styles = StyleSheet.create({
   profileContainer: {
     width: width,
     height: "auto",
-    flex: 0.85,
+    flex: 0.6,
   },
   profileDetails: {
     paddingTop: theme.SIZES.BASE * 4,
@@ -283,10 +396,9 @@ const styles = StyleSheet.create({
   options: {
     width: width * 0.9,
     paddingHorizontal: theme.SIZES.BASE * 0.3,
-    paddingVertical: theme.SIZES.BASE * 0.2,
+    paddingVertical: theme.SIZES.BASE * 0.1,
     marginHorizontal: theme.SIZES.BASE,
-    marginBottom: theme.SIZES.BASE,
-    marginTop: theme.SIZES.BASE,
+    marginTop: theme.SIZES.BASE / 1.5,
     borderRadius: 40,
     backgroundColor: theme.COLORS.WHITE,
     shadowColor: "black",
@@ -353,9 +465,8 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 1000,
     borderColor: "#EFEFEF",
-    paddingVertical: 8,
+    paddingVertical: 4,
     paddingHorizontal: width * 0.05,
-    marginHorizontal: theme.SIZES.BASE * 1.25,
     shadowColor: "black",
     shadowOffset: { width: -1, height: -1 },
     shadowRadius: 2,
@@ -409,7 +520,7 @@ const styles = StyleSheet.create({
   navbar: {
     backgroundColor: "white",
     width: width,
-    height: height * 0.16,
+    height: height * 0.1,
     paddingTop: theme.SIZES.BASE * 2,
     paddingLeft: theme.SIZES.BASE,
     borderBottomWidth: 1,

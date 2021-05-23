@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -13,13 +13,13 @@ import { Button, Block, Text, theme, Input } from "galio-framework";
 import { IMLocalized } from "../src/localization/IMLocalization";
 import { materialTheme } from "../constants/";
 import { Icon } from "../components/";
-import SwitchButton from "switch-button-react-native";
-import MapView from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 import * as ImagePicker from "expo-image-picker";
 import * as firebase from "firebase";
 import 'firebase/firestore';
 import 'firebase/auth';
 import 'firebase/storage';
+import { patient } from "../store/duck/reducers";
 
 const firestore = firebase.firestore();
 const auth = firebase.auth();
@@ -27,21 +27,15 @@ const storage = firebase.storage();
 const { width, height } = Dimensions.get("screen");
 
 const CreateDoctorAccount = (props) => {
-  const { navigation } = props;
-  const [activeSwitch, setActiveSwitch] = useState(1);
+  const { navigation, route } = props;
+  let { doctorId, doctor } = route.params;
   const [imageUri, setImageUri] = useState(null);
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState("fdsfds");
   const [password, setPassword] = useState("");
   const [fullname, setFullname ] = useState("");
   const [address, setAddress] = useState("");
   const [description, setDescription] = useState("");
   const [activity, setActivity] = useState(false);
-
-  const handleAvatar = (val) => {
-    setActiveSwitch(val);
-    if (val == 2) pickImage();
-    else setImageUri(null);
-  };
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -74,7 +68,7 @@ const CreateDoctorAccount = (props) => {
           size={17}
           bold
         >
-          Create Doctor Account
+          {doctorId ? "Edit Doctor Account" : "Create Doctor Account"}
         </Text>
       </Block>
     );
@@ -90,7 +84,7 @@ const CreateDoctorAccount = (props) => {
           var uid = userCredential.user.uid;
           firestore.collection('PCDoctors').doc(uid).collection('PCDoctor').doc()
             .set({
-              email, password, fullName: fullname, address, description
+              email, password, name: fullname, address, description
             })
             .then( async () => {
               setActivity(false);
@@ -130,9 +124,9 @@ const CreateDoctorAccount = (props) => {
             borderless
             color="black"
             type="email-address"
-            placeholder="Email"
+            placeholder={doctorId ? doctor.email : "Email" }           
             autoCapitalize="none"
-            style={styles.input}
+            style={styles.input}            
             onChangeText={e => setEmail(e)}
             iconContent={
               <Icon
@@ -151,7 +145,7 @@ const CreateDoctorAccount = (props) => {
             color="black"
             password
             viewPass
-            placeholder="Password"
+            placeholder={doctorId ? doctor.password : "Password"}
             autoCapitalize="none"
             style={styles.input}
             onChangeText={e => setPassword(e)}
@@ -172,35 +166,30 @@ const CreateDoctorAccount = (props) => {
             Doctor Info
           </Text>
           <Block center row style={{ top: 10 }}>
-            <Block middle style={{ marginRight: 14 }}>
-              {imageUri ? (
-                <Image
-                  source={{ uri: imageUri }}
-                  style={{ width: 50, height: 50 }}
-                />
-              ) : (
-                <Image
-                  source={require("../assets/images/userDefault.png")}
-                  style={{ width: 50, height: 50 }}
-                />
-              )}
+            <Block middle>
+              <TouchableOpacity
+                onPress={() => pickImage()}
+              >
+                {imageUri ? (
+                  <Image
+                    source={{ uri: imageUri }}
+                    style={{ width: 80, height: 80, borderRadius: 50 }}
+                  />
+                ) : (
+                  <Image
+                    source={require("../assets/images/userDefault.png")}
+                    style={{ width: 80, height: 80, borderRadius: 50 }}
+                  />
+                )}
+              </TouchableOpacity>
+              <Icon
+                name="camera"
+                family="font-awesome"
+                color="#555"
+                size={24}
+                style={{position: 'absolute', bottom: 4, right: 4}}
+              />
             </Block>
-            <SwitchButton
-              onValueChange={handleAvatar}
-              text1="Remove"
-              text2="Upload"
-              switchWidth={120}
-              switchHeight={30}
-              switchdirection="rtl"
-              switchBorderRadius={100}
-              switchSpeedChange={500}
-              switchBorderColor="#3B3E51"
-              switchBackgroundColor="#fff"
-              btnBorderColor="#3B3E51"
-              btnBackgroundColor="#3B3E51"
-              fontColor="#3B3E51"
-              activeFontColor="#fff"
-            />
           </Block>
           <Block style={styles.doctorInfo}>
             <Block style={styles.detail}>
@@ -215,7 +204,7 @@ const CreateDoctorAccount = (props) => {
                     placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
                     borderless
                     color="black"
-                    placeholder="Mark Veronic"
+                    placeholder={doctorId ? doctor.email : "Mark Veronich"}
                     onChangeText={e => setFullname(e)}
                     autoCapitalize="none"
                     style={styles.name}
@@ -233,7 +222,7 @@ const CreateDoctorAccount = (props) => {
                     placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
                     borderless
                     color="black"
-                    placeholder="Markveronic@"
+                    placeholder={doctorId ? doctor.address : "1587 West 3rd Avenue, Columbus, OH, USA"}
                     onChangeText={e => setAddress(e)}
                     autoCapitalize="none"
                     style={styles.name}
@@ -251,7 +240,7 @@ const CreateDoctorAccount = (props) => {
                     placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
                     borderless
                     color="black"
-                    placeholder="Markveronic@"
+                    placeholder={doctorId ? doctor.description : "description here"}
                     onChangeText={e => setDescription(e)}
                     autoCapitalize="none"
                     style={styles.name}
@@ -267,19 +256,30 @@ const CreateDoctorAccount = (props) => {
                 style={{ margin: 10 }}
               />
               <Text size={12} color={"grey"} style={{ marginTop: 10 }}>
-                92/6, 3rd Floor, Outer Ring Road, Chandra Layout
+                {doctorId ? doctor.address : null}{" "}{doctorId ? doctor.city_state : null}
               </Text>
             </Block>
             <Block style={{borderRadius: 10}}>
-              <MapView 
-                initialRegion={{
-                  latitude: 37.78825,
-                  longitude: -122.4324,
-                  latitudeDelta: 0.0922,
-                  longitudeDelta: 0.0421,
+              <MapView
+                region={{
+                  latitude: 41.881832,
+                  longitude: -87.623177,
+                  latitudeDelta: 0.001,
+                  longitudeDelta: 0.001,
                 }}
-                style={styles.mapView} 
-              />
+                style={styles.mapView}
+              >
+                <Marker
+                  coordinate={{
+                    latitude: 41.881832,
+                    longitude: -87.623177,
+                  }}
+                  title={`${doctorId ? doctor.address : null} ${doctorId ? doctor.city_state : null}`}
+                  onDragEnd={e => {
+                    console.log('dragEnd', e.nativeEvent.coordinate);
+                  }}
+                />
+            </MapView>
             </Block>
           </Block>
           <Block center style={styles.saveBtn}>
@@ -342,8 +342,8 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 24,
     borderBottomLeftRadius: 24,
     width: width,
-    height: height * 0.16,
-    paddingTop: theme.SIZES.BASE * 2,
+    height: height * 0.1,
+    paddingTop: theme.SIZES.BASE,
     paddingLeft: theme.SIZES.BASE,
   },
   input: {

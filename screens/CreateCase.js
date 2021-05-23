@@ -9,25 +9,99 @@ import {
 import { Block, Text, theme } from "galio-framework";
 import { Icon } from "../components";
 import SvgUri from "expo-svg-uri";
-import * as firebase from "firebase";
-import 'firebase/firestore';
 import { Alert } from "react-native";
 import { useSelector } from 'react-redux';
+import * as firebase from "firebase";
+import 'firebase/firestore';
+import 'firebase/storage';
+import firebaseConfig from "../FirebaseConfig";
 
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 const firestore = firebase.firestore();
+const storage = firebase.storage();
+const auth = firebase.auth();
+
 const { width, height } = Dimensions.get("screen");
 
 const CreateCase = (props) => {
   const { navigation } = props;
   const [createdTime, setCreatedTime] = useState('');
+  const [dateOfInjury, setDateOfInjury] = useState('2021-05-23');
   const [isCompletedPatient, setIsCompletedPatient] = useState(true);
-  const patientUid = useSelector((state) => state.patient.uid);
-  const patientName = useSelector((state) => state.patient.patientName);
-  const patientPhoto = useSelector((state) => state.patient.patientPhoto);
-  const patientDob = useSelector((state) => state.patient.patientDob);
+
+  const [patientName, setPatientName] = useState('');
+  const [patientDob, SetPatientDob] = useState('');
+  const [patientAvatar, setPatientAvatar] = useState('');
+  const [patientCityState, setPatientCityState] = useState('');
+  const [patientEmail, setPatientEmail] = useState('');
+  const [patientPassword, setPatientPassword] = useState('abcABC123');
+  const [patientSsn, setPatientSsn] = useState('');
+
+  const [insurAddress, setInsurAddress] = useState('');
+  const [insurCompany, setInsurCompany] = useState('');
+  const [insurZipCode, setInsurZipCode] = useState('');
+  const [insureCityState, setInsurCityState] = useState('');
+  const [insurAdjuster, setInsurAdjuster] = useState('');
+  const [insurPolicyNum, setInsurPolicyNum] = useState('');
+
+  const [attorAddress, setAttorAddress] = useState('');
+  const [attorCityState, setAttorCityState] = useState('');
+  const [attorEmail, setAttorEmail] = useState('');
+  const [attorFax, setAttorFax] = useState('');
+  const [attorName, setAttorName] = useState('');
+  const [attorPhone, setAttorPhone] = useState('');
+  const [attorReference, setAttorReference] = useState('');
+  const [attorZip, setAttorZip] = useState('');
+
+  const [noteAuthorName, setNoteAuthorName] = useState('');
+  const [noteCreateDate, setNoteCreateDate] = useState('');
+  const [noteDescription, setNoteDescription] = useState('');
+
+  const addPInfo = useSelector((state) => state.patient.pInfo);
+  const addAttorInfo = useSelector((state) => state.attorney.attorneyInfo);
+  const addInsurInfo = useSelector((state) => state.insurance.insuranceInfo);
+  const addNoteInfo = useSelector((state) => state.note.noteInfo);
+
   useEffect(() => {
     let createdTimeTemp = new Date().toLocaleDateString();
     setCreatedTime(createdTimeTemp);
+    console.log("addPInfo: ", addPInfo);
+    console.log("attorneyInfo: ", addAttorInfo);
+    console.log("insuranceInfo: ", addInsurInfo);
+    console.log("noteInfo: ", addNoteInfo);
+    addPInfo.map((item, index) => {
+      setPatientName(item.name);
+      SetPatientDob(item.dob);
+      setPatientAvatar(item.avatar);
+      setPatientCityState(item.cityState);
+      setPatientEmail(item.email);
+      setPatientSsn(item.ssn);
+    });
+    addAttorInfo.map((item, index) => {
+      setAttorAddress(item.attorAddress);
+      setAttorCityState(item.attorCityState);
+      setAttorEmail(item.attorEmail);
+      setAttorFax(item.attorFax);
+      setAttorName(item.attorName);
+      setAttorPhone(item.attorTel);
+      setAttorReference("");
+      setAttorZip(item.attorZipcode);
+    });
+    addInsurInfo.map((item, index) => {
+      setInsurAddress(item.insurAddress);
+      setInsurCompany(item.insurCompanyName);
+      setInsurZipCode(item.insurZipcode);
+      setInsurCityState(item.insurCityState);
+      setInsurAdjuster(item.insurAdjuster);
+      setInsurPolicyNum(item.insurPolicyNumber);
+    });
+    addNoteInfo.map((item, index) => {
+      setNoteAuthorName(item.noteAuthorName);
+      setNoteCreateDate(item.noteCreateDate);
+      setNoteDescription(item.description);
+    });
   });
 
   const Action = (props) => {
@@ -36,7 +110,7 @@ const CreateCase = (props) => {
       return (
         <TouchableOpacity onPress={() => {
           if (isCompletedPatient)
-            navigation.navigate(props.link, { patientUid: patientUid });
+            navigation.navigate(props.link);
           else
             Alert.alert(
               "Warning",
@@ -133,7 +207,7 @@ const CreateCase = (props) => {
         showsVerticalScrollIndicator={false}
       >
         <TouchableOpacity onPress={() => {
-          navigation.navigate("AddPatient", { editPatient: false});
+          navigation.navigate("AddPatient", { editPatient: false });
         }} style={{ width: 60 }}>
           <Image source={require("../assets/images/createCase.png")} />
         </TouchableOpacity>
@@ -151,30 +225,37 @@ const CreateCase = (props) => {
         </Block>
 
         <Block row center style={styles.patientHeading}>
-          <Image source={require("../assets/images/avatar.png")} />
-          <Block column>
+          {patientAvatar ? (
+            <Image
+              source={{ uri: patientAvatar }}
+              style={{ width: 60, height: 60, borderRadius: 50, borderWidth: 3, borderColor: "white" }}
+            />
+          ) : (
+            <Image
+              source={require("../assets/images/userDefault.png")}
+              style={{ width: 60, height: 60, borderRadius: 50, borderWidth: 3, borderColor: "white" }}
+            />
+          )}
+          <Block column style={{ marginLeft: theme.SIZES.BASE }}>
             <Text bold size={16}>
-              Edie Sparks
+              {patientName}
             </Text>
             <Text color={"#909CA1"} style={{ paddingTop: theme.SIZES.BASE }}>
-              1993/04/29
+              {patientDob}
             </Text>
           </Block>
-          <Block column style={{ paddingLeft: width * 0.3 }}>
+          <Block column style={{ paddingLeft: width * 0.4 }}>
             <Text style={{ alignSelf: "flex-end" }} color={"#06D81E"}>
               {/* 11:45 AM */}
             </Text>
             <TouchableOpacity
               onPress={() => navigation.navigate("AddPatient", { editPatient: true })}
+              style={{ backgroundColor: 'white' }}
             >
               <SvgUri
                 width="20"
                 height="20"
                 source={require("../assets/icons/editGreen.svg")}
-                style={{
-                  right: -theme.SIZES.BASE * 2,
-                  paddingTop: theme.SIZES.BASE,
-                }}
               />
             </TouchableOpacity>
           </Block>
@@ -188,14 +269,13 @@ const CreateCase = (props) => {
           >
             Case Info
           </Text>
-
           {renderDetils({
             heading: `Created time:${createdTime}`,
             action: "",
             link: "",
           })}
           {renderDetils({
-            heading: "Date of Injury:2022.2.10",
+            heading: `Date of Injury: ${dateOfInjury}`,
             action: "",
             link: "",
           })}
@@ -223,9 +303,109 @@ const CreateCase = (props) => {
         <Block row center style={{ marginTop: theme.SIZES.BASE }}>
           <TouchableOpacity
             style={styles.saveSend}
-            onPress={() => {
-              if (isCompletedPatient)
-                console.log("Add a case");
+            onPress={async () => {
+              if (isCompletedPatient) {
+                // add to firestore
+                let pUid = '';
+                let pDocId = '';
+                console.log(patientEmail, patientPassword);
+                await auth
+                  .createUserWithEmailAndPassword(patientEmail, patientPassword)
+                  .then((res) => {
+                    console.log(res.user.uid);
+                    pUid = res.user.uid;
+                    // firestore.collection('Patients').doc(res.user.uid).set({});
+                    firestore.collection('Patients').doc(res.user.uid).collection("Patient").doc().set({
+                      DOB: patientDob,
+                      SSN: patientSsn,
+                      address: "",
+                      avatar: patientAvatar,
+                      cityState: patientCityState,
+                      email: patientEmail,
+                      geoLocation: "",
+                      name: patientName,
+                      phone: "",
+                  });
+                  })
+                  .catch((error) => {
+                    console.log(">>>Error>>>", error)
+                  });
+                console.log('pUid:', pUid);
+                await firestore.collection('Patients').doc(pUid).collection("Patient").get().then((querySnapshot) => {
+                  querySnapshot.forEach((doc) => {
+                    pDocId = doc.id;
+                  });
+                });
+                console.log("pDocId->",pDocId);
+                const patientLinks = {
+                  businessUserID: pUid,
+                  patientProfileID: pDocId
+                };
+                firestore.collection('Patients').doc(pUid).collection("PatientProfileLink").doc().set(patientLinks);
+                firestore.collection('Cases').doc(pUid).collection("Case").doc().set({
+                  InsuranceInfo: {
+                    address: insurAddress,
+                    'city/state': insureCityState,
+                    insuranceAdjuster: insurAdjuster,
+                    insuranceCompany: insurCompany,
+                    insurancePolicyNum: insurPolicyNum,
+                    insurZip: insurZipCode,
+                  },
+                  attorneyInfo: {
+                    attorneyAddress: attorAddress,
+                    attorneyCityState: attorCityState,
+                    attorneyEmail: attorEmail,
+                    attorneyFax: attorFax,
+                    attorneyName: attorName,
+                    attorneyPhone: attorPhone,
+                    attorneyReference: "(WE DON'T USE THIS ONE YET)",
+                    attorneyZip: attorZip,
+                  },
+                  caseAgent: {
+                    agentID: auth.currentUser.uid,
+                    agentReference: '',
+                    agentName: '',
+                  },
+                  caseCreateTime: createdTime,
+                  caseID: '',
+                  caseStatus: 'New Case',
+                  caseWarning: {
+                    '0' : 'PATIENT_FILE_WAITING_REVIEW',
+                  },
+                  dateOfInjury: "2020-12-1",
+                  note: [
+                    {
+                      authorName: noteAuthorName,
+                      authorReference: "",
+                      createDate: 'noteCreateDate',//not compete : noteCreateDate
+                      noteDescription : 'noteDescription',
+                    },
+                  ],
+                  patientInfo: {
+                    avatar: patientAvatar,
+                    patientName: patientName,
+                    patientReference: ''
+                  },
+                  patientUploadFile: [
+                    {
+                      isApproved: false,
+                      label: '',
+                      scanFileUrl: '',
+                      uploadTime: '',
+                    }
+                  ],
+                  pcDoctorInfo: {
+                    doctorID: '',
+                    doctorReference: '',
+                    name: '',
+                    phone: '',
+                  },
+                  schedule: {
+                    scheduleReference: '',
+                    scheduleTime: '',
+                  }
+                })
+              }
               else
                 Alert.alert(
                   "Warning",
@@ -336,6 +516,7 @@ const styles = StyleSheet.create({
   },
   patientHeading: {
     width: width * 0.92,
+    padding: theme.SIZES.BASE / 4,
     borderColor: "#F1F1F1",
     borderRadius: 20,
     shadowColor: "grey",

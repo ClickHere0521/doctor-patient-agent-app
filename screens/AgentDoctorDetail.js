@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   Image,
@@ -6,30 +6,77 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
-  TouchableHighlight,
 } from "react-native";
 import { Block, Button, Text, theme } from "galio-framework";
 
 const { height, width } = Dimensions.get("screen");
-import SwitchButton from "switch-button-react-native";
 import materialTheme from "../constants/Theme";
 import { IMLocalized, init } from "../src/localization/IMLocalization";
 import { Icon } from "../components/";
 import { ScrollView } from "react-native-gesture-handler";
 import * as ImagePicker from "expo-image-picker";
-import MapView from 'react-native-maps';
+import MapView, { Marker } from "react-native-maps";
+import firebase from "firebase";
+import Geocoder from "react-native-geocoding";
 
 const AgentDoctorDetail = (props) => {
-  const { navigation } = props;
-  const [modalVisible, setModalVisible] = useState(0);
+  const firestore = firebase.firestore();
+  const { navigation, route } = props;
+  const { doctorId } = route.params;
   const [imageUri, setImageUri] = useState(null);
-  const [activeSwitch, setActiveSwitch] = useState(1);
+  const [doctor, setDoctor] = useState({});
+  let tempDoc = {};
 
-  const handleAvatar = (val) => {
-    setActiveSwitch(val);
-    if (val == 2) pickImage();
-    else setImageUri(null);
-  };
+  useEffect(() => {
+    // console.log('doctorId', doctorId);
+    firestore
+      .collection("PCDoctors")
+      .doc(doctorId)
+      .collection("PCDoctor")
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doctorDoc) => {
+          const {
+            address,
+            city_state,
+            email,
+            name,
+            phone,
+            description,
+            password,
+          } = doctorDoc.data();
+          firestore
+            .collection("PCDoctors")
+            .doc(doctorId)
+            .collection("PCDoctor")
+            .doc(doctorDoc.id)
+            .collection("ScheduleInfo")
+            .get()
+            .then((querySnapshot) => {
+              querySnapshot.forEach((res) => {
+                const { caseID, caseReference, scheduleTime } = res.data();
+              });
+            });
+          tempDoc = {
+            address,
+            city_state,
+            email,
+            name,
+            phone,
+            description,
+            password,
+          };
+          // Geocoder.init("AIzaSyAI7Bmf7Kw_ZXiDuUOFYHpjhJForJNprLo");
+          // Geocoder.from(name)
+          //   .then(json => {
+          //     var location = json.results[0].geometry.location;
+          //     console.log('location', location);
+          //   })
+          //   .catch(error => console.warn(error));
+        });
+        setDoctor(tempDoc);
+      });
+  }, []);
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -38,9 +85,6 @@ const AgentDoctorDetail = (props) => {
       aspect: [3, 3],
       quality: 1,
     });
-
-    console.log(result);
-
     if (!result.cancelled) {
       setImageUri(result.uri);
     }
@@ -49,96 +93,73 @@ const AgentDoctorDetail = (props) => {
   return (
     <Block flex style={styles.container}>
       <Block>
-        <Block style={styles.roundBlock}>
-          <Block row style={styles.headArrow}>
-            <Block>
+        <Block flex flexDirection="row" style={styles.roundBlock}>
+          <Block flex={1} >
+            <TouchableOpacity onPress={() => navigation.goBack()}>
               <Icon
                 size={16}
                 name="chevron-left"
                 family="font-awesome"
                 color={"white"}
                 style={{ paddingLeft: theme.SIZES.BASE }}
-                onPress={() => navigation.goBack()}
               />
-            </Block>
+            </TouchableOpacity>
+          </Block>
+          <Block flex={6}></Block>
+          <Block flex={1}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("CreateDoctorAccount", { doctorId: doctorId, doctor: doctor })}
+            >
+              <Image
+                source={require("../assets/icons/editHeaderWhite.png")}
+                alt=""
+                style={{width: 20, height: 20}}
+              />
+            </TouchableOpacity>
           </Block>
         </Block>
       </Block>
       <Block style={styles.body}>
         <Block style={styles.header}>
           <Block center>
-            <Block middle style={{ marginRight: 14 }}>
-              {imageUri ? (
-                <Image
-                  source={{ uri: imageUri }}
-                  style={{ width: 80, height: 80, borderRadius: 20 }}
-                />
-              ) : (
-                <Image
-                  source={require("../assets/images/grayscale-photo-of-man2.png")}
-                  style={{ width: 80, height: 80, borderRadius: 20 }}
-                />
-              )}
-            </Block>
-            <Block style={{position: 'absolute', right: -width * 0.3, top: 25 }}>
-              <SwitchButton
-                onValueChange={handleAvatar}
-                text1="Remove"
-                text2="Upload"
-                switchWidth={120}
-                switchHeight={30}
-                switchdirection="rtl"
-                switchBorderRadius={100}
-                switchSpeedChange={500}
-                switchBorderColor="#3B3E51"
-                switchBackgroundColor="#fff"
-                btnBorderColor="#3B3E51"
-                btnBackgroundColor="#3B3E51"
-                fontColor="#3B3E51"
-                activeFontColor="#fff"
+            <Block middle>
+              <TouchableOpacity onPress={() => pickImage()}>
+                {imageUri ? (
+                  <Image
+                    source={{ uri: imageUri }}
+                    style={{
+                      width: 80,
+                      height: 80,
+                      borderRadius: 50,
+                      borderWidth: 3,
+                      borderColor: "white",
+                    }}
+                  />
+                ) : (
+                  <Image
+                    source={require("../assets/images/userDefault.png")}
+                    style={{
+                      width: 80,
+                      height: 80,
+                      borderRadius: 50,
+                      borderWidth: 3,
+                      borderColor: "white",
+                    }}
+                  />
+                )}
+              </TouchableOpacity>
+              <Icon
+                name="camera"
+                family="font-awesome"
+                color="#555"
+                size={20}
+                style={{ position: "absolute", bottom: 4, right: 4 }}
               />
             </Block>
           </Block>
-          <Text size={14} style={{ marginTop: 10 }} center>
-            Dr. Ronald Joseph
+          <Text size={20} style={{ marginVertical: 10 }} center>
+            {doctor.name}
           </Text>
-          <Text color={"grey"} text={12} center>
-            B.Sc, MBBS, DDVL, MD- Dermitologist
-          </Text>
-          <Block style={styles.headBottom}>
-            <Text color="grey" size={12}>
-              <Text color="black" size={14}>
-                16
-              </Text>{" "}
-              yrs. Experience
-            </Text>
-            <Block row center>
-              <Block style={{ paddingHorizontal: theme.SIZES.BASE / 2 }}>
-                <Image
-                  style={{ width: 70, height: 70 }}
-                  source={require("../assets/images/grayscale-photo-of-man2.png")}
-                ></Image>
-              </Block>
-              <Block style={{ paddingHorizontal: theme.SIZES.BASE / 2 }}>
-                <Image
-                  style={{ width: 70, height: 70 }}
-                  source={require("../assets/images/grayscale-photo-of-man2.png")}
-                ></Image>
-              </Block>
-              <Block style={{ paddingHorizontal: theme.SIZES.BASE / 2 }}>
-                <Image
-                  style={{ width: 70, height: 70 }}
-                  source={require("../assets/images/grayscale-photo-of-man2.png")}
-                ></Image>
-              </Block>
-              <Block style={{ paddingHorizontal: theme.SIZES.BASE / 2 }}>
-                <Image
-                  style={{ width: 70, height: 70 }}
-                  source={require("../assets/images/grayscale-photo-of-man2.png")}
-                ></Image>
-              </Block>
-            </Block>
-          </Block>
         </Block>
       </Block>
       <ScrollView>
@@ -152,19 +173,30 @@ const AgentDoctorDetail = (props) => {
                 style={{ margin: 10 }}
               />
               <Text size={12} color={"grey"} style={{ marginTop: 10 }}>
-                92/6, 3rd Floor, Outer Ring Road, Chandra Layout
+                {doctor.address} {doctor.city_state}
               </Text>
             </Block>
-            <Block style={{borderRadius: 10}}>
-              <MapView 
-                initialRegion={{
-                  latitude: 37.78825,
-                  longitude: -122.4324,
-                  latitudeDelta: 0.0922,
-                  longitudeDelta: 0.0421,
+            <Block style={{ borderRadius: 10 }}>
+              <MapView
+                region={{
+                  latitude: 41.881832,
+                  longitude: -87.623177,
+                  latitudeDelta: 0.001,
+                  longitudeDelta: 0.001,
                 }}
-                style={styles.mapView} 
-              />
+                style={styles.mapView}
+              >
+                <Marker
+                  coordinate={{
+                    latitude: 41.881832,
+                    longitude: -87.623177,
+                  }}
+                  title={`${doctor.address} ${doctor.city_state}`}
+                  onDragEnd={(e) => {
+                    console.log("dragEnd", e.nativeEvent.coordinate);
+                  }}
+                />
+              </MapView>
             </Block>
             <Block row style={{ margin: 10 }}>
               <Text color="black" style={{ alignSelf: "flex-start" }}>
@@ -172,7 +204,7 @@ const AgentDoctorDetail = (props) => {
                 <Text color="red">*</Text>
               </Text>
               <Text color="grey" style={{ paddingLeft: 10 }}>
-                +1234567890
+                +{doctor.phone}
               </Text>
             </Block>
             <Block>
@@ -191,9 +223,9 @@ const AgentDoctorDetail = (props) => {
                     <Text color="grey">*</Text>
                   </Text>
                 </Block>
-                <Block flex={2}>
-                  <Text color="grey">Joseph@gmail.com</Text>
-                  <Text color="grey">134ds346gf</Text>
+                <Block flex={3}>
+                  <Text color="grey">{doctor.email}</Text>
+                  <Text color="grey">{doctor.password}</Text>
                 </Block>
               </Block>
             </Block>
@@ -203,8 +235,7 @@ const AgentDoctorDetail = (props) => {
                 <Text color="red">*</Text>
               </Text>
               <Text color="grey" size={16} style={styles.descriptionText}>
-                Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
-                diam nonu my eirmod tempor invidun.
+                {doctor.description}
               </Text>
             </Block>
             <Block row>
@@ -216,7 +247,7 @@ const AgentDoctorDetail = (props) => {
               </Block>
               <TouchableOpacity
                 style={{ marginTop: 10, marginLeft: width * 0.45 }}
-                onPress={() => navigation.navigate("DoctorScheduleDetail")}
+                onPress={() => navigation.navigate("DoctorScheduleDetail", {doctorId})}
               >
                 <Text
                   color={"#00CE30"}
@@ -227,7 +258,7 @@ const AgentDoctorDetail = (props) => {
               </TouchableOpacity>
               <TouchableOpacity
                 style={{ marginTop: 10, marginLeft: width * 0.05 }}
-                onPress={() => navigation.navigate("ScheduleEdit")}
+                onPress={() => navigation.navigate("ScheduleEdit", {doctorId})}
               >
                 <Text
                   color={"#00CE30"}
@@ -251,7 +282,7 @@ const styles = StyleSheet.create({
     borderRadius: 17,
     borderWidth: 0.5,
     borderColor: "#C7C7C7",
-    marginTop: theme.SIZES.BASE,
+    marginTop: theme.SIZES.BASE,    
   },
   innerModal: {
     backgroundColor: "rgba(255,255,255,0.99)",
@@ -268,9 +299,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#F5F5F5",
   },
   headArrow: {
-    marginTop: height * 0.1,
+    marginTop: height * 0.06,
     paddingHorizontal: theme.SIZES.BASE * 0.5,
-    position: "absolute",
     zIndex: 1,
   },
   button: {
@@ -320,8 +350,9 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 24,
     position: "absolute",
     backgroundColor: "#6E78F7",
-    height: height * 0.25,
+    height: height * 0.15,
     width: width,
+    paddingTop: theme.SIZES.BASE * 2.5,
     top: 0,
     zIndex: 2,
   },
@@ -343,10 +374,11 @@ const styles = StyleSheet.create({
   },
   body: {
     marginHorizontal: width * 0.04,
-    marginTop: height * 0.18,
+    marginTop: height * 0.1,
     zIndex: 2,
     backgroundColor: "white",
-    borderRadius: 12,
+    borderTopRightRadius: 12,
+    borderTopLeftRadius: 12,
   },
   prime: {
     top: height * 0.08,
@@ -373,11 +405,11 @@ const styles = StyleSheet.create({
   },
   mainBody: {
     marginHorizontal: width * 0.04,
-    marginTop: height * 0.06,
+    // marginTop: height * 0.01,
     paddingBottom: height * 0.05,
     zIndex: 2,
     backgroundColor: "white",
-    borderRadius: 12,
+    // borderRadius: 12,
   },
   info: {
     marginHorizontal: 10,
@@ -397,10 +429,10 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   mapView: {
-    width: width * 0.8, 
-    height: 150, 
-    margin: width * 0.01, 
-    alignSelf: "center" 
+    width: width * 0.8,
+    height: 150,
+    margin: width * 0.01,
+    alignSelf: "center",
   },
 });
 

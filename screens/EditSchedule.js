@@ -1,11 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   StyleSheet,
   Dimensions,
   ScrollView,
   Image,
-  ImageBackground,
-  Platform,
   View,
   TouchableOpacity,
 } from "react-native";
@@ -14,15 +12,16 @@ import { materialTheme } from "../constants";
 import { IMLocalized } from "../src/localization/IMLocalization";
 import SwitchButton from "switch-button-react-native";
 import SvgUri from "expo-svg-uri";
+import firebase from'firebase';
 
 const { width, height } = Dimensions.get("screen");
 const thumbMeasure = (width - 48 - 32) / 3;
 
 const EditSchedule = (props) => {
+  const firestore = firebase.firestore();
   const { navigation } = props;
+  const { doctorId } = props.route.params;
   const [activeSwitch, setActiveSwitch] = useState(1);
-  const [dataSourceCords, setDataSourceCords] = useState([]);
-  const [ref, setRef] = useState(null);
   const [weekState, setWeekState] = useState([
     {
       date: "MON",
@@ -53,6 +52,46 @@ const EditSchedule = (props) => {
       status: false,
     },
   ]);
+  const [currentDay, setCurrentDay] = useState(0);
+  const [timeSlot, setTimeSlot] = useState(null);
+  const [childDay, setChildDay] = useState([]);
+  const [doctor, setDoctor] = useState({});
+  const [schedule, setSchedule] = useState([]);
+  const childDayList = [];
+  let tempTimeSlot = [];
+  let tempDoctor = {};
+  let tempSchedule = [];
+
+  useEffect(() => {
+    firestore.collection('PCDoctors').doc(doctorId).collection('PCDoctor').get().then((querySnapShot) => {
+      querySnapShot.forEach((doctorDoc) => {
+        const {address, city_state, email, name, phone, description, password } = doctorDoc.data();
+        firestore.collection('PCDoctors').doc(doctorId).collection('PCDoctor').doc(doctorDoc.id).collection('ScheduleInfo').get().then((querySnapShot) => {
+          querySnapShot.forEach((res) => {
+            const { patientName, caseID, caseReference, scheduleTime } = res.data();
+            const time = new Date(scheduleTime.seconds * 1000 + scheduleTime.nanoseconds/1000000);
+            childDayList.push(`${time.getFullYear()}-${time.getMonth()<10 ? 0 : null}${time.getMonth()+1}-${time.getDate()}`);
+            tempSchedule.push({
+              patientName,
+              time: time.toUTCString(),
+              year: time.getFullYear(),
+              month: time.getMonth(),
+              day: time.getDate(),
+              caseID,
+            });
+          })
+        })
+        setChildDay(childDayList);
+        setSchedule(tempSchedule);
+        tempDoctor = {
+          name, address, city_state, email, name, phone, description, password,
+        }
+        tempTimeSlot = doctorDoc.data().timeSlot;
+      })
+      setTimeSlot(tempTimeSlot);
+      setDoctor(tempDoctor);
+    })
+  }, []);
 
   const weekBar = () => {
     const handleWeekbar = (index) => {
@@ -60,6 +99,7 @@ const EditSchedule = (props) => {
         weekState[indexTemp].status = index == indexTemp ? true : false;
       });
       setWeekState([...weekState]);
+      setCurrentDay(index);
       // if (dataSourceCords.length > scrollToIndex) {
       //   ref.scrollTo({
       //     x: 0,
@@ -84,19 +124,19 @@ const EditSchedule = (props) => {
         {weekState.map((value, index) => {
           return (
             <View
-              onLayout={(event) => {
-                const layout = event.nativeEvent.layout;
-                // dataSourceCords[key] = layout.y;
-                // setDataSourceCords(dataSourceCords);
-                console.log(dataSourceCords);
-                console.log("height:", layout.height);
-                console.log("width:", layout.width);
-                console.log("x:", layout.x);
-                console.log("y:", layout.y);
-              }}
+              key={index}
+              // onLayout={(event) => {
+              //   const layout = event.nativeEvent.layout;
+              //   dataSourceCords[key] = layout.y;
+              //   setDataSourceCords(dataSourceCords);
+              //   console.log(dataSourceCords);
+              //   console.log("height:", layout.height);
+              //   console.log("width:", layout.width);
+              //   console.log("x:", layout.x);
+              //   console.log("y:", layout.y);
+              // }}
             >
               <TouchableOpacity
-                key={index}
                 onPress={() => {
                   handleWeekbar(index);
                 }}
@@ -113,136 +153,59 @@ const EditSchedule = (props) => {
     );
   };
 
-  const renderStatus = (status) => {
-    switch (status) {
-      case "income": {
-        return (
-          <SvgUri
-            width="24 "
-            height="24"
-            source={require("../assets/icons/check.svg")}
-            style={{
-              position: "absolute",
-              right: -4,
-              top: -4,
-            }}
-          />
-        );
-      }
-      case "miss": {
-        return (
-          <SvgUri
-            width="24 "
-            height="24"
-            source={require("../assets/icons/redCheck.svg")}
-            style={{
-              position: "absolute",
-              right: -4,
-              top: -4,
-            }}
-          />
-        );
-      }
-      case "complete": {
-        return <></>;
-      }
-    }
+  const renderScheduleItem = (number, time, index) => {
+    return (
+      <Block key={index} style={styles.scheduleBlock}>
+        <Block flex flexDirection="row" style={styles.schedule}>
+          <Block flex={4} style={styles.time}>
+            <Text color={"white"} size={16}>
+              {time}
+            </Text>
+            <SvgUri
+              width="20"
+              height="20"
+              source={require("../assets/icons/dotRed.svg")}
+              style={{ position: "absolute", right: 0, top: -10 }}
+            />
+            <Text bold size={12} color={"white"} style={styles.number}>
+              {number}
+            </Text>
+          </Block>
+          <Block flex={5}></Block>
+          <Block flex={1} style={styles.schedule}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("SchedulePatientList")}
+            >
+              <SvgUri
+                width="16"
+                height="16"
+                source={require("../assets/icons/add.svg")}
+              />
+            </TouchableOpacity>
+          </Block>
+        </Block>
+      </Block>
+    );
+  }
+
+  const renderScheduleItems = (day) => {
+    return [
+      renderScheduleItem(day && day.a, "11.00-14.00 am", 1),
+      renderScheduleItem(day && day.b, "14.00-17.00 pm", 2),    
+      renderScheduleItem(day && day.c, "9.00-11.00 am", 3)
+    ];
   };
 
-  const renderSchedules = (details) => {
-    let { time, status, number } = { ...details };
-
-    switch (status) {
-      case "missed":
-        return (
-          <Block style={styles.scheduleBlock}>
-            <Block flex flexDirection="row" style={styles.schedule}>
-              <Block flex={4} style={styles.time}>
-                <Text color={"white"} size={16}>
-                  {time}
-                </Text>
-                <SvgUri
-                  width="20"
-                  height="20"
-                  source={require("../assets/icons/dotRed.svg")}
-                  style={{ position: "absolute", right: 0, top: -10 }}
-                />
-                <Text bold size={12} color={"white"} style={styles.number}>
-                  {number}
-                </Text>
-              </Block>
-              <Block flex={5}></Block>
-              <Block flex={1} style={styles.schedule}>
-                <TouchableOpacity
-                  onPress={() => navigation.navigate("SchedulePatientList")}
-                >
-                  <SvgUri
-                    width="16"
-                    height="16"
-                    source={require("../assets/icons/add.svg")}
-                  />
-                </TouchableOpacity>
-              </Block>
-            </Block>
-          </Block>
-        );
-      case "idle":
-        return (
-          <Block style={styles.scheduleBlock}>
-            <Block flex flexDirection="row" style={styles.schedule}>
-              <Block flex={4} style={styles.timeIdle}>
-                <Text color={"black"} size={16}>
-                  {time}
-                </Text>
-              </Block>
-              <Block flex={5}></Block>
-              <Block flex={1} style={styles.schedule}>
-                <TouchableOpacity
-                  onPress={() => navigation.navigate("SchedulePatientList")}
-                >
-                  <SvgUri
-                    width="16"
-                    height="16"
-                    source={require("../assets/icons/add.svg")}
-                  />
-                </TouchableOpacity>
-              </Block>
-            </Block>
-          </Block>
-        );
-      case "booked":
-        return (
-          <Block style={styles.scheduleBlock}>
-            <Block flex flexDirection="row" style={styles.schedule}>
-              <Block flex={4} style={styles.time}>
-                <Text color={"white"} size={16}>
-                  {time}
-                </Text>
-                <SvgUri
-                  width="20"
-                  height="20"
-                  source={require("../assets/icons/dot.svg")}
-                  style={{ position: "absolute", right: 0, top: -10 }}
-                />
-                <Text bold size={12} color={"white"} style={styles.number}>
-                  {number}
-                </Text>
-              </Block>
-              <Block flex={5}></Block>
-              <Block flex={1} style={styles.schedule}>
-                <TouchableOpacity
-                  onPress={() => navigation.navigate("SchedulePatientList")}
-                >
-                  <SvgUri
-                    width="16"
-                    height="16"
-                    source={require("../assets/icons/add.svg")}
-                  />
-                </TouchableOpacity>
-              </Block>
-            </Block>
-          </Block>
-        );
+  const renderSchedules = () => {
+    switch (currentDay) {
+      case 0: return renderScheduleItems(timeSlot && timeSlot.Monday); 
+      case 1: return renderScheduleItems(timeSlot && timeSlot.Tuesday); 
+      case 2: return renderScheduleItems(timeSlot && timeSlot.Wednesday); 
+      case 3: return renderScheduleItems(timeSlot && timeSlot.Thursday); 
+      case 4: return renderScheduleItems(timeSlot && timeSlot.Friday); 
+      case 5: return renderScheduleItems(timeSlot && timeSlot.Saturday); 
+      case 6: return renderScheduleItems(timeSlot && timeSlot.Sunday); 
+      default: return;
     }
   };
 
@@ -291,8 +254,8 @@ const EditSchedule = (props) => {
               }}
             />
           </Block>
-          <Text size={20}>Dr. Ronald Joseph</Text>
-          <Text>neurosergion specialist</Text>
+          <Text size={20}>{doctor.name}</Text>
+          <Text>{doctor.address}</Text>
 
           <Block center style={styles.centerBlock}>
             <SwitchButton
@@ -315,31 +278,13 @@ const EditSchedule = (props) => {
         </Block>
         <Block row style={styles.Container}>
           <Text style={styles.schedules}>Schedules</Text>
-          <TouchableOpacity onPress={() => navigation.navigate("Calendar")}>
+          <TouchableOpacity onPress={() => navigation.navigate("Calendar", {childDay, schedule})}>
             <Text style={styles.calendar}>Calendar</Text>
           </TouchableOpacity>
         </Block>
         {weekBar()}
         <Block style={styles.renderSchedules}>
-          {renderSchedules({
-            time: "9.00-11.00 am",
-            status: "missed",
-            number: 3,
-          })}
-          {renderSchedules({
-            time: "11.00-12.00 am",
-            status: "idle",
-          })}
-          {renderSchedules({
-            time: "14.00-15.00 pm",
-            status: "booked",
-            number: 2,
-          })}
-          {renderSchedules({
-            time: "15.00-17.00 pm",
-            status: "booked",
-            number: 2,
-          })}
+          {renderSchedules()}
         </Block>
         <Block center style={styles.saveBtn}>
           <TouchableOpacity>
@@ -481,16 +426,6 @@ const styles = StyleSheet.create({
   backIcon: {
     marginLeft: theme.SIZES.BASE,
   },
-  roundBlock: {
-    borderBottomLeftRadius: 34,
-    borderBottomRightRadius: 34,
-    position: "absolute",
-    backgroundColor: "rgba(100, 120, 247, 0.84)",
-    height: height * 0.16,
-    width: width,
-    top: -10,
-    zIndex: 2,
-  },
   heading: {
     marginTop: height * 0.08,
     paddingHorizontal: theme.SIZES.BASE * 0.5,
@@ -513,15 +448,15 @@ const styles = StyleSheet.create({
   },
   calendar: {
     color: "#06D81E",
-    paddingLeft: width * 0.5,
+    paddingLeft: width * 0.53,
   },
   navbar: {
     backgroundColor: "#6E78F7",
     borderBottomRightRadius: 24,
     borderBottomLeftRadius: 24,
     width: width,
-    height: height * 0.16,
-    paddingTop: theme.SIZES.BASE * 2,
+    height: height * 0.1,
+    paddingTop: theme.SIZES.BASE,
     paddingLeft: theme.SIZES.BASE,
   },
   time: {
@@ -558,7 +493,7 @@ const styles = StyleSheet.create({
   },
   saveBtn: {
     width: width * 0.3,
-    height: theme.SIZES.BASE * 2,
+    height: theme.SIZES.BASE * 2.5,
     backgroundColor: "#6E78F7",
     borderRadius: 30,
     justifyContent: "center",

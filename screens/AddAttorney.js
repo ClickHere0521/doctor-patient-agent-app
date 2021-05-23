@@ -11,10 +11,11 @@ import { Button, Block, Text, theme, Icon } from "galio-framework";
 import { isValid } from '../src/utils/helpers';
 import Input from '../components/InputType2';
 import { materialTheme } from "../constants";
-import SwitchButton from "switch-button-react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as firebase from "firebase";
 import 'firebase/firestore';
+import { useDispatch } from 'react-redux';
+import { attorneyInfoAction } from '../store/duck/action';
 import 'firebase/storage';
 
 const { width, height } = Dimensions.get("screen");
@@ -22,11 +23,10 @@ const thumbMeasure = (width - 48 - 32) / 3;
 
 const AddAttorney = (props) => {
   const firestore = firebase.firestore();
-  const storage = firestore.storage();
+  const storage = firebase.storage();
 
   const { navigation } = props;
-  const { patientUid } = props.route.params;
-  const [activeSwitch, setActiveSwitch] = useState(1);
+  // const { patientUid } = props.route.params;
   const [imageUri, setImageUri] = useState(null);
   const [editFlg, setEditFlg] = useState(false);
   const [userName, setUserName] = useState("");
@@ -48,11 +48,9 @@ const AddAttorney = (props) => {
   const validFax = isValid('fax', fax);
   const validDescription = isValid('description', description);
 
-  const handleAvatar = (val) => {
-    setActiveSwitch(val);
-    if (val == 2) pickImage();
-    else setImageUri(null);
-  };
+  const attorneyInfoDispatch = useDispatch();
+
+  const attorneyInfo = [];
 
   const renderUserDetail = (detail) => {
     let { heading, content, handleName, handleValue, handleLabel, handlePlaceholder } = { ...detail };
@@ -68,8 +66,11 @@ const AddAttorney = (props) => {
           <Input
             label={handleLabel}
             value={handleValue}
-            onChangeText={handleName}
-            editable={editFlg}
+            onChangeText={(res) => {
+              handleName(res)
+              setSaveEnable()
+            }}
+            // editable={editFlg}
             placeholder={handlePlaceholder}
             keyboardType="email-address"
             leftIcon=""
@@ -82,6 +83,15 @@ const AddAttorney = (props) => {
       </Block>
     );
   };
+
+  const setSaveEnable = () => {
+    if (validEmail && validName && validAddress && validCityState && validZipcode && validTel && validFax) {
+      setEditFlg(true);
+    }
+    else{
+      setEditFlg(false);
+    }
+  }
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -118,63 +128,72 @@ const AddAttorney = (props) => {
         >
           Add Attorney Info
         </Text>
-        <TouchableOpacity onPress={() => { setEditFlg(true) }}>
+        {/* <TouchableOpacity onPress={() => { setEditFlg(true) }}>
           <Image
             source={require("../assets/icons/editHeaderWhite.png")}
             alt=""
             style={{ marginLeft: width * 0.4 }}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </Block>
     );
   };
 
   const handleSave = async () => {
-    if (validEmail && validName && validAddress && validCityState && validZipcode && validTel && validFax) {       
-      let caseId, attorneyId;
-      try {
-        await firestore.collection('Cases').doc(patientUid).collection('Case').get().then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            caseId = doc.id;
-          });
-        });
-        await firestore.collection('Cases').doc(patientUid).collection('Case').doc(caseId).collection('attorneyInfo').get().then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            attorneyId = doc.id;
-          })
-        });
-      } catch(e) {
-        console.log(e);
-      }
-      let newRef = firestore.collection('Cases').doc(patientUid).collection('Case').doc(caseId).collection('attorneyInfo').doc(attorneyId);
-      newRef.set({
-        address, cityState, email, fax, userName, tel, zipcode, description, reference: newRef
-      })
-      .then( async () => {
-        const pngRef = storage.ref(`logo/${patientUid}.png`);
-        await pngRef.put(imageUri);
-        const url = await pngRef.getDownloadURL();
-        console.log("FDFD",url);
-        Alert.alert(
-          "Success",
-          "You have successfully created the attorney info",
-          [
-            {
-              text: 'OK',
-              onPress: () => navigation.navigate("CreateCase")
-            }
-          ]
-        );        
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-      setEditFlg(false)
-      setRequested(false);
-    }
-    else {
-      setRequested(true);
-    }
+
+    attorneyInfo.push({
+      attorAvatar: imageUri,
+      attorName: userName,
+      attorEmail: email,
+      attorZipcode: zipcode,
+      attorCityState: cityState,
+      attorTel: tel,
+      attorFax: fax,
+      attorAddress: address,
+      attorDescription: description
+    });
+
+    console.log("attor-PInfo: ", attorneyInfo);
+
+    attorneyInfoDispatch(attorneyInfoAction(attorneyInfo));
+    // let caseId, attorneyId;
+    // try {
+    //   await firestore.collection('Cases').doc(patientUid).collection('Case').get().then((querySnapshot) => {
+    //     querySnapshot.forEach((doc) => {
+    //       caseId = doc.id;
+    //     });
+    //   });
+    //   await firestore.collection('Cases').doc(patientUid).collection('Case').doc(caseId).collection('attorneyInfo').get().then((querySnapshot) => {
+    //     querySnapshot.forEach((doc) => {
+    //       attorneyId = doc.id;
+    //     })
+    //   });
+    // } catch(e) {
+    //   console.log(e);
+    // }
+    // let newRef = firestore.collection('Cases').doc(patientUid).collection('Case').doc(caseId).collection('attorneyInfo').doc(attorneyId);
+    // newRef.set({
+    //   address, cityState, email, fax, userName, tel, zipcode, description, reference: newRef
+    // })
+    // .then( async () => {
+    //   const pngRef = storage.ref(`logo/${patientUid}.png`);
+    //   await pngRef.put(imageUri);
+    //   const url = await pngRef.getDownloadURL();
+    //   console.log("FDFD",url);
+    //   Alert.alert(
+    //     "Success",
+    //     "You have successfully created the attorney info",
+    //     [
+    //       {
+    //         text: 'OK',
+    //         onPress: () => navigation.navigate("CreateCase")
+    //       }
+    //     ]
+    //   );        
+    // })
+    // .catch((error) => {
+    //   console.log(error);
+    // });
   }
 
   return (
@@ -182,35 +201,30 @@ const AddAttorney = (props) => {
       {navbar()}
       <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
         <Block center row style={{ marginTop: 10, top: 10, marginBottom: 20 }}>
-          <Block middle style={{ marginRight: 14 }}>
-            {imageUri ? (
-              <Image
-                source={{ uri: imageUri }}
-                style={{ width: 50, height: 50 }}
-              />
-            ) : (
-              <Image
-                source={require("../assets/images/userDefault.png")}
-                style={{ width: 50, height: 50 }}
-              />
-            )}
+          <Block middle>
+            <TouchableOpacity
+              onPress={() => pickImage()}
+            >
+              {imageUri ? (
+                <Image
+                  source={{ uri: imageUri }}
+                  style={{ width: 80, height: 80, borderRadius: 50, borderWidth: 3, borderColor: "white" }}
+                />
+              ) : (
+                <Image
+                  source={require("../assets/images/userDefault.png")}
+                  style={{ width: 80, height: 80, borderRadius: 50, borderWidth: 3, borderColor: "white" }}
+                />
+              )}
+            </TouchableOpacity>
+            <Icon
+              name="camera"
+              family="font-awesome"
+              color="#555"
+              size={20}
+              style={{ position: 'absolute', bottom: 4, right: 4 }}
+            />
           </Block>
-          <SwitchButton
-            onValueChange={handleAvatar}
-            text1="Remove"
-            text2="Upload"
-            switchWidth={120}
-            switchHeight={30}
-            switchdirection="rtl"
-            switchBorderRadius={100}
-            switchSpeedChange={500}
-            switchBorderColor="#3B3E51"
-            switchBackgroundColor="#fff"
-            btnBorderColor="#3B3E51"
-            btnBackgroundColor="#3B3E51"
-            fontColor="#3B3E51"
-            activeFontColor="#fff"
-          />
         </Block>
 
         <Block style={styles.userDetail}>
@@ -266,7 +280,8 @@ const AddAttorney = (props) => {
         </Block>
         <Block row center>
           <TouchableOpacity
-            style={styles.save}
+            style={editFlg ? styles.save : styles.saveDisable}
+            disabled={!editFlg}
             onPress={() => handleSave()}
           >
             <Text color={"white"} size={16}>
@@ -448,6 +463,16 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     paddingHorizontal: 20,
     paddingVertical: 0,
+  },
+  saveDisable: {
+    backgroundColor: "grey",
+    borderRadius: 15,
+    width: width * 0.35,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+    marginHorizontal: 20,
   },
   save: {
     backgroundColor: "#00CE30",

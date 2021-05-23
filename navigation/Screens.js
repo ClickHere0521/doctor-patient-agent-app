@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState, useEffect} from "react";
 import { Easing, Dimensions } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createDrawerNavigator } from "@react-navigation/drawer";
@@ -6,6 +6,7 @@ import { createDrawerNavigator } from "@react-navigation/drawer";
 //constants
 import { Icon, Header } from "../components/";
 import { Images, materialTheme } from "../constants/";
+import CustomDrawerContent from "./Menu";
 
 //redux
 import { useDispatch, useSelector } from "react-redux";
@@ -20,7 +21,6 @@ import PatientCaseHistoryScreen from "../screens/PatientCaseHistory";
 import ChatScreen from "../screens/Chat";
 import CartScreen from "../screens/Cart";
 import CaseViewScreen from "../screens/CaseView";
-import CustomDrawerContent from "./Menu";
 import DoctorScheduleDetailScreen from "../screens/DoctorScheduleDetail";
 import DashboardPatientScreen from "../screens/DashboardPatient";
 import DashboardDoctorScreen from "../screens/DashboardDoctor";
@@ -72,6 +72,12 @@ import DoctorCaseHistoryScreen from "../screens/DoctorCaseHistory";
 import DoctorAllNotesScreen from "../screens/DoctorAllNotes";
 import DoctorAddNotesScreen from "../screens/DoctorAddNotes";
 import BiometricsScreen from "../screens/Biometrics";
+
+import * as firebase from "firebase";
+import 'firebase/firestore';
+import 'firebase/storage';
+import "firebase/auth";
+import _ from "lodash";
 
 import { IMLocalized } from "../src/localization/IMLocalization";
 
@@ -244,7 +250,18 @@ const DoctorCaseHistoryStack = (props) => {
 
 const AppStack = (props) => {
   const userRole = useSelector((state) => state.user.role);
+  
+  const firestore = firebase.firestore();
+  const storage = firebase.storage();
 
+  const auth = firebase.auth();
+  // console.log(auth.currentUser.uid);
+
+  // useEffect(() => {
+  //   firestore.collection('Agents').doc(auth.currentUser.uid).get().then((querySnapshot) => {
+  //     querySnapshot.forEach((doc) => {})
+  //   });
+  // });
   let profile = {};
   switch (userRole) {
     case "agent":

@@ -27,4 +27,25 @@ const patientInfoAction = (pInfo) => {
 	};
 };
 
-export { roleSelector, patientInfoAction };
+const attorneyInfoAction = (attorneyInfo) => {
+	return {
+		type: types.SET_ATTORNEY_INFO,
+		payload: { attorneyInfo }
+	};
+};
+
+const insuranceInfoAction = (insuranceInfo) => {
+	return {
+		type: types.SET_INSURANCE_INFO,
+		payload: { insuranceInfo }
+	};
+};
+
+const noteInfoAction = (noteInfo) => {
+	return {
+		type: types.SET_NOTE_INFO,
+		payload: { noteInfo }
+	};
+};
+
+export { roleSelector, patientInfoAction, attorneyInfoAction, insuranceInfoAction, noteInfoAction };

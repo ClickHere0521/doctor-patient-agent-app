@@ -47,7 +47,7 @@ const Components = (props) => {
       <TouchableWithoutFeedback
         style={{ zIndex: 3 }}
         key={`product-${item.title}`}
-        onPress={() => {}}
+        onPress={() => { }}
       >
         <LinearGradient
           start={{ x: 0, y: 0 }}
@@ -93,20 +93,62 @@ const Components = (props) => {
     );
   };
 
+  const patientLists = async () => {
+    const agentUid = '6hQ6yTAGNXNihOuFfQku05BK1SJ2';
+
+    if (editFlg == true) {
+      let patientId;
+      try {
+        await firestore.collection('Patients').doc().collection('Patient').doc().collection('profile').get().then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            patientId = doc.id;
+          });
+        });
+      } catch (e) {
+        console.log(e);
+      }
+
+      let newRef = firestore.collection('Patients').doc().collection('Patient').doc();
+      newRef.get({
+        email, fullName: fullname, phone: tel, location: address, role: "agent"
+      })
+        .then(async () => {
+          const pngRef = storage.ref(`logo/${agentUid}.png`);
+          await pngRef.put(imageUri);
+          const url = await pngRef.getDownloadURL();
+          console.log("FDFD", url);
+
+          Alert.alert(
+            "Success",
+            "You have successfully edited the agent info",
+            [
+              {
+                text: 'OK',
+                onPress: () => { }
+              }
+            ]
+          );
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  };
+
   const renderPatientsList = () => {
     return (
       <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
         <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
-          <ListItem product={products[0]} horizontal role="agentPatinet" />
-          <ListItem product={products[1]} horizontal role="agentPatinet" />
-          <ListItem product={products[2]} horizontal role="agentPatinet" />
-          <ListItem product={products[3]} horizontal role="agentPatinet" />
-          <ListItem product={products[4]} horizontal role="agentPatinet" />
-          <ListItem product={products[0]} horizontal role="agentPatinet" />
-          <ListItem product={products[1]} horizontal role="agentPatinet" />
-          <ListItem product={products[2]} horizontal role="agentPatinet" />
-          <ListItem product={products[3]} horizontal role="agentPatinet" />
-          <ListItem product={products[4]} horizontal role="agentPatinet" />
+          <ListItem product={products[0]} horizontal role="agentPatient" />
+          <ListItem product={products[1]} horizontal role="agentPatient" />
+          <ListItem product={products[2]} horizontal role="agentPatient" />
+          <ListItem product={products[3]} horizontal role="agentPatient" />
+          <ListItem product={products[4]} horizontal role="agentPatient" />
+          <ListItem product={products[0]} horizontal role="agentPatient" />
+          <ListItem product={products[1]} horizontal role="agentPatient" />
+          <ListItem product={products[2]} horizontal role="agentPatient" />
+          <ListItem product={products[3]} horizontal role="agentPatient" />
+          <ListItem product={products[4]} horizontal role="agentPatient" />
         </ScrollView>
       </Block>
     );
@@ -148,10 +190,10 @@ const Components = (props) => {
         style={styles.components}
         showsVerticalScrollIndicator={false}
       >
-        <TouchableOpacity onPress={() => navigation.navigate("AddPatient", { editPatient: false })} style={{width:60}}>
+        <TouchableOpacity onPress={() => navigation.navigate("AddPatient", { editPatient: false })} style={{ width: 60 }}>
           <Image source={require("../assets/images/createCase.png")} />
-        </TouchableOpacity> 
-        <Text size={10} style={{left: 26}}> Add</Text>
+        </TouchableOpacity>
+        <Text size={10} style={{ left: 26 }}> Add</Text>
         {renderSorts()}
         {renderPatientsList()}
       </ScrollView>

@@ -1,10 +1,12 @@
 import React from "react";
-import { StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { Block, Text, theme } from "galio-framework";
 
 import Icon from "./Icon";
 import materialTheme from "../constants/Theme";
 import { IMLocalized, init } from "../src/localization/IMLocalization";
+
+import firebase from "firebase";
 
 const DrawerItem = (props) => {
   const renderIcon = () => {
@@ -164,15 +166,50 @@ const DrawerItem = (props) => {
             color={focused ? "white" : materialTheme.COLORS.MUTED}
           />
         );
+      case "Log out":
+        return (
+          <Icon
+            size={15}
+            name="sign-out"
+            family="font-awesome"
+            color={focused ? "white" : materialTheme.COLORS.MUTED}
+          />
+        );
       default:
         return null;
     }
   };
-  const { title, focused, navigation } = props;
+  const { title, focused, navigation, modal } = props;
   return (
     <TouchableOpacity
       style={{ height: 55 }}
-      onPress={() => navigation.navigate(title)}
+      onPress={() => modal ? (
+        Alert.alert (
+          'Are you sure?',
+          'Do you want to really log out?',
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                firebase
+                  .auth()
+                  .signOut()
+                  .then(() => {
+                    // console.log("success")
+                    navigation.navigate("UserSelectStack")
+                  })
+                  .catch((error) => {
+                    console.log(error);
+                  });
+              }
+            },
+            {
+              text: 'Cancel',
+              onPress: () => {}
+            }
+          ]
+        )
+      ) : navigation.navigate(title)}
     >
       <Block
         flex

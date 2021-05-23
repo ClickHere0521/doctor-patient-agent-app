@@ -2,11 +2,11 @@
 import {
   ScrollView,
   StyleSheet,
-  Image,
+  BackHandler,
   ImageBackground,
   Dimensions,
   TouchableOpacity,
-  TouchableOpacityComponent,
+  Alert,
 } from "react-native";
 import { Button, Block, Text, theme, Icon } from "galio-framework";
 
@@ -16,9 +16,51 @@ import { Product, HorizontalListItem } from "../components";
 import SwitchButton from "switch-button-react-native";
 import { IMLocalized } from "../src/localization/IMLocalization";
 import SvgUri from "expo-svg-uri";
+import {
+  useFocusEffect
+ } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get("screen");
 const DashboardPatient = (props) => {
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const onBackPress = () => {
+       Alert.alert(
+        "Are you sure?",
+        "Do you want to really log out?",
+        [
+          {
+            text: "OK",
+            onPress: () => {navigation.navigate("UserSelectStack")}
+          },
+          {
+            text: "Cancel",
+            onPress: () => {}
+          }
+        ]
+       );
+        // Return true to stop default back navigaton
+        // Return false to keep default back navigaton
+        return true;
+      };
+
+      // Add Event Listener for hardwareBackPress
+      BackHandler.addEventListener(
+        'hardwareBackPress',
+        onBackPress
+      );
+
+      return () => {
+        // Once the Screen gets blur Remove Event Listener
+        BackHandler.removeEventListener(
+          'hardwareBackPress',
+          onBackPress
+        );
+      };
+    }, []),
+  );
+
   const { navigation } = props;
   const [activeSwitch, setActiveSwitch] = useState(null);
   console.log(activeSwitch);

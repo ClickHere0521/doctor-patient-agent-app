@@ -1,18 +1,18 @@
 import types from '../action/types';
 
 const initialState = {
-	pInfo: []
+	noteInfo: []
 };
 
-const patient = (state = initialState, action) => {
+const note = (state = initialState, action) => {
 	switch (action.type) {
-		case types.SET_PATIENT_INFO:
+		case types.SET_NOTE_INFO:
 			return {
 				...state,
-				pInfo: action.payload.pInfo,
+				noteInfo: action.payload.noteInfo,
 			};
 		default:
 			return state;
 	}
 };
-export default patient;
+export default note;

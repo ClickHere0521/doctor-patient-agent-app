@@ -2,20 +2,17 @@ import React, { useState } from "react";
 import {
   ScrollView,
   StyleSheet,
-  TouchableWithoutFeedback,
   Dimensions,
   TouchableHighlight,
   TouchableOpacity,
 } from "react-native";
 import { Button, Block, Text, Input, theme } from "galio-framework";
 import { Icon } from "../components";
-
-import products from "../constants/images/home";
-import { ListItem } from "../components";
 import { LinearGradient } from "expo-linear-gradient";
-import SwitchButton from "switch-button-react-native";
 import { IMLocalized } from "../src/localization/IMLocalization";
 import { useSelector } from "react-redux";
+// import DocumentScanner from 'react-native-documentscanner-android';
+
 const { width, height } = Dimensions.get("screen");
 
 const cardWidth = theme.SIZES.BASE * 4;
@@ -241,11 +238,11 @@ const PatientView = (props) => {
                 start={{ x: 0, y: 0 }}
                 end={{ x: 0.25, y: 1.1 }}
                 locations={[0.2, 1]}
-                colors={["#EFEFEF", "#FFF"]}
+                colors={["#00CE30", "#00CE30"]}
                 style={styles.sortItem}
               >
                 <Block center>
-                  <Text center size={15} fontWeight="semiBold">
+                  <Text center size={15} fontWeight="semiBold" color="white">
                     {IMLocalized("Upload Files")}
                   </Text>
                 </Block>
@@ -256,6 +253,7 @@ const PatientView = (props) => {
       );
     }
   };
+
   const renderSorts = () => {
     return (
       <Block
@@ -317,6 +315,15 @@ const PatientView = (props) => {
       {navbar()}
       {scanAndUpload()}
       {renderSorts()}
+      {/* <View>
+        <DocumentScanner
+          onPictureTaken={data => {
+            console.log(data.path);
+          }}
+          enableTorch={false}
+          detectionCountBeforeCapture={5}
+        />
+      </View> */}
       <ScrollView
         vertical={true}
         pagingEnabled={true}

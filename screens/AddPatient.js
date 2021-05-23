@@ -4,16 +4,13 @@ import {
   Dimensions,
   ScrollView,
   Image,
-  ImageBackground,
   TouchableOpacity,
-  Platform,
+  View,
 } from "react-native";
 import { Button, Block, Text, theme, Icon } from "galio-framework";
 
 import { materialTheme } from "../constants";
-import SwitchButton from "switch-button-react-native";
 import * as ImagePicker from "expo-image-picker";
-import { SvgUri } from "react-native-svg";
 import { isValid } from '../src/utils/helpers';
 import Input from '../components/InputType2';
 import { useDispatch } from 'react-redux';
@@ -37,16 +34,7 @@ const thumbMeasure = (width - 48 - 32) / 3;
 const AddPatient = (props) => {
   const { route, navigation } = props;
   const { editPatient, patientUid } = route.params;
-  const patientInfoDispatch = useDispatch();
-  const [activeSwitch, setActiveSwitch] = useState(1);
   const [imageUri, setImageUri] = useState(null);
-
-
-  // const imageUri = "../assets/images/avatar.png";
-  const handleChange = (name, value) => {
-    setVals({ [name]: value });
-  };
-
   const [editFlg, setEditFlg] = useState(false);
 
   const [userName, setUserName] = useState("");
@@ -66,12 +54,9 @@ const AddPatient = (props) => {
   const validSsn = isValid('ssn', ssn);
   const validDescription = isValid('description', description);
 
-  const userId = "";
-  const handleAvatar = (val) => {
-    setActiveSwitch(val);
-    if (val == 2) pickImage();
-    else setImageUri(null);
-  };
+  const patientInfoDispatch = useDispatch();
+  
+  const pInfo = [];
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -87,6 +72,7 @@ const AddPatient = (props) => {
       setImageUri(result.uri);
     }
   };
+
   const navbar = () => {
     return (
       <Block row style={styles.navbar} center>
@@ -107,51 +93,44 @@ const AddPatient = (props) => {
         >
           {editPatient ? "Patient Info" : "Add Patient"}
         </Text>
-        <TouchableOpacity onPress={() => { setEditFlg(true) }}>
-          <Image
-            source={require("../assets/icons/editHeaderWhite.png")}
-            alt=""
-            style={{ marginLeft: width * 0.54 }}
-          />
-        </TouchableOpacity>
       </Block>
     );
   };
 
+  const setSaveEnable = () => {
+    if (validEmail && validName && validSsn && validCityState && validDate) {
+      setEditFlg(true);
+    }
+  }
   return (
     <Block center flex style={styles.profile}>
       {navbar()}
       <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
         <Block center row style={{ top: 10 }}>
-          <Block middle style={{ marginRight: 14 }}>
-            {imageUri ? (
-              <Image
-                source={{ uri: imageUri }}
-                style={{ width: 50, height: 50 }}
-              />
-            ) : (
-              <Image
-                source={require("../assets/images/userDefault.png")}
-                style={{ width: 50, height: 50 }}
-              />
-            )}
+          <Block middle>
+            <TouchableOpacity
+              onPress={() => pickImage()}
+            >
+              {imageUri ? (
+                <Image
+                  source={{ uri: imageUri }}
+                  style={{ width: 80, height: 80, borderRadius: 50, borderWidth: 3, borderColor: "white" }}
+                />
+              ) : (
+                <Image
+                  source={require("../assets/images/userDefault.png")}
+                  style={{ width: 80, height: 80, borderRadius: 50, borderWidth: 3, borderColor: "white" }}
+                />
+              )}
+            </TouchableOpacity>
+            <Icon
+              name="camera"
+              family="font-awesome"
+              color="#555"
+              size={20}
+              style={{ position: 'absolute', bottom: 4, right: 4 }}
+            />
           </Block>
-          <SwitchButton
-            onValueChange={handleAvatar}
-            text1="Remove"
-            text2="Upload"
-            switchWidth={120}
-            switchHeight={30}
-            switchdirection="rtl"
-            switchBorderRadius={100}
-            switchSpeedChange={500}
-            switchBorderColor="#3B3E51"
-            switchBackgroundColor="#fff"
-            btnBorderColor="#3B3E51"
-            btnBackgroundColor="#3B3E51"
-            fontColor="#3B3E51"
-            activeFontColor="#fff"
-          />
         </Block>
         <Block style={styles.userInfo}>
           <Block row style-st flex flexDirection="row">
@@ -164,8 +143,10 @@ const AddPatient = (props) => {
               <Input
                 label="USERNAME"
                 value={userName}
-                onChangeText={setUserName}
-                editable={editFlg}
+                onChangeText={(res) => {
+                  setUserName(res)
+                  setSaveEnable()
+                }}
                 placeholder="Name"
                 keyboardType="email-address"
                 leftIcon=""
@@ -186,8 +167,10 @@ const AddPatient = (props) => {
               <Input
                 label="DATE"
                 value={dob}
-                onChangeText={setDob}
-                editable={editFlg}
+                onChangeText={(res) => {
+                  setDob(res)
+                  setSaveEnable()
+                }}
                 placeholder="MM/DD/YYYY"
                 keyboardType="email-address"
                 leftIcon=""
@@ -208,8 +191,10 @@ const AddPatient = (props) => {
               <Input
                 label="CityState"
                 value={cityState}
-                onChangeText={setCityState}
-                editable={editFlg}
+                onChangeText={(res) => {
+                  setCityState(res)
+                  setSaveEnable()
+                }}
                 placeholder="NewYork XX"
                 keyboardType="email-address"
                 leftIcon=""
@@ -230,8 +215,10 @@ const AddPatient = (props) => {
               <Input
                 label="Email"
                 value={email}
-                onChangeText={setEmail}
-                editable={editFlg}
+                onChangeText={(res) => {
+                  setEmail(res)
+                  setSaveEnable()
+                }}
                 keyboardType="email-address"
                 placeholder="john0092@email.com"
                 leftIcon=""
@@ -252,8 +239,10 @@ const AddPatient = (props) => {
               <Input
                 label="SSN"
                 value={ssn}
-                onChangeText={setSsn}
-                editable={editFlg}
+                onChangeText={(res) => {
+                  setSsn(res)
+                  setSaveEnable()
+                }}
                 leftIcon=""
                 rightIcon=""
                 validate
@@ -263,57 +252,54 @@ const AddPatient = (props) => {
               />
             </Block>
           </Block>
-          <Block style-st>
-            <Text style={styles.label}>
-              Description <Text color={"red"}>*</Text>
-            </Text>
-            <Input
-              label="Description"
-              value={description}
-              onChangeText={setDescription}
-              editable={editFlg}
-              leftIcon=""
-              rightIcon=""
-              validate
-              requested={requested}
-              style={[styles.valiInput, { height: 100 }]}
-              multiline={true}
-            />
-          </Block>
         </Block>
         <Block row center>
           <TouchableOpacity
-            style={styles.save}
+            style={editFlg ? styles.save : styles.saveDisable}
+            disabled={!editFlg}
             onPress={async () => {
-              if (validEmail && validName && validSsn && validCityState && validDate && validDescription) {
+              if (validEmail && validName && validSsn && validCityState && validDate) {
                 if (!editPatient) {
                   console.log("email & password signUp");
-                  await auth
-                    .createUserWithEmailAndPassword(email, password)
-                    .then((res) => {
-                      dbh.collection('Patients').doc(res.user.uid).collection("Patient").doc().collection("Profile").add({
-                        address: "",
-                        avatar: "",
-                        cityState: cityState,
-                        description: description,
-                        dob: dob,
-                        email: email,
-                        geoLocation: "",
-                        name: userName,
-                        phone: "",
-                        scheduleRelatedID: "",
-                        ssn: ssn
-                      }).
-                        then(() => {
-                          console.log('user Add');
-                        });
-                      patientInfoDispatch(patientInfoAction(res.user.uid));
-                    })
-                    .catch((error) => {
-                      console.log(">>>Error>>>")
-                    });
+                  pInfo.push({
+                    email: email,
+                    password: password,
+                    cityState: cityState,
+                    dob: dob,
+                    email: email,
+                    name: userName,
+                    ssn: ssn,
+                    avatar: imageUri
+                  });
 
-                  setEditFlg(false);
+                  console.log("addPatient-PInfo: ", pInfo);
+                  
+                  patientInfoDispatch(patientInfoAction(pInfo));
+
+                  // await auth
+                  //   .createUserWithEmailAndPassword(email, password)
+                  //   .then((res) => {
+                  //     dbh.collection('Patients').doc(res.user.uid).collection("Patient").doc().collection("Profile").add({
+                  //       address: "",
+                  //       avatar: "",
+                  //       cityState: cityState,
+                  //       description: description,
+                  //       dob: dob,
+                  //       email: email,
+                  //       geoLocation: "",
+                  //       name: userName,
+                  //       phone: "",
+                  //       scheduleRelatedID: "",
+                  //       ssn: ssn
+                  //     }).
+                  //       then(() => {
+                  //         console.log('user Add');
+                  //       });
+                  //   })
+                  //   .catch((error) => {
+                  //     console.log(">>>Error>>>")
+                  //   });
+                                    
                   setRequested(false);
                 }
                 else {
@@ -506,6 +492,16 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     paddingHorizontal: 20,
     paddingVertical: 0,
+  },
+  saveDisable: {
+    backgroundColor: "grey",
+    borderRadius: 15,
+    width: width * 0.35,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+    marginHorizontal: 20,
   },
   save: {
     backgroundColor: "#00CE30",

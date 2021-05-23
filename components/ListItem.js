@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { withNavigation } from "@react-navigation/compat";
 import {
   StyleSheet,
@@ -20,6 +20,7 @@ const ListItem = (props) => {
   const {
     navigation,
     product,
+    category,
     horizontal,
     full,
     style,
@@ -30,7 +31,6 @@ const ListItem = (props) => {
     weekday,
     role,
   } = props;
-
   const imageStyles = [
     styles.image,
     full ? styles.fullImage : styles.horizontalImage,
@@ -50,8 +50,8 @@ const ListItem = (props) => {
             style={{
               borderRadius: 50,
               backgroundColor: "#06D81E",
-              width: theme.SIZES.BASE * 1.3,
-              height: theme.SIZES.BASE * 1.3,
+              width: theme.SIZES.BASE,
+              height: theme.SIZES.BASE,
               position: "absolute",
               right: -5,
               top: -5,
@@ -61,8 +61,8 @@ const ListItem = (props) => {
               name="check"
               family="font-awesome"
               color={theme.COLORS.WHITE}
-              size={theme.SIZES.BASE}
-              style={{ paddingLeft: 3, paddingTop: 0 }}
+              size={theme.SIZES.BASE * 0.8}
+              style={{ justifyContent: 'center', paddingLeft: 1.5 }}
             >
               {" "}
             </Icon>
@@ -100,8 +100,9 @@ const ListItem = (props) => {
   };
 
   const renderButtons = (role) => {
+    console.log(role);
     switch (role) {
-      case "agentPatinet":
+      case "agentPatient":
         return (
           <>
             <Button
@@ -159,7 +160,7 @@ const ListItem = (props) => {
               }}
             >
               <Text
-                size={12}
+                size={11}
                 center
                 style={{ justifyContent: "center", alignItems: "center" }}
                 color={"#FFF"}
@@ -195,16 +196,14 @@ const ListItem = (props) => {
               shadowless
               color={"#06D81E"}
               style={[styles.button, styles.shadow]}
-              size={12}
+              size={11}
               onPress={() => navigation.navigate("DoctorCaseDetail")}
             >
               <Text
-                size={12}
+                size={11}
                 center
-                bold
                 style={{ justifyContent: "center", alignItems: "center" }}
                 color={"#FFF"}
-                fontWeight={"semiBold"}
               >
                 {IMLocalized("Detail")}
               </Text>
@@ -229,7 +228,7 @@ const ListItem = (props) => {
             onPress={() => {
               switch (userRole) {
                 case "agent": {
-                  navigation.navigate("AgentCaseDetail");
+                  navigation.navigate("AgentCaseDetail", {category});
                   break;
                 }
                 case "doctor": {
@@ -267,28 +266,28 @@ const ListItem = (props) => {
         onPress={() => ("Product", { product: product })}
       >
         <Block style={[styles.imageContainer, styles.shadow]}>
-          <Image source={{ uri: product.image }} style={imageStyles} />
+          <Image source={{ uri: category.avatar }} style={imageStyles} />
         </Block>
       </TouchableWithoutFeedback>
       <TouchableWithoutFeedback onPress={() => console.log("Patient Pressed")}>
         <Block flex={2}>
-          <Text size={16} style={styles.userName}>
-            {product.title}
+          <Text size={12} style={styles.userName}>
+            {category.patientName}
           </Text>
           <Text
-            size={14}
+            size={11}
             muted={!priceColor}
             color={priceColor}
             style={styles.content}
           >
-            {role != "schedulePatientList" && product.content}
+            {role != "schedulePatientList" && category.caseStatus}
           </Text>
         </Block>
       </TouchableWithoutFeedback>
       <TouchableWithoutFeedback onPress={() => console.log("Patient Pressed")}>
         <Block flex={1}>
-          <Text size={12} style={styles.times} color={"#06D81E"}>
-            {product.time}
+          <Text size={11} style={styles.times} color={"#06D81E"}>
+            {category.caseCreateTime.toDate().toDateString()}
           </Text>
           {renderButtons(role)}
         </Block>
@@ -321,14 +320,14 @@ const styles = StyleSheet.create({
     margin: theme.SIZES.BASE / 2,
   },
   horizontalImage: {
-    height: theme.SIZES.BASE * 4.5,
-    width: theme.SIZES.BASE * 4.5,
+    height: theme.SIZES.BASE * 3.5,
+    width: theme.SIZES.BASE * 3.5,
     borderWidth: 2,
     borderColor: theme.COLORS.WHITE,
   },
   fullImage: {
-    height: 215,
-    width: width - theme.SIZES.BASE * 3,
+    height: 150,
+    width: width - theme.SIZES.BASE * 4,
   },
   shadow: {
     shadowColor: theme.COLORS.BLACK,
@@ -355,9 +354,8 @@ const styles = StyleSheet.create({
     paddingRight: 2,
   },
   button: {
-    marginBottom: theme.SIZES.BASE,
     width: theme.SIZES.BASE * 3.5,
-    height: theme.SIZES.BASE * 1.5,
+    height: theme.SIZES.BASE * 1.2,
     position: "absolute",
     right: theme.SIZES.BASE / 4,
     borderRadius: 40,

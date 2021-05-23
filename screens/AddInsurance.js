@@ -13,6 +13,9 @@ import Input from '../components/InputType2';
 import { materialTheme } from "../constants";
 import * as firebase from "firebase";
 import 'firebase/firestore';
+import { useDispatch } from 'react-redux';
+import { insuranceInfoAction } from '../store/duck/action';
+import InsuranceInfo from "./BookDoctor";
 
 const firestore = firebase.firestore();
 const { width, height } = Dimensions.get("screen");
@@ -20,7 +23,7 @@ const thumbMeasure = (width - 48 - 32) / 3;
 
 const AddInsurance = (props) => {
   const { navigation } = props;
-  const { patientUid } = props.route.params;
+  // const { patientUid } = props.route.params;
   const [editFlg, setEditFlg] = useState(false);
   const [userName, setUserName] = useState("");
   const [insurancenumber, setInsurancenumber] = useState("");
@@ -38,6 +41,9 @@ const AddInsurance = (props) => {
   const validInsuranceadjuster = isValid('insuranceadjuster', insuranceadjuster);
   const validDescription = isValid('description', description);
 
+  const insuranceInfo = [];
+  const insuranceInfoDispatch = useDispatch();
+
   const renderUserDetail = (detail) => {
     let { heading, content, handleName, handleValue, handleLabel, handlePlaceholder } = { ...detail };
     return (
@@ -52,8 +58,10 @@ const AddInsurance = (props) => {
           <Input
             label={handleLabel}
             value={handleValue}
-            onChangeText={handleName}
-            editable={editFlg}
+            onChangeText={(res) => {
+              handleName(res)
+              setSaveEnable()
+            }}
             placeholder={handlePlaceholder}
             keyboardType="email-address"
             leftIcon=""
@@ -66,6 +74,15 @@ const AddInsurance = (props) => {
       </Block>
     );
   };
+
+  const setSaveEnable = () => {
+    if (validName && validAddress && validCityState && validZipcode && validInsurancePolicyNumber && validInsuranceadjuster) {
+      setEditFlg(true);
+    }
+    else{
+      setEditFlg(false);
+    }
+  }
 
   const navbar = () => {
     return (
@@ -89,59 +106,71 @@ const AddInsurance = (props) => {
         >
              Add Insurance Info
         </Text>
-        <TouchableOpacity onPress={() => { setEditFlg(true) }}>
+        {/* <TouchableOpacity onPress={() => { setEditFlg(true) }}>
           <Image
             source={require("../assets/icons/editHeaderWhite.png")}
             alt=""
             style={{ marginLeft: width * 0.4 }}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </Block>
     );
   };
 
   const handleSave = async () => {
-    if (validName && validAddress && validCityState && validZipcode && validInsurancePolicyNumber && validInsuranceadjuster) {
-      let caseId, insuranceId;
-      try {
-        await firestore.collection('Cases').doc(patientUid).collection('Case').get().then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            caseId = doc.id;
-          });
-        });
-        await firestore.collection('Cases').doc(patientUid).collection('Case').doc(caseId).collection('InsuranceInfo').get().then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            insuranceId = doc.id;
-          })
-        });
-      } catch(e) {
-        console.log(e);
-      }
-      let newRef = firestore.collection('Cases').doc(patientUid).collection('Case').doc(caseId).collection('InsuranceInfo').doc(insuranceId);
-      newRef.set({
-        address, cityState, adjuster: insuranceadjuster, companyName: userName, policyNumber: insurancenumber, zipCode: zipcode
-      })
-      .then(() => {
-        Alert.alert(
-          "Success",
-          "You have successfully created the insurance info",
-          [
-            {
-              text: 'OK',
-              onPress: () => navigation.navigate("CreateCase")
-            }
-          ]
-        );        
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-        setEditFlg(false)
-        setRequested(false);
-      }
-    else {
-      setRequested(true);
-    }
+    insuranceInfo.push({
+      insurCompanyName: userName,
+      insurZipcode: zipcode,
+      insurCityState: cityState,
+      insurAddress: address,
+      insurAdjuster: insuranceadjuster,
+      insurPolicyNumber: insurancenumber,
+    });
+
+    console.log("insur-PInfo: ", insuranceInfo);
+
+    insuranceInfoDispatch(insuranceInfoAction(insuranceInfo));
+    // if (validName && validAddress && validCityState && validZipcode && validInsurancePolicyNumber && validInsuranceadjuster) {
+    //   let caseId, insuranceId;
+    //   try {
+    //     await firestore.collection('Cases').doc(patientUid).collection('Case').get().then((querySnapshot) => {
+    //       querySnapshot.forEach((doc) => {
+    //         caseId = doc.id;
+    //       });
+    //     });
+    //     await firestore.collection('Cases').doc(patientUid).collection('Case').doc(caseId).collection('InsuranceInfo').get().then((querySnapshot) => {
+    //       querySnapshot.forEach((doc) => {
+    //         insuranceId = doc.id;
+    //       })
+    //     });
+    //   } catch(e) {
+    //     console.log(e);
+    //   }
+    //   let newRef = firestore.collection('Cases').doc(patientUid).collection('Case').doc(caseId).collection('InsuranceInfo').doc(insuranceId);
+    //   newRef.set({
+    //     address, cityState, adjuster: insuranceadjuster, companyName: userName, policyNumber: insurancenumber, zipCode: zipcode
+    //   })
+    //   .then(() => {
+    //     Alert.alert(
+    //       "Success",
+    //       "You have successfully created the insurance info",
+    //       [
+    //         {
+    //           text: 'OK',
+    //           onPress: () => navigation.navigate("CreateCase")
+    //         }
+    //       ]
+    //     );        
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
+    //     setEditFlg(false)
+    //     setRequested(false);
+    //   }
+    // else {
+    //   setRequested(true);
+    // }
   }
 
   return (
@@ -195,7 +224,8 @@ const AddInsurance = (props) => {
         </Block>
         <Block row center>
           <TouchableOpacity
-            style={styles.save}
+            style={editFlg ? styles.save : styles.saveDisable}
+            disabled={!editFlg}
             onPress={() => handleSave()}
           >
             <Text color={"white"} size={16}>
@@ -377,6 +407,16 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     paddingHorizontal: 20,
     paddingVertical: 0,
+  },
+  saveDisable: {
+    backgroundColor: "grey",
+    borderRadius: 15,
+    width: width * 0.35,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+    marginHorizontal: 20,
   },
   save: {
     backgroundColor: "#00CE30",

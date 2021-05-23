@@ -1,60 +1,65 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
   Image,
   Dimensions,
+  ActivityIndicator,
 } from "react-native";
 import { Button, Block, Text, theme } from "galio-framework";
-
 import { Icon } from "../components/";
 import Accordion from "react-native-collapsible/Accordion";
 import { IMLocalized } from "../src/localization/IMLocalization";
 import SvgUri from "expo-svg-uri";
 import { useSelector } from "react-redux";
+import firebase from 'firebase';
 
 const { width, height } = Dimensions.get("screen");
 
-const SECTIONS = [
-  {
-    title: "First",
-    content: "Lorem ipsum...",
-  },
-  {
-    title: "Second",
-    content: "Lorem ipsum...",
-  },
-  {
-    title: "First",
-    content: "Lorem ipsum...",
-  },
-  {
-    title: "Second",
-    content: "Lorem ipsum...",
-  },
-  {
-    title: "First",
-    content: "Lorem ipsum...",
-  },
-  {
-    title: "Second",
-    content: "Lorem ipsum...",
-  },
-];
 const PrimaryCareDoctorView = (props) => {
-  
+  const firestore = firebase.firestore();
   const userRole = useSelector((state) => state.user.role);
   const { navigation } = props;
   const [activeSections, setActiveSections] = useState([0]);
+  const [doctors, setDoctors] = useState([]);
+  let doctorsList = [];
+
+  useEffect(() => {
+    firestore.collection('PCDoctors').get().then(async(querySnapshot) => {
+      await querySnapshot.docs.map(async(doc) => {
+        console.log("=============",doc.data())
+        await firestore.collection('PCDoctors').doc(doc.id).collection('PCDoctor').get().then((querySnapshot) => {
+          const doctorId = doc.id;
+          querySnapshot.forEach((doctorDoc) => {
+            const { address, city_state, email, name, phone, description } = doctorDoc.data();
+            
+            doctorsList.push({
+              name,
+              phone,
+              address,
+              city_state,
+              description,     
+              doctorId,             
+            });
+            
+          })
+          console.log('---doctorlist---', doctorsList);
+          setDoctors(doctorsList);
+          
+        });
+      });
+      
+    });
+  }, []);
 
   const navbarIcons = () => {
     if(userRole == "agent"){
       return (
         <Block row>
           <TouchableOpacity
-            onPress={() => navigation.navigate("CreateDoctorAccount")}
-            style={{ paddingLeft: width * 0.45, padding: 2 }}
+            onPress={() => navigation.navigate("CreateDoctorAccount", { doctorId: null })}
+            style={{ paddingLeft: width * 0.6, padding: 2 }}
           >
             <Text color={"white"}>
               <SvgUri
@@ -65,7 +70,7 @@ const PrimaryCareDoctorView = (props) => {
             </Text>
           </TouchableOpacity>
 
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={() => {}}
             style={{ paddingLeft: width * 0.02, padding: 2 }}
           >
@@ -89,11 +94,12 @@ const PrimaryCareDoctorView = (props) => {
                 source={require("../assets/icons/trash.svg")}
               />
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </Block>
       )
     }
   }
+  
   const navbar = () => {
     return (
       <Block>
@@ -111,7 +117,7 @@ const PrimaryCareDoctorView = (props) => {
           <Text
             color="black"
             style={{ paddingLeft: theme.SIZES.BASE }}
-            size={22}
+            size={20}
             fontWeight="semiBold"
           >
             {IMLocalized("Doctors")}
@@ -131,7 +137,7 @@ const PrimaryCareDoctorView = (props) => {
             <Image
               source={{
                 uri:
-                  "https://images.unsplash.com/photo-1491336477066-31156b5e4f35?crop=entropy&w=840&h=840&fit=crop",
+                  "https://firebasestorage.googleapis.com/v0/b/amgwf-70a28.appspot.com/o/avatar%2Fvlcsnap-00002%20(2).jpg?alt=media&token=328edbad-458b-4a6a-a4ac-963e38928619",
               }}
               style={[
                 styles.picBox,
@@ -143,9 +149,9 @@ const PrimaryCareDoctorView = (props) => {
             />
           </Block>
           <Block flex style={styles.ml_3}>
-            <Text size={22}>Dr. Ronald Joseph</Text>
+            <Text size={22}>{section.name}</Text>
             <Text size={14} muted>
-              Neurosurgeon Specialist{" "}
+            {IMLocalized("Phone")}: {section.phone}{" "}
             </Text>
           </Block>
           <Block center>
@@ -161,14 +167,13 @@ const PrimaryCareDoctorView = (props) => {
         </Block>
         <Block style={{ paddingTop: 10 }}>
           <Text size={16}>
-            6 {IMLocalized("yearsExp")}.{" "}
-            <Text bold>| {IMLocalized("consultation")}</Text>:{" "}
-            {IMLocalized("mon")}, {IMLocalized("tue")}, {IMLocalized("wed")}
+          {IMLocalized("address")}: {section.address}{", "}{IMLocalized("City/State")}: {section.city_state}
           </Text>
         </Block>
       </Block>
     );
   };
+
   const _renderContent = (section) => {
     if(userRole == 'agent')
     {
@@ -177,10 +182,7 @@ const PrimaryCareDoctorView = (props) => {
           <Block flex style={{ flexDirection: "column" }}>
             <Block flex>
               <Text size={16}>
-                <Text bold>{IMLocalized("description")}:</Text>Lorem ipsum dolor
-                sit amet, consetetur sadipscing elitr, sed diam nonu my eirmod
-                tempor invidunt ut labore et doloremagna aliquyam erat, sed diam
-                volup tua.
+                <Text bold>{IMLocalized("description")}:</Text>{section.description}
               </Text>
             </Block>
           </Block>
@@ -188,7 +190,7 @@ const PrimaryCareDoctorView = (props) => {
             shadowless
             color={"#00CE30"}
             style={[styles.button]}
-            onPress={() => navigation.navigate("AgentDoctorDetail")}
+            onPress={() => navigation.navigate("AgentDoctorDetail", { doctorId: section.doctorId })}
           >
             <Text size={15} color={"white"}>
               {IMLocalized("Detail")}
@@ -217,7 +219,6 @@ const PrimaryCareDoctorView = (props) => {
   };
 
   const onChangeHandle = (event) => {
-    console.log(event);
     setActiveSections(event);
   };
 
@@ -226,14 +227,18 @@ const PrimaryCareDoctorView = (props) => {
       <Block style={{ marginBottom: theme.SIZES.BASE * 2 }}>
         <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
           <Block height={theme.SIZES.BASE} flex></Block>
-          <Accordion
-            sections={SECTIONS}
-            activeSections={activeSections}
-            renderHeader={_renderHeader}
-            renderContent={_renderContent}
-            onChange={onChangeHandle}
-            style={{backgroundColor: 'white'}}
-          />
+          {doctors.length == 0 ? (
+            <ActivityIndicator size={50} color="#6E78F7" />
+          ) : (
+            <Accordion
+              sections={doctors}
+              activeSections={activeSections}
+              renderHeader={_renderHeader}
+              renderContent={_renderContent}
+              onChange={onChangeHandle}
+              style={{backgroundColor: 'white'}}
+            />
+          )}
         </ScrollView>
       </Block>
     );
@@ -280,15 +285,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 0,
     paddingTop: 0,
     marginBottom: theme.SIZES.BASE * 3,
-  },
-  navbar: {
-    backgroundColor: "#6E78F7",
-    borderBottomRightRadius: 24,
-    borderBottomLeftRadius: 24,
-    width: width,
-    height: height * 0.16,
-    paddingTop: theme.SIZES.BASE * 2,
-    paddingLeft: theme.SIZES.BASE,
   },
   picBox: {
     borderRadius: 16,
@@ -353,7 +349,7 @@ const styles = StyleSheet.create({
   navbar: {
     backgroundColor: "white",
     width: width,
-    height: height * 0.16,
+    height: height * 0.1,
     paddingTop: theme.SIZES.BASE * 2,
     paddingLeft: theme.SIZES.BASE,
     borderBottomWidth: 1,

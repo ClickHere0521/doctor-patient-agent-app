@@ -15,6 +15,8 @@ import * as firebase from 'firebase';
 import "firebase/firestore";
 import "firebase/auth";
 import firebaseConfig from "../FirebaseConfig";
+import { useDispatch } from 'react-redux';
+import { noteInfoAction } from '../store/duck/action';
 
 const { width, height } = Dimensions.get("screen");
 const thumbMeasure = (width - 48 - 32) / 3;
@@ -31,18 +33,19 @@ const dbh = firebase.firestore();
 const AddNotes = (props) => {
 
   const { navigation } = props;
-  const { patientUid } = props.route.params;
+  // const { patientUid } = props.route.params;
 
-  const [title, setTitle] = useState("");
   const [authorName, setAuthorName] = useState("");
   const [dob, setDob] = useState("");
   const [description, setDescription] = useState("");
   const [editFlg, setEditFlg] = useState(false);
   const [requested, setRequested] = useState(false);
-  const validName = isValid('title', title);
   const validDob = isValid('date', dob);
   const validAuthorName = isValid('username', authorName);
   const validDescription = isValid('description', description);
+
+  const noteInfoDispatch = useDispatch();
+  const noteInfo = [];
 
   const renderUserDetail = (detail) => {
     let { heading, content, handleValue, handleName, handleLabel, handlePlaceholder } = { ...detail };
@@ -51,8 +54,10 @@ const AddNotes = (props) => {
         <Input
           label={handleLabel}
           value={handleValue}
-          onChangeText={handleName}
-          editable={editFlg}
+          onChangeText={(res) => {
+            handleName(res)
+            setSaveEnable()
+          }}
           placeholder={handlePlaceholder}
           keyboardType="email-address"
           leftIcon=""
@@ -66,53 +71,69 @@ const AddNotes = (props) => {
 
   };
 
-
+  const setSaveEnable = () => {
+    if (validDob && validAuthorName && validDescription) {
+      setEditFlg(true);
+    }
+    else{
+      setEditFlg(false);
+    }
+  }
   const handleSave = async () => {
-    if (validName && validDob && validAuthorName && validDescription) {
-      let caseId, noteId;
-      try {
-        await dbh.collection('Cases').doc(patientUid).collection('Case').get().then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            caseId = doc.id;
-          });
-        });
-        await dbh.collection('Cases').doc(patientUid).collection('Case').doc(caseId).collection('notes').get().then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            noteId = doc.id;
-          })
-        });
-      } catch (e) {
-        console.log(e);
-      }
-      let newRef = dbh.collection('Cases').doc(patientUid).collection('Case').doc(caseId).collection('notes').doc();
-      newRef.set({
-        title: title,
-        description: description,
-        createDate: dob,
-        authorName: authorName,
-        reference: newRef
-      })
-        .then(() => {
-          Alert.alert(
-            "Success",
-            "You have successfully created the attorney info",
-            [
-              {
-                text: 'OK',
-                onPress: () => navigation.navigate("CreateCase")
-              }
-            ]
-          );
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      setEditFlg(false)
-      setRequested(false);
-    }
-    else {
-      setRequested(true);
-    }
+    noteInfo.push({
+      noteAuthorName: authorName,
+      noteCreateDate: dob,
+      noteDescription: description,
+    });
+
+    console.log("noteInfo->", noteInfo);
+    
+    noteInfoDispatch(noteInfoAction(noteInfo));
+    // if (validName && validDob && validAuthorName && validDescription) {
+    //   let caseId, noteId;
+    //   try {
+    //     await dbh.collection('Cases').doc(patientUid).collection('Case').get().then((querySnapshot) => {
+    //       querySnapshot.forEach((doc) => {
+    //         caseId = doc.id;
+    //       });
+    //     });
+    //     await dbh.collection('Cases').doc(patientUid).collection('Case').doc(caseId).collection('notes').get().then((querySnapshot) => {
+    //       querySnapshot.forEach((doc) => {
+    //         noteId = doc.id;
+    //       })
+    //     });
+    //   } catch (e) {
+    //     console.log(e);
+    //   }
+    //   let newRef = dbh.collection('Cases').doc(patientUid).collection('Case').doc(caseId).collection('notes').doc();
+    //   newRef.set({
+    //     title: title,
+    //     description: description,
+    //     createDate: dob,
+    //     authorName: authorName,
+    //     reference: newRef
+    //   })
+    //     .then(() => {
+    //       Alert.alert(
+    //         "Success",
+    //         "You have successfully created the attorney info",
+    //         [
+    //           {
+    //             text: 'OK',
+    //             onPress: () => navigation.navigate("CreateCase")
+    //           }
+    //         ]
+    //       );
+    //     })
+    //     .catch((error) => {
+    //       console.log(error);
+    //     });
+    //   setEditFlg(false)
+    //   setRequested(false);
+    // }
+    // else {
+    //   setRequested(true);
+    // }
   }
 
   const navbar = () => {
@@ -137,7 +158,7 @@ const AddNotes = (props) => {
         >
           Add Notes
         </Text>
-        <TouchableOpacity onPress={
+        {/* <TouchableOpacity onPress={
           () => setEditFlg(true)
         }>
           <Image
@@ -145,7 +166,7 @@ const AddNotes = (props) => {
             alt=""
             style={{ marginLeft: width * 0.55 }}
           />
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </Block>
     );
   };
@@ -155,13 +176,6 @@ const AddNotes = (props) => {
       {navbar()}
       <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
         <Block style={styles.userDetail}>
-          {renderUserDetail({
-            heading: "General Physician @99",
-            handlePlaceholder: "Fill with Note Title",
-            handleName: setTitle,
-            handleValue: title,
-            handleLabel: "Title",
-          })}
           {renderUserDetail({
             heading: "General Physician @99",
             handlePlaceholder: "Fill with note create date",
@@ -180,8 +194,10 @@ const AddNotes = (props) => {
             <Input
               label="Description"
               value={description}
-              onChangeText={setDescription}
-              editable={editFlg}
+              onChangeText={(res) => {
+                setDescription(res)
+                setSaveEnable()
+              }}
               placeholder="Write descriptions here."
               leftIcon=""
               rightIcon=""
@@ -194,8 +210,9 @@ const AddNotes = (props) => {
         </Block>
         <Block row style={{ marginTop: 20, alignSelf: 'flex-end' }}>
           <TouchableOpacity
-            style={styles.save}
+            style={editFlg ? styles.save : styles.saveDisable}
             onPress={() => handleSave()}
+            disabled={!editFlg}
           >
             <Text color={"#3A58FC"} size={14} style={{ alignSelf: 'center' }}>
               Save
@@ -205,7 +222,6 @@ const AddNotes = (props) => {
             style={styles.save}
             onPress={() => {
               setEditFlg(false);
-              setTitle("");
               setDob("");
               setAuthorName("");
               setDescription("");
@@ -388,6 +404,17 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     paddingHorizontal: 20,
     paddingVertical: 0,
+  },
+  saveDisable: {
+    backgroundColor: "lightgrey",
+    borderRadius: 20,
+    borderColor: '#C7C7C7',
+    borderWidth: 1,
+    paddingVertical: 4,
+    paddingHorizontal: 6,
+    width: 90,
+    marginBottom: 10,
+    marginHorizontal: 10,
   },
   save: {
     backgroundColor: "white",

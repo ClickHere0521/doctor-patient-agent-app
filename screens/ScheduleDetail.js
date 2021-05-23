@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Dimensions,
@@ -7,27 +7,50 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Block, Text, theme } from "galio-framework";
-import CalendarPicker from "react-native-calendar-picker";
 import DateTime from "./DateTime";
 import _ from "lodash";
-
 import { Icon } from "../components";
+import firebase from 'firebase';
+import { ActivityIndicator } from "react-native";
 
 const { width, height } = Dimensions.get("screen");
 
 const ScheduleDetail = (props) => {
   const { navigation } = props;
+  const { name, doctorId, doctorDocId } = props.route.params.section;
   const [isOpenCalendar, setIsOpenCalendar] = useState(false);
+  const [schedules, setSchedules] = useState([]);
+  const [childDays, setChildDays] = useState([]);
+  const [time, setTime] = useState("");
+  const firestore = firebase.firestore();
+  const scheduleList = [];
+  const childDayList = [];
+
+  useEffect(() => {
+    firestore.collection('PCDoctors').doc(doctorId).collection('PCDoctor').doc(doctorDocId).collection('ScheduleInfo').get().then((querySnapshot) => {
+      querySnapshot.forEach((res) => {
+        const { caseID, caseReference, scheduleTime, patientName, patientReference } = res.data();
+        const time = new Date(scheduleTime.seconds * 1000 + scheduleTime.nanoseconds/1000000);
+        childDayList.push(`${time.getFullYear()}-${time.getMonth()<10 ? 0 : null}${time.getMonth()+1}-${time.getDate()}`);
+        scheduleList.push({
+          patientName,
+          time: time.toUTCString(),
+          caseID,
+        });
+      })
+      setChildDays(childDayList);
+      setSchedules(scheduleList);
+    })
+  }, []);
 
   const renderDetils = (details) => {
-    let { heading, subHeading1, subHeading2, subHeading3, time, location } = {
+    let { index, patientName, scheduleTime, caseID } = {
       ...details,
     };
-
     return (
-      <Block style={styles.schedule}>
+      <Block style={styles.schedule} key={index}>
         <TouchableOpacity
-          onPress={() => navigation.navigate("AgentCaseDetail")}
+          onPress={() => navigation.navigate("AgentCaseDetail", {caseID})}
         >
           <Block row>
             <Image
@@ -43,18 +66,8 @@ const ScheduleDetail = (props) => {
                 size={18}
                 style={{ alignSelf: "flex-start", paddingVertical: 5 }}
               >
-                {heading}
+                {patientName}
               </Text>
-              <Block
-                style={{
-                  borderWidth: 1,
-                  borderRadius: 5,
-                  borderColor: theme.COLORS.GREY,
-                  padding: 8,
-                }}
-              >
-                <Text>{subHeading1}</Text>
-              </Block>
               <Block row style={{ paddingVertical: 8 }}>
                 <Block middle>
                   <Icon
@@ -67,7 +80,7 @@ const ScheduleDetail = (props) => {
                   </Icon>
                 </Block>
                 <Block middle style={{ marginRight: 40 }}>
-                  <Text>{time}</Text>
+                  <Text>{scheduleTime}</Text>
                 </Block>
               </Block>
             </Block>
@@ -77,29 +90,15 @@ const ScheduleDetail = (props) => {
     );
   };
 
-  const [time, setTime] = useState("");
-
   const onChangeDate = (date) => {
     alert(date);
   };
 
-  const renderChildDay = (day) => {
-    if (_.includes(["2018-11-15", "2018-12-10", "2018-12-20"], day)) {
+  const renderChildDay = (day) => {    
+    console.log(childDays)
+    if (_.includes(childDays, day)) {
       return (
-        <Image
-          source={require("../assets/images/doctor1.png")}
-          style={styles.icLockRed}
-        />
-      );
-    }
-    if (
-      _.includes(["2018-11-16", "2018-12-12", "2018-12-21", "2018-12-18"], day)
-    ) {
-      return (
-        <Image
-          source={require("../assets/images/doctor.png")}
-          style={styles.icLockRed}
-        />
+        <Block style={styles.icLockRed}></Block>
       );
     }
   };
@@ -148,7 +147,7 @@ const ScheduleDetail = (props) => {
                   style={{ fontFamily: "Inter-Black" }}
                   bold
                 >
-                  Dr.Adila Tahir
+                  {name}
                 </Text>
               </Block>
             </Block>
@@ -214,36 +213,18 @@ const ScheduleDetail = (props) => {
             showsVerticalScrollIndicator={false}
             style={{ height: height * 0.75 }}
           >
-            {renderDetils({
-              heading: "Zean Ronen",
-              subHeading1: "MBBS,DOMS,MS - Ophthalmology",
-              time: "8.00-9.00",
-            })}
-            {renderDetils({
-              heading: "Zean Ronen",
-              subHeading1: "MBBS,DOMS,MS - Ophthalmology",
-              time: "8.00-9.00",
-            })}
-            {renderDetils({
-              heading: "Zean Ronen",
-              subHeading1: "MBBS,DOMS,MS - Ophthalmology",
-              time: "8.00-9.00",
-            })}
-            {renderDetils({
-              heading: "Zean Ronen",
-              subHeading1: "MBBS,DOMS,MS - Ophthalmology",
-              time: "8.00-9.00",
-            })}
-            {renderDetils({
-              heading: "Zean Ronen",
-              subHeading1: "MBBS,DOMS,MS - Ophthalmology",
-              time: "8.00-9.00",
-            })}
-            {renderDetils({
-              heading: "Zean Ronen",
-              subHeading1: "MBBS,DOMS,MS - Ophthalmology",
-              time: "8.00-9.00",
-            })}
+            {schedules.length ==0 ? (
+              <ActivityIndicator size={50} color="#6E78F7" />
+            ) : (
+              schedules.map((val, index) => {                
+                return renderDetils({
+                  index,
+                  patientName: val.patientName,
+                  scheduleTime: val.time,
+                  caseID: val.caseID,
+                })
+              })
+            ) }
           </ScrollView>
         </Block>
       </Block>
@@ -258,11 +239,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   icLockRed: {
-    width: 13 / 2,
+    backgroundColor: "#0064FE",
+    width: 9,
     height: 9,
+    borderRadius: 5,
     position: "absolute",
-    top: 2,
-    left: 1,
+    top: 29,
+    left: 15,
   },
   schedule: {
     paddingHorizontal: width * 0.03,
@@ -288,7 +271,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 24,
     borderBottomRightRadius: 24,
     backgroundColor: "rgba(100, 120, 247, 0.84)",
-    height: height * 0.16,
+    height: height * 0.14,
     width: width,
   },
   dateActive: {
@@ -317,17 +300,17 @@ const styles = StyleSheet.create({
     marginHorizontal: theme.SIZES.BASE / 2,
   },
   heading: {
-    marginTop: height * 0.08,
+    marginTop: height * 0.05,
     paddingHorizontal: theme.SIZES.BASE * 0.5,
     position: "absolute",
   },
   btnCalendar: {
     position: "absolute",
     right: width * 0.05,
-    top: height * 0.08,
+    top: height * 0.06,
   },
   body: {
-    marginTop: height * 0.14,
+    marginTop: height * 0.12,
     position: "absolute",
   },
   check: {

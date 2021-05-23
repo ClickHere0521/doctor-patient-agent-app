@@ -1,23 +1,25 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Dimensions,
   ScrollView,
   Image,
-  ImageBackground,
-  Platform,
   TouchableOpacity,
 } from "react-native";
 import { Block, Text, theme, Icon, NavBar } from "galio-framework";
 import { materialTheme } from "../constants";
 import SwitchButton from "switch-button-react-native";
+import firebase from "firebase";
 import SvgUri from "expo-svg-uri";
+import { set } from "react-hook-form";
 
 const { width, height } = Dimensions.get("screen");
 const thumbMeasure = (width - 48 - 32) / 3;
 
 const DoctorScheduleDetail = (props) => {
   const { navigation } = props;
+  const { doctorId } = props.route.params;
+  const firestore = firebase.firestore();
   const [activeSwitch, setActiveSwitch] = useState(1);
   const [weekState, setWeekState] = useState([
     {
@@ -49,6 +51,38 @@ const DoctorScheduleDetail = (props) => {
       status: false,
     },
   ]);
+  const [doctor, setDoctor] = useState({});
+  const [schedule, setSchedule] = useState([]);
+  const [childDay, setChildDay] = useState([]);
+  const tempSchedule = [];
+  const childDayList = [];
+  let tempDoctor = {};
+
+  useEffect(() => {
+    firestore.collection('PCDoctors').doc(doctorId).collection('PCDoctor').get().then((querySnapShot) => {
+      querySnapShot.forEach((doctorDoc) => {
+        const {address, city_state, email, name, phone, description, password} = doctorDoc.data();
+        firestore.collection('PCDoctors').doc(doctorId).collection('PCDoctor').doc(doctorDoc.id).collection('ScheduleInfo').get().then((querySnapShot) => {
+          querySnapShot.forEach((res) => {
+            const { patientName, caseID, caseReference, scheduleTime } = res.data();
+            const time = new Date(scheduleTime.seconds * 1000 + scheduleTime.nanoseconds/1000000);
+            childDayList.push(`${time.getFullYear()}-${time.getMonth()<10 ? 0 : null}${time.getMonth()+1}-${time.getDate()}`);
+            tempSchedule.push({
+              patientName,
+              time: time.toUTCString(),
+              caseID,
+            });
+          })
+        })
+        setChildDay(childDayList);
+        setSchedule(tempSchedule);
+        tempDoctor = {
+          name, address, city_state, email, name, phone, description, password,
+        }
+      })
+      setDoctor(tempDoctor);
+    })
+  }, []);
 
   const weekBar = () => {
     const handleWeekbar = index => {
@@ -231,9 +265,8 @@ const DoctorScheduleDetail = (props) => {
               }}
             />
           </Block>
-          <Text size={20}>Dr. Ronald Joseph</Text>
-          <Text>neurosergion specialist</Text>
-
+          <Text size={20}>{doctor.name}</Text>
+          <Text>Tel: +{doctor.phone}</Text>
           <Block center style={styles.centerBlock}>
             <SwitchButton
               onValueChange={(val) => setActiveSwitch(val)}
@@ -256,34 +289,25 @@ const DoctorScheduleDetail = (props) => {
         <Block row style={styles.Container}>
           <Text style={styles.schedules}>Schedules</Text>
           <TouchableOpacity
-            onPress={() => navigation.navigate("Calendar")}
+            onPress={() => navigation.navigate("Calendar", {childDay})}
           >
             <Text style={styles.calendar}>Calendar</Text>
           </TouchableOpacity>
         </Block>
         {weekBar()}
         <Block style={styles.renderDetails}>
-          {renderDetails({
-            caseName: "Heart Pain",
-            time: "9.00-11.00 am",
-            patient: "James Hilton",
-            reminder: false,
-            status: "income",
-          })}
-          {renderDetails({
-            caseName: "Heart Pain",
-            time: "9.00-11.00 am",
-            patient: "James Hilton",
-            reminder: true,
-            status: "miss",
-          })}
-          {renderDetails({
-            caseName: "Heart Pain",
-            time: "9.00-11.00 am",
-            patient: "James Hilton",
-            reminder: false,
-            status: "complete",
-          })}
+          {/* {schedule.length ==0 ? (
+              <ActivityIndicator size={50} color="#6E78F7" />
+            ) : (
+              schedule.map((val, index) => {                
+                return renderDetils({
+                  index,
+                  patientName: val.patientName,
+                  scheduleTime: val.time,
+                  caseID: val.caseID,
+                })
+              })
+            ) } */}
         </Block>
       </ScrollView>
     </Block>

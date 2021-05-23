@@ -11,7 +11,6 @@ import {
 import { Block, Button, Text, theme, Input } from "galio-framework";
 
 const { height, width } = Dimensions.get("screen");
-import SwitchButton from "switch-button-react-native";
 import materialTheme from "../constants/Theme";
 import { IMLocalized, init } from "../src/localization/IMLocalization";
 import { Icon } from "../components/";
@@ -20,15 +19,7 @@ import * as ImagePicker from "expo-image-picker";
 
 const AgentDoctorDetail = (props) => {
   const { navigation } = props;
-  const [modalVisible, setModalVisible] = useState(0);
   const [imageUri, setImageUri] = useState(null);
-  const [activeSwitch, setActiveSwitch] = useState(1);
-
-  const handleAvatar = (val) => {
-    setActiveSwitch(val);
-    if (val == 2) pickImage();
-    else setImageUri(null);
-  };
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -37,9 +28,6 @@ const AgentDoctorDetail = (props) => {
       aspect: [3, 3],
       quality: 1,
     });
-
-    console.log(result);
-
     if (!result.cancelled) {
       setImageUri(result.uri);
     }
@@ -84,36 +72,29 @@ const AgentDoctorDetail = (props) => {
       <ScrollView vertical={true} showsVerticalScrollIndicator={false} style={{height: height * 0.8}}>
         <Block style={styles.container}>
           <Block style={{borderWidth: 1, borderColor:'black', borderRadius: theme.SIZES.BASE * 2, margin: theme.SIZES.BASE, padding: theme.SIZES.BASE, marginTop: theme.SIZES.BASE *4}}>
-            <Block row center style={{marginLeft: width * 0.3, marginTop: -theme.SIZES.BASE * 3.5}}>
-              <Block middle style={{ marginRight: 14 }}>
-                {imageUri ? (
-                  <Image
-                    source={{ uri: imageUri }}
-                    style={{ width: 80, height: 80, borderRadius: 20 }}
-                  />
-                ) : (
-                  <Image
-                    source={require("../assets/images/grayscale-photo-of-man2.png")}
-                    style={{ width: 80, height: 80, borderRadius: 20 }}
-                  />
-                )}
-              </Block>
-              <Block>
-                <SwitchButton
-                  onValueChange={handleAvatar}
-                  text1="Remove"
-                  text2="Upload"
-                  switchWidth={120}
-                  switchHeight={30}
-                  switchdirection="rtl"
-                  switchBorderRadius={100}
-                  switchSpeedChange={500}
-                  switchBorderColor="#3B3E51"
-                  switchBackgroundColor="#fff"
-                  btnBorderColor="#3B3E51"
-                  btnBackgroundColor="#3B3E51"
-                  fontColor="#3B3E51"
-                  activeFontColor="#fff"
+            <Block row center style={{marginTop: -theme.SIZES.BASE * 3.5}}>
+              <Block middle>
+                <TouchableOpacity
+                  onPress={() => pickImage()}
+                >
+                  {imageUri ? (
+                    <Image
+                      source={{ uri: imageUri }}
+                      style={{ width: 80, height: 80, borderRadius: 50, borderWidth: 3, borderColor: "white" }}
+                    />
+                  ) : (
+                    <Image
+                      source={require("../assets/images/userDefault.png")}
+                      style={{ width: 80, height: 80, borderRadius: 50, borderWidth: 3, borderColor: "white" }}
+                    />
+                  )}
+                </TouchableOpacity>
+                <Icon
+                  name="camera"
+                  family="font-awesome"
+                  color="#555"
+                  size={20}
+                  style={{position: 'absolute', bottom: 4, right: 4}}
                 />
               </Block>
             </Block>

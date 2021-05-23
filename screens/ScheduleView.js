@@ -1,62 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   Image,
-  ImageBackground,
   Dimensions,
-  View,
-  Component,
+  ActivityIndicator,
 } from "react-native";
 import { Button, Block, Text, Input, theme } from "galio-framework";
 import { IMLocalized } from "../src/localization/IMLocalization";
-import { materialTheme, products, Images, tabs } from "../constants/";
 import {
   Select,
   Icon,
-  Header,
-  Product,
-  Switch,
-  Tabs,
-  ListItem,
 } from "../components/";
 import Accordion from "react-native-collapsible/Accordion";
-import SvgUri from "expo-svg-uri";
+import firebase from 'firebase';
 
 const { width, height } = Dimensions.get("screen");
 
-const SECTIONS = [
-  {
-    title: "First",
-    content: "Lorem ipsum...",
-  },
-  {
-    title: "Second",
-    content: "Lorem ipsum...",
-  },
-  {
-    title: "First",
-    content: "Lorem ipsum...",
-  },
-  {
-    title: "Second",
-    content: "Lorem ipsum...",
-  },
-  {
-    title: "First",
-    content: "Lorem ipsum...",
-  },
-  {
-    title: "Second",
-    content: "Lorem ipsum...",
-  },
-];
-
 const ScheduleView = (props) => {
+  const firestore = firebase.firestore();
   const { navigation } = props;
   const [activeSections, setActiveSections] = useState([0]);
+  const [schedule, setSchedule] = useState([]);
+  const scheduleList = [];
+  let time;
+
   const [weekState, setWeekState] = useState([
     {
       date: "MON",
@@ -87,6 +56,35 @@ const ScheduleView = (props) => {
       status: false,
     },
   ]);
+
+  useEffect(() => {
+    firestore.collection('PCDoctors').get().then((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        firestore.collection('PCDoctors').doc(doc.id).collection('PCDoctor').get().then((querySnapshot) => {
+          const doctorId = doc.id;
+          querySnapshot.forEach((doctorDoc) => {
+            const { address, city_state, email, name, phone, description } = doctorDoc.data();
+            firestore.collection('PCDoctors').doc(doc.id).collection('PCDoctor').doc(doctorDoc.id).collection('ScheduleInfo').get().then((querySnapshot) => {
+              querySnapshot.forEach((res) => {
+                const { caseID, caseReference, scheduleTime, patientName, patientReference } = res.data();
+                time = new Date(scheduleTime.seconds * 1000 + scheduleTime.nanoseconds/1000000);
+              })
+            })
+            scheduleList.push({
+              name,
+              phone,
+              address,
+              city_state,
+              description,     
+              doctorId,     
+              doctorDocId: doctorDoc.id,
+            });
+          })
+          setSchedule(scheduleList);
+        });
+      });
+    });
+  }, []);
 
   const weekBar = () => {
     const handleWeekbar = index => {
@@ -140,9 +138,9 @@ const ScheduleView = (props) => {
             />
           </Block>
           <Block flex style={styles.ml_3}>
-            <Text size={22}>Dr. Ronald Joseph</Text>
+            <Text size={22}>{section.name}</Text>
             <Text size={14} muted>
-              Neurosurgeon Specialist{" "}
+              {"Phone +"}{section.phone}{" "}
             </Text>
           </Block>
           <Block center>
@@ -158,22 +156,21 @@ const ScheduleView = (props) => {
         </Block>
         <Block style={{ paddingTop: 10 }}>
           <Text size={16}>
-            6 years exp. <Text bold>| Consultation</Text>: Mon, Tue, Wed
+            {section.address}
           </Text>
         </Block>
       </Block>
     );
   };
+
   const _renderContent = (section) => {
     return (
       <Block flex style={[styles.contentContainer]}>
         <Block flex style={{ flexDirection: "column" }}>
           <Block flex>
             <Text size={16}>
-              <Text bold>Description:</Text>Lorem ipsum dolor sit amet,
-              consetetur sadipscing elitr, sed diam nonu my eirmod tempor
-              invidunt ut labore et doloremagna aliquyam erat, sed diam volup
-              tua.
+              <Text bold>Description:</Text>
+              {section.description}
             </Text>
           </Block>
         </Block>
@@ -181,7 +178,7 @@ const ScheduleView = (props) => {
           shadowless
           color={"#00CE30"}
           style={[styles.button]}
-          onPress={() => navigation.navigate("ScheduleDetail")}
+          onPress={() => navigation.navigate("ScheduleDetail", {section})}
         >
           <Text size={15} color={"white"}>
             Detail
@@ -195,20 +192,23 @@ const ScheduleView = (props) => {
     setActiveSections(event);
   };
 
-  const onclick = () => {};
-
   const renderPatientsList = () => {
     return (
       <Block style={{ marginBottom: theme.SIZES.BASE * 2 }}>
         <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
           <Block height={theme.SIZES.BASE} flex></Block>
-          <Accordion
-            sections={SECTIONS}
-            activeSections={activeSections}
-            renderHeader={_renderHeader}
-            renderContent={_renderContent}
-            onChange={onChangeHandle}
-          />
+          {schedule.length == 0 ? (
+            <ActivityIndicator size={50} color="#6E78F7" />
+          ) : (
+            <Accordion
+              sections={schedule}
+              activeSections={activeSections}
+              renderHeader={_renderHeader}
+              renderContent={_renderContent}
+              onChange={onChangeHandle}
+              style={{backgroundColor: 'white'}}
+            />
+          )}
         </ScrollView>
       </Block>
     );
@@ -232,13 +232,13 @@ const ScheduleView = (props) => {
           <Text
             color="black"
             style={{ paddingLeft: theme.SIZES.BASE }}
-            size={22}
+            size={20}
             fontWeight="semiBold"
           >
             {IMLocalized("Schedules")}
           </Text>
           
-        <Block row>
+        {/* <Block row>
           <TouchableOpacity
             onPress={() => navigation.navigate("CreateDoctorAccount")}
             style={{ paddingLeft: width * 0.4, padding: 2 }}
@@ -277,7 +277,7 @@ const ScheduleView = (props) => {
               />
             </Text>
           </TouchableOpacity>
-        </Block>
+        </Block> */}
       
         </Block>
         <Block style={{ borderTopWidth: 1, borderColor: "white" }}></Block>
@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
   navbar: {
     backgroundColor: "white",
     width: width,
-    height: height * 0.16,
+    height: height * 0.1,
     paddingTop: theme.SIZES.BASE * 2,
     paddingLeft: theme.SIZES.BASE,
     borderBottomWidth: 1,

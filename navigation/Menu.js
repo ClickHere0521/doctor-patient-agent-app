@@ -12,6 +12,7 @@ import { useSafeArea } from "react-native-safe-area-context";
 import { Drawer as DrawerCustomItem } from "../components/";
 import { materialTheme } from "../constants/";
 import { useSelector } from "react-redux";
+import { TouchableOpacity } from "react-native-gesture-handler";
 
 const { width, height } = Dimensions.get("screen");
 
@@ -36,6 +37,7 @@ const CustomDrawerContent = ({
         "Doctors",
         "Schedules",
         "Settings",
+        "Log out",
       ];
       break;
     case "patient":
@@ -45,6 +47,7 @@ const CustomDrawerContent = ({
         "Case History",
         "Notification",
         "Settings",
+        "Log out",
       ];
       break;
     case "doctor":
@@ -52,7 +55,8 @@ const CustomDrawerContent = ({
         "Dashboard",
         "Profile Info",
         "Case History",
-        "Settings"
+        "Settings",
+        "Log out",
       ]  
     default: 
       break;
@@ -77,7 +81,7 @@ const CustomDrawerContent = ({
           </Block>
         </TouchableWithoutFeedback>
       </Block>
-      <Block flex style={{ paddingLeft: 7, paddingRight: 14 }}>
+      <Block flex style={{ paddingLeft: 0, paddingRight: 0 }}>
         <ScrollView
           contentContainerStyle={[
             {
@@ -89,14 +93,34 @@ const CustomDrawerContent = ({
           showsVerticalScrollIndicator={false}
         >
           {screens.map((item, index) => {
-            return (
-              <DrawerCustomItem
-                title={item}
-                key={index}
-                navigation={navigation}
-                focused={state.index === index ? true : false}
-              />
-            );
+            if (item == "Log out") 
+              // console.log(1111)
+              // return (
+              //   <TouchableWithoutFeedback
+              //     style={{}}
+              //   >
+              //     <Text key={index}>{item}</Text>
+              //   </TouchableWithoutFeedback>
+              // )
+              return (
+                <DrawerCustomItem
+                  title={item}
+                  key={index}
+                  modal={true}
+                  navigation={navigation}
+                  focused={state.index === index ? true : false}
+                />
+              );
+            else 
+              return (
+                <DrawerCustomItem
+                  title={item}
+                  key={index}
+                  navigation={navigation}
+                  modal={false}
+                  focused={state.index === index ? true : false}
+                />
+              );
           })}
         </ScrollView>
       </Block>
@@ -111,8 +135,6 @@ const styles = StyleSheet.create({
   header: {
     backgroundColor: "#6E78F7",
     paddingHorizontal: 28,
-    paddingBottom: theme.SIZES.BASE,
-    paddingTop: theme.SIZES.BASE * 2,
     justifyContent: "center"
   },
   footer: {

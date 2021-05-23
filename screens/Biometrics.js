@@ -15,6 +15,7 @@ import { IMLocalized, init } from "../src/localization/IMLocalization";
 import { useSelector } from "react-redux";
 import SvgUri from "expo-svg-uri";
 import * as LocalAuthentication from "expo-local-authentication";
+import AsyncStorage from '@react-native-community/async-storage';
 
 const { width, height } = Dimensions.get("window");
 
@@ -22,11 +23,36 @@ const Biometrics = (props) => {
   const { navigation } = props;
   const userRole = useSelector((state) => state.user.role);  
   const [scanned, setScanned] = useState(false);
+  const [bioType, setBioType] = useState('');
 
   useEffect(() => {
-    checkDeviceForHardware();
-    checkForBiometrics();
-    if (!scanned) handleLoginPress();
+    AsyncStorage.getItem(
+      'bio',
+      (err, result) => {
+        var tmp = JSON.parse(result);
+        if (!tmp) {
+          navigation.replace("App");
+        }
+        if (tmp && tmp.bio == 'none') 
+          {
+            navigation.replace("App");
+          }
+        if (tmp && tmp.bio == 'touch')
+          {
+            setBioType('touch');
+            checkDeviceForHardware();
+            checkForBiometrics();
+            if (!scanned) handleLoginPress();
+          }  
+        if (tmp && tmp.bio == 'face')
+          {
+            setBioType('face');
+            checkDeviceForHardware();
+            checkForBiometrics();
+            if (!scanned) handleLoginPress();
+          }
+      }
+    )
   }, []);
 
   const checkDeviceForHardware = async () => {
@@ -104,13 +130,13 @@ const Biometrics = (props) => {
     if (userRole == "agent") {
       return (
         <Block center style={{ marginBottom: theme.SIZES.BASE * 5 }}>
-          <Text color="white">Sign In Successfully!</Text>
+          <Text color="white">Sign In with Biometrics</Text>
         </Block>
       );
     } else {
       return (
         <Block center style={{ marginBottom: theme.SIZES.BASE }}>
-          <Text color="white">Sign In Successfully!</Text>
+          <Text color="white">Sign In with Biometrics</Text>
         </Block>
       );
     }
