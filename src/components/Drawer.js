@@ -181,11 +181,11 @@ const DrawerItem = (props) => {
   const { title, focused, navigation, modal } = props;
   return (
     <TouchableOpacity
-      style={{ height: 55 }}
+      style={{ height: 60 }}
       onPress={() => modal ? (
         Alert.alert (
-          'Are you sure?',
-          'Do you want to really log out?',
+          'Log out',
+          'Are you sure you want to log out?',
           [
             {
               text: 'OK',
@@ -220,7 +220,7 @@ const DrawerItem = (props) => {
         <Block middle flex={0.1} style={{ marginRight: 28 }}>
           {renderIcon()}
         </Block>
-        <Block flex={0.9}>
+        <Block flex={1}>
           <Text size={15} color={focused ? "white" : "black"}>
             {/* {IMLocalized(title)} */}
             {title}
@@ -233,7 +233,7 @@ const DrawerItem = (props) => {
 
 const styles = StyleSheet.create({
   defaultStyle: {
-    paddingVertical: 16,
+    paddingVertical: 14,
     paddingHorizontal: 16,
     marginBottom: 6,
   },

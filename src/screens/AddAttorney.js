@@ -258,15 +258,15 @@ const AddAttorney = (props) => {
             <TouchableOpacity
               onPress={() => showModal()}
             >
-              {info.attorneyAvatar ? (
+              { info && info.attorneyAvatar ? (
                 <Image
                   source={{ uri: info.attorneyAvatar }}
                   style={{ width: 80, height: 80, borderRadius: 50 }}
                 />
               ) : (
                 <Image
-                  // source={doctorId ? { uri: doctor.avatar } : require("../assets/images/userDefault.png")}
-                  source={require("../assets/images/userDefault.png")}
+                  source={imageUri ? { uri: imageUri } : require("../assets/images/userDefault.png")}
+                  // source={require("../assets/images/userDefault.png")}
                   style={{ width: 80, height: 80, borderRadius: 50 }}
                 />
               )}
@@ -305,7 +305,7 @@ const AddAttorney = (props) => {
             handleName: setAddress,
             handleValue: address,
             handleLabel: "Address",
-            data: info ? info.attorneyName : null,
+            data: info ? info.attorneyAddress : null,
           })}
           {renderUserDetail({
             heading: "City/State",

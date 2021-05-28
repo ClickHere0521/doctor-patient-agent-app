@@ -27,8 +27,8 @@ const DashboardPatient = (props) => {
     React.useCallback(() => {
       const onBackPress = () => {
        Alert.alert(
-        "Are you sure?",
-        "Do you want to really log out?",
+        'Log out',
+        'Are you sure you want to log out?',
         [
           {
             text: "OK",

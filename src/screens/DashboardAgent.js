@@ -8,11 +8,11 @@ import {
   TouchableOpacity,
   BackHandler,
   Alert,
-  Image
+  Image,
+  ActivityIndicator,
 } from "react-native";
 import { Block, Text, theme, Icon } from "galio-framework";
-// import { LinearGradient } from "expo-linear-gradient";
-
+import LinearGradient from "react-native-linear-gradient";
 import products from "../constants/images/home";
 import { materialTheme } from "../constants";
 import { HeaderHeight } from "../constants/utils";
@@ -54,7 +54,7 @@ const DashboardAgent = (props) => {
   const [caseSort, setCaseSort] = useState(true);
   const [dateSort, setDateSort] = useState(true);
   const [statusSort, setStatusSort] = useState(true);
-  
+
   const [activeCases, setActiveCases] = useState(0);
   const [thisYear, setThisYear] = useState(0);
   const [resolvedYear, setResolvedYear] = useState(0);
@@ -62,53 +62,46 @@ const DashboardAgent = (props) => {
   const caseStatuses = useSelector((state) => state.caseStatus.caseStatus);
 
   const [sortDirection, setSortDirection] = useState({
-    patientName: true, 
-    caseCreateTime: true, 
-    caseStatus: true, 
+    patientName: true,
+    caseCreateTime: true,
+    caseStatus: true,
   });
 
-  useEffect(() => {
-    firestore()
-      .collection("Cases")
-      .get()
-      .then((querySnapshot) => {
-        const caseArrayPromise = querySnapshot.docs.map((doc) => {
-          return firestore()
-            .collection("Cases")
-            .doc(doc.id)
-            .collection("Case")
-            .get()
-            .then((querySnapshot) => {
-              const caseId = doc.id;
-              var caseData = {};
-              querySnapshot.forEach((caseDoc) => {
-                const { patientName, avatar, patientReference, caseStatus, caseCreateTime, caseID, caseWarning, docId } =
-                  caseDoc.data();
-                if(caseDoc.data().caseStatus != 'DISCHARGED')
-                {
-                  console.log("->",caseDoc.data().caseStatus);
-                  setActiveCases(activeCases + 1);
-                  setThisYear(thisYear + 1);
-                  // setResolvedYear(resolvedYear + 1);
-                  console.log("1->",activeCases)
-                }
-                caseData = { ...caseDoc.data() };
-              });
-              return caseData;
+  // useEffect(() => {
+  firestore()
+    .collection("Cases")
+    .get()
+    .then((querySnapshot) => {
+      const caseArrayPromise = querySnapshot.docs.map((doc) => {
+        return firestore()
+          .collection("Cases")
+          .doc(doc.id)
+          .collection("Case")
+          .get()
+          .then((querySnapshot) => {
+            const caseId = doc.id;
+            var caseData = {};
+            querySnapshot.forEach((caseDoc) => {
+              const { patientName, avatar, patientReference, caseStatus, caseCreateTime, caseID, caseWarning, docId } =
+                caseDoc.data();
+              caseData = { ...caseDoc.data() };
             });
-        });
-        Promise.all(caseArrayPromise).then((usersArray) => {
-          setCases(usersArray);
-        });
+            return caseData;
+          });
       });
-  }, []);
+      Promise.all(caseArrayPromise).then((usersArray) => {
+        setCases(usersArray);
+      });
+    });
+  // }, []);
+
 
   useFocusEffect(
     React.useCallback(() => {
       const onBackPress = () => {
         Alert.alert(
-          "Are you sure?",
-          "Do you want to really log out?",
+          'Log out',
+          'Are you sure you want to log out?',
           [
             {
               text: "OK",
@@ -199,7 +192,7 @@ const DashboardAgent = (props) => {
           });
           setCases(sortArray);
           let temSort1 = { ...sortDirection };
-          setSortDirection({...temSort1, patientName: !temSort1.patientName})
+          setSortDirection({ ...temSort1, patientName: !temSort1.patientName })
           break;
         case 'Date':
           const sortArray1 = [...cases].sort((a, b) => {
@@ -209,7 +202,7 @@ const DashboardAgent = (props) => {
           });
           setCases(sortArray1);
           let temSort2 = { ...sortDirection };
-          setSortDirection({...temSort2, caseCreateTime: !temSort2.caseCreateTime})
+          setSortDirection({ ...temSort2, caseCreateTime: !temSort2.caseCreateTime })
           break;
         case 'Current Status':
           const sortArray2 = [...cases].sort((a, b) => {
@@ -219,7 +212,7 @@ const DashboardAgent = (props) => {
           });
           setCases(sortArray2);
           let temSort3 = { ...sortDirection };
-          setSortDirection({...temSort3, caseStatus: !temSort3.caseStatus})
+          setSortDirection({ ...temSort3, caseStatus: !temSort3.caseStatus })
           break;
       }
     }
@@ -232,7 +225,7 @@ const DashboardAgent = (props) => {
           sortting();
         }}
       >
-        {/* <LinearGradient
+        <LinearGradient
           start={{ x: 0, y: 0 }}
           end={{ x: 0.25, y: 1.1 }}
           locations={[0.2, 1]}
@@ -244,7 +237,7 @@ const DashboardAgent = (props) => {
               {item.title}
             </Text>
           </Block>
-        </LinearGradient> */}
+        </LinearGradient>
       </TouchableOpacity>
     );
   };
@@ -254,7 +247,8 @@ const DashboardAgent = (props) => {
       <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
         <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
 
-          {cases.length === 0 ? <></> :
+          {cases.length === 0 ? (
+            <ActivityIndicator style={{marginTop: 40}} size={50} color="#6E78F7" />) :
             cases.map((val, index) =>
             (
               <ListItem key={index} category={val} product={products[0]} horizontal role="agentDashboard" />
@@ -288,14 +282,48 @@ const DashboardAgent = (props) => {
             size={16}
             fontWeight="semiBold"
           >
-            {/* {IMLocalized("Dashboard")} */}
-            Dashboard
+            {IMLocalized("Dashboard")}
           </Text>
         </Block>
         <Block style={{ borderTopWidth: 1, borderColor: "white" }}></Block>
       </Block>
     );
   };
+
+  const CasesFilter = (caseType) => {
+    let activeCnt = 0;
+    let yearCnt = 0;
+    let resolveCnt = 0;
+    cases.forEach(element => {
+      switch (caseType) {
+        case "total":
+          if (element.caseStatus != 6) {
+            activeCnt += 1;
+          }
+          break;
+        case "year":
+          var currentYear = new Date().getFullYear();
+          console.log(element.caseCreateTime.toDate());
+          if (element.caseCreateTime.toDate().getFullYear() == currentYear) {
+            yearCnt += 1;
+          }
+          break;
+        case "resolved":
+          if (element.caseStatus == 6) {
+            resolveCnt += 1;
+          }
+          break;
+      }
+    });
+    switch (caseType) {
+      case "total":
+        return activeCnt;
+      case "year":
+        return yearCnt;
+      case "resolved":
+        return resolveCnt;
+    }
+  }
 
   return (
     <Block flex style={styles.profile}>
@@ -305,29 +333,26 @@ const DashboardAgent = (props) => {
         style={styles.profileContainer}
         imageStyle={styles.profileImage}
       >
-        {/* <LinearGradient
+        <LinearGradient
           colors={["rgba(110,120,247,0.2)", "rgba(110,120,247,0.3)"]}
           style={styles.gradient}
-        > */}
+        >
           <Block
           >
             {renderEvents({
-              // eventHeading: IMLocalized("Total active case"),
-              eventHeading: "Total active case",
-              eventContent: activeCases,
+              eventHeading: IMLocalized("Total active case"),
+              eventContent: CasesFilter("total"),
             })}
             {renderEvents({
-              // eventHeading: IMLocalized("This year"),
-              eventHeading: "This year",
-              eventContent: thisYear,
+              eventHeading: IMLocalized("This year"),
+              eventContent: CasesFilter("year"),
             })}
             {renderEvents({
-              // eventHeading: IMLocalized("Case resolved this year"),
-              eventHeading: "Case resolved this year",
-              eventContent: resolvedYear,
+              eventHeading: IMLocalized("Case resolved this year"),
+              eventContent: CasesFilter("resolved"),
             })}
           </Block>
-        {/* </LinearGradient> */}
+        </LinearGradient>
       </ImageBackground>
       <Block flex={1.3} style={{ backgroundColor: "#F8F8F8" }}>
         <Block
@@ -353,7 +378,7 @@ const DashboardAgent = (props) => {
                   height: 20,
                 }}
               >
-              <Image source={require('../assets/images/add.png')} alt="" />
+                <Image source={require('../assets/images/add.png')} alt="" />
                 {/* <SvgUri
                   width="16"
                   height="16"     
@@ -424,7 +449,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.SIZES.BASE * 0.3,
     paddingVertical: theme.SIZES.BASE * 0.1,
     marginHorizontal: theme.SIZES.BASE,
-    marginTop: theme.SIZES.BASE / 1.5,
+    marginTop: theme.SIZES.BASE / 1.7,
     borderRadius: 40,
     backgroundColor: theme.COLORS.WHITE,
     shadowColor: "black",

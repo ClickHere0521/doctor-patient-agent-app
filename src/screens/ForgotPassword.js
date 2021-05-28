@@ -126,7 +126,6 @@ const ForgotPassword = (props) => {
                 borderWidth: 1,
                 borderColor: "#707070",
                 width: theme.SIZES.BASE * 12,
-                paddingVertical: theme.SIZES.BASE,
                 justifyContent: "center",
                 alignItems: "center",
               }}
@@ -362,8 +361,8 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 24,
     borderBottomLeftRadius: 24,
     width: width,
-    height: height * 0.16,
-    paddingTop: theme.SIZES.BASE * 2,
+    height: height * 0.1,
+    paddingTop: theme.SIZES.BASE,
     paddingLeft: theme.SIZES.BASE,
   },
   input: {

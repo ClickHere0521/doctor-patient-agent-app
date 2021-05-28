@@ -340,28 +340,33 @@ const AddPatient = (props) => {
                   else {
                     await auth()
                       .createUserWithEmailAndPassword(email, password)
-                      .then((res) => {
+                      .then(async (res) => {
+                        console.log(res.user.uid);
+
+                        const reference = storage().ref(`avatar/${res.user.uid}.png`);  // Patient Avatar Add to Storage and get Download URL
+                        const pathToFile = patientAvatar;
+                        // uploads file
+                        await reference.putFile(pathToFile);
+                        const url = await storage()
+                          .ref(`avatar/${res.user.uid}.png`)
+                          .getDownloadURL();
+                        patientDownloadURL = url;
+
                         firestore().collection('Patients').doc(res.user.uid).set({});
-                        firestore().collection('Patients').doc(res.user.uid).collection("Patient").doc().collection("Profile").set({
+                        firestore().collection('Patients').doc(res.user.uid).collection("Patient").doc().set({
+                          DOB: firestore.Timestamp.fromDate(new Date(dob)),
+                          SSN: ssn,
                           address: "",
-                          avatar: "",
+                          avatar: url,
                           cityState: cityState,
-                          dob: firestore.Timestamp.fromDate(new Date(dob)),
                           email: email,
-                          password: password,
                           geoLocation: "",
                           name: userName,
                           phone: "",
-                          scheduleRelatedID: "",
-                          ssn: ssn,
-                          avatar: imageUri
-                        }).
-                          then(() => {
-                            console.log('user Add');
-                          });
+                        });
                       })
                       .catch((error) => {
-                        console.log(">>>Error>>>")
+                        console.log(">>>Error>>>", error)
                       });
                   }
                   setRequested(false);
@@ -397,18 +402,18 @@ const AddPatient = (props) => {
           </TouchableOpacity>
         </Block>
       </ScrollView>
-      
+
       <Modal
-          visible={visible}
-          onDismiss={hideModal}
-          contentContainerStyle={styles.modal}>
-          <TouchableOpacity style={styles.cameraButton} onPress={openCamera}>
-            <Text style={{color: '#FFF'}}>Open Camera</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.cameraButton} onPress={openLibrary}>
-            <Text style={{color: '#FFF'}}>Open Library</Text>
-          </TouchableOpacity>
-        </Modal>
+        visible={visible}
+        onDismiss={hideModal}
+        contentContainerStyle={styles.modal}>
+        <TouchableOpacity style={styles.cameraButton} onPress={openCamera}>
+          <Text style={{ color: '#FFF' }}>Open Camera</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.cameraButton} onPress={openLibrary}>
+          <Text style={{ color: '#FFF' }}>Open Library</Text>
+        </TouchableOpacity>
+      </Modal>
     </Block>
   );
 };

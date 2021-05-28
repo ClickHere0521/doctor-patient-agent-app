@@ -342,7 +342,7 @@ const PatientCaseFile = (props) => {
               </LinearGradient>
             </TouchableOpacity>
             <TouchableOpacity
-              style={{ zIndex: 3 }}
+
               // onPress={}
             >
               <LinearGradient
@@ -423,21 +423,6 @@ const PatientCaseFile = (props) => {
 
   return (
     <Block flex style={styles.components}>
-      {activity ? (
-        <ActivityIndicator
-          style={{
-            opacity: 1.0,
-            alignSelf: "center",
-            top: height * 0.4,
-            position: "absolute",
-            zIndex: 10,
-          }}
-          color="#6E78F7"
-          size={50}
-        />
-      ) : (
-        <></>
-      )}
       {navbar()}
       {scanAndUpload()}
       {renderSorts()}
@@ -462,7 +447,7 @@ const PatientCaseFile = (props) => {
             return (
               <Block key={index}>
                 <TouchableHighlight
-                  style={{ zIndex: 3 }}
+
                 >
                   <LinearGradient
                     start={{ x: 0, y: 0 }}
@@ -508,6 +493,9 @@ const PatientCaseFile = (props) => {
 
       </ScrollView>
       {returnButtons()}
+      <Block>
+        
+      </Block>
       <Modal
         visible={visible}
         onDismiss={hideModal}
@@ -631,7 +619,6 @@ const styles = StyleSheet.create({
     height: cardWidth - theme.SIZES.BASE,
   },
   searchBtn: {
-    position: "absolute",
     right: theme.SIZES.BASE,
     borderRadius: 1000,
     borderWidth: 1,
@@ -665,7 +652,7 @@ const styles = StyleSheet.create({
     height: height * 0.3,
     alignItems: 'center',
     justifyContent: 'space-around',
-    zIndex: 1000,
+    zIndex: 1001,
   },
 });
 

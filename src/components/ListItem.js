@@ -283,13 +283,13 @@ const ListItem = (props) => {
         onPress={() => ("Product", { product: product })}
       >
         <Block style={[styles.imageContainer, styles.shadow]}>
-          {/* <Image source={{ uri: (category && category.patientInfo.avatar) || 'https://firebasestorage.googleapis.com/v0/b/amgwf-70a28.appspot.com/o/avatar%2Fvlcsnap-00002%20(2).jpg?alt=media&token=328edbad-458b-4a6a-a4ac-963e38928619' }} style={imageStyles} /> */}
+          <Image source={{ uri: (category && category.patientInfo.avatar) || 'https://firebasestorage.googleapis.com/v0/b/amgwf-70a28.appspot.com/o/avatar%2Fvlcsnap-00002%20(2).jpg?alt=media&token=328edbad-458b-4a6a-a4ac-963e38928619' }} style={imageStyles} />
         </Block>
       </TouchableWithoutFeedback>
       <TouchableWithoutFeedback onPress={() => console.log("Patient Pressed")}>
         <Block flex={2}>
           <Text size={15} style={styles.userName}>
-            {/* {category && category.patientInfo.patientName} */}
+            {category && category.patientInfo.patientName}
           </Text>
           <Text
             size={12}
@@ -297,16 +297,14 @@ const ListItem = (props) => {
             color={priceColor}
             style={styles.content}
           >
-            {role != "schedulePatientList" && role !="agentPatient" && category && getStatusText(category.caseStatus)}
+            {role != "schedulePatientList" && role != "agentPatient" && category && getStatusText(category.caseStatus)}
           </Text>
         </Block>
       </TouchableWithoutFeedback>
       <TouchableWithoutFeedback onPress={() => console.log("Patient Pressed")}>
         <Block flex={1}>
           <Text size={11} style={styles.times} color={"#06D81E"}>
-            {/* {category.caseCreateTime.toDate().toDateString()} */}
-            {/* { console.log("createData:", category.caseCreateTime)} */}
-            {/* {category.caseCreateTime} */}
+            {category.caseCreateTime.toDate().toDateString()}
           </Text>
           {renderButtons(role)}
         </Block>
@@ -361,7 +359,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
   },
   userName: {
-    padding: theme.SIZES.BASE ,
+    padding: theme.SIZES.BASE,
     paddingBottom: 0,
   },
   content: {

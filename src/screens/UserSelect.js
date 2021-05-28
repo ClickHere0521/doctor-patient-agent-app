@@ -44,14 +44,14 @@ const Onboarding = (props) => {
       }
     );
     if (tmpReminder && tmpReminder.reminder) {
-      if (!tmpBio) 
+      if (!tmpBio)
         navigation.replace("App");
-      if (tmpBio && tmpBio.bio == 'none') 
+      if (tmpBio && tmpBio.bio == 'none')
         navigation.replace("App");
       if (tmpBio && tmpBio.bio == 'touch')
-        navigation.navigate("Biometrics", {bioTypeProp: 'touch'});
+        navigation.navigate("Biometrics", { bioTypeProp: 'touch' });
       if (tmpBio && tmpBio.bio == 'face')
-        navigation.navigate("Biometrics", {bioTypeProp: 'face'});
+        navigation.navigate("Biometrics", { bioTypeProp: 'face' });
     }
     else {
       navigation.navigate("SignIn");
@@ -74,98 +74,98 @@ const Onboarding = (props) => {
   // if (!fontsLoaded) {
   //   return <AppLoading />;
   // } else {
-    return (
-      <Block flex style={styles.container}>
-        <Block middle style={{ height: height / 2}}>
-          <Image
-            source={require("../assets/images/doctor.png")}
-            style={styles.doctorImage}
-          />
-          <Block middle style={styles.roundBlock}>
-            <Block style={styles.bodyTitle} middle>
-              <Block>
-                <Image
-                  source={require("../assets/icons/cureBag.png")}
-                  style={{
-                    height: theme.SIZES.BASE * 2,
-                    width: theme.SIZES.BASE * 2.2,
-                  }}
-                />
-              </Block>
-              <Block
-                flex
-                flexDirection="column"
-                middle
-                center
-                style={{ marginTop: theme.SIZES.BASE }}
+  return (
+    <Block flex style={styles.container}>
+      <Block middle style={{ height: height / 2 }}>
+        <Image
+          source={require("../assets/images/doctor.png")}
+          style={styles.doctorImage}
+        />
+        <Block middle style={styles.roundBlock}>
+          <Block style={styles.bodyTitle} middle>
+            <Block>
+              <Image
+                source={require("../assets/icons/cureBag.png")}
+                style={{
+                  height: theme.SIZES.BASE * 2,
+                  width: theme.SIZES.BASE * 2.2,
+                }}
+              />
+            </Block>
+            <Block
+              flex
+              flexDirection="column"
+              middle
+              center
+              style={{ marginTop: theme.SIZES.BASE }}
+            >
+              <Text
+                color="white"
+                size={34}
+                style={{ fontFamily: "Inter-Black" }}
+                bold
               >
-                <Text
-                  color="white"
-                  size={34}
-                  style={{ fontFamily: "Inter-Black" }}
-                  bold
-                >
-                  {IMLocalized("advanced")}
-                </Text>
-                <Text
-                  color="white"
-                  size={34}
-                  style={{ fontFamily: "Inter-Black" }}
-                  bold
-                >
-                  {IMLocalized("medical")}
-                </Text>
-                <Text
-                  color="white"
-                  size={34}
-                  style={{ fontFamily: "Inter-Black" }}
-                  bold
-                >
-                  {IMLocalized("group")}
-                </Text>
-              </Block>
+                {IMLocalized("advanced")}
+              </Text>
+              <Text
+                color="white"
+                size={34}
+                style={{ fontFamily: "Inter-Black" }}
+                bold
+              >
+                {IMLocalized("medical")}
+              </Text>
+              <Text
+                color="white"
+                size={34}
+                style={{ fontFamily: "Inter-Black" }}
+                bold
+              >
+                {IMLocalized("group")}
+              </Text>
             </Block>
           </Block>
         </Block>
-        <Block flex={1} space="between" style={{ marginTop: height / 13 }}>
-          <Block center style={{ paddingBottom: 30 }}>
-            <Button
-              shadowless
-              style={styles.button}
-              textStyle={{ fontSize: 14, color: "#3F4079", fontWeight: "bold", shadowColor: "#EEE" }}
-              onPress={() => handleRole("agent")}
-            >
-              {IMLocalized("agent")}
-            </Button>
+      </Block>
+      <Block flex={1} space="between" style={{ marginTop: height / 13 }}>
+        <Block center style={{ paddingBottom: 30 }}>
+          <Button
+            shadowless
+            style={styles.button}
+            textStyle={{ fontSize: 14, color: "#3F4079", fontWeight: "bold", shadowColor: "#EEE" }}
+            onPress={() => handleRole("agent")}
+          >
+            {IMLocalized("agent")}
+          </Button>
 
-            <Button
-              shadowless
-              style={styles.button}
-              textStyle={{ fontSize: 14, color: "#3082CC", fontWeight: "bold", shadowColor: "#EEE" }}
-              onPress={() => handleRole("patient")}
-            >
-              {IMLocalized("Patient")}
-            </Button>
+          <Button
+            shadowless
+            style={styles.button}
+            textStyle={{ fontSize: 14, color: "#3082CC", fontWeight: "bold", shadowColor: "#EEE" }}
+            onPress={() => handleRole("patient")}
+          >
+            {IMLocalized("Patient")}
+          </Button>
 
-            <Button
-              shadowless
-              style={styles.button}
-              textStyle={[styles.buttonTextStyle, { color: "#FF6B6B", shadowColor: "#EEE" }]}
-              onPress={() => handleRole("doctor")}
-            >
-              {IMLocalized("doctor")}
-            </Button>
-            <TouchableOpacity onPress={() => {
-              handlePress();
-            }}>
-              <Text color="grey" size={10} style={{marginTop: theme.SIZES.BASE}}>
-                {IMLocalized("agreeTerm")}
-              </Text>
-            </TouchableOpacity>
-          </Block>
+          <Button
+            shadowless
+            style={styles.button}
+            textStyle={[styles.buttonTextStyle, { color: "#FF6B6B", shadowColor: "#EEE" }]}
+            onPress={() => handleRole("doctor")}
+          >
+            {IMLocalized("doctor")}
+          </Button>
+          <TouchableOpacity onPress={() => {
+            handlePress();
+          }}>
+            <Text color="grey" size={10} style={{ marginTop: theme.SIZES.BASE }}>
+              {IMLocalized("agreeTerm")}
+            </Text>
+          </TouchableOpacity>
         </Block>
       </Block>
-    );
+    </Block>
+  );
   // }
 };
 

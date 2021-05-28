@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   TouchableWithoutFeedback,
   ScrollView,
@@ -12,7 +12,9 @@ import { useSafeArea } from "react-native-safe-area-context";
 import { Drawer as DrawerCustomItem } from "../components/";
 import { materialTheme } from "../constants/";
 import { useSelector } from "react-redux";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
+
 
 const { width, height } = Dimensions.get("screen");
 
@@ -25,8 +27,9 @@ const CustomDrawerContent = ({
   ...rest
 }) => {
   const insets = useSafeArea();
-  const userRole = useSelector( state => state.user.role );
+  const userRole = useSelector(state => state.user.role);
   let screens = [];
+  const [curUser, setCurUser] = useState({});
   switch (userRole) {
     case "agent":
       screens = [
@@ -57,10 +60,23 @@ const CustomDrawerContent = ({
         "Case History",
         "Settings",
         "Log out",
-      ]  
-    default: 
+      ]
+    default:
       break;
   }
+
+  useEffect(() => {
+    let userId = auth().currentUser.uid;
+    switch (userRole) {
+      case 'agent': 
+        firestore().collection('Agents').doc('6hQ6yTAGNXNihOuFfQku05BK1SJ2').collection('BusinessAgent').doc(userId).get().then((shot) => {
+          setCurUser(shot.data());
+        });
+        break;
+
+      default: break;
+    }
+  }, []);
 
   return (
     <Block
@@ -72,10 +88,10 @@ const CustomDrawerContent = ({
           onPress={() => navigation.navigate("Agent Info")}
         >
           <Block row style={{marginLeft: -20, marginTop: height * 0.05}}>
-            <Image source={require('../assets/images/avatar.png')} alt="" />
+            <Image style={{ width: 50, height: 50, borderRadius: 100 }} source={curUser ? { uri: curUser.avatar } : require('../assets/images/avatar.png')} alt="" />
             <Block middle style={styles.profile}>            
               <Text h5 color={"white"}>
-                {profile.name}
+                {curUser ? curUser.Name : profile.name}                
               </Text>
             </Block>
           </Block>
@@ -93,7 +109,7 @@ const CustomDrawerContent = ({
           showsVerticalScrollIndicator={false}
         >
           {screens.map((item, index) => {
-            if (item == "Log out") 
+            if (item == "Log out")
               // console.log(1111)
               // return (
               //   <TouchableWithoutFeedback
@@ -111,7 +127,7 @@ const CustomDrawerContent = ({
                   focused={state.index === index ? true : false}
                 />
               );
-            else 
+            else
               return (
                 <DrawerCustomItem
                   title={item}
@@ -142,7 +158,8 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end"
   },
   profile: {
-    marginBottom: theme.SIZES.BASE / 2
+    marginBottom: theme.SIZES.BASE / 2,
+    paddingLeft: theme.SIZES.BASE
   },
   avatar: {
     height: 40,

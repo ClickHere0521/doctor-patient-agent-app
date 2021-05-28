@@ -94,7 +94,7 @@ const CreateCase = (props) => {
     addNoteInfo && addNoteInfo.map((item, index) => {
       setNoteAuthorName(item.noteAuthorName);
       setNoteCreateDate(item.noteCreateDate);
-      setNoteDescription(item.description);
+      setNoteDescription(item.noteDescription);
     });
   });
 
@@ -137,7 +137,7 @@ const CreateCase = (props) => {
               ]
             );
         }}>
-          <Image source={require('../assets/images/editGreen.png')} alt=""/>
+          <Image source={require('../assets/images/editGreen.png')} alt="" />
         </TouchableOpacity>
       );
   };
@@ -241,7 +241,7 @@ const CreateCase = (props) => {
                   style={{ backgroundColor: 'white' }}
                 >
                   {
-                    <Image source={require('../assets/images/editGreen.png')} alt="" style={{width: 25, height: 22}}/>
+                    <Image source={require('../assets/images/editGreen.png')} alt="" style={{ width: 25, height: 22 }} />
                   }
                 </TouchableOpacity>
             }
@@ -291,6 +291,7 @@ const CreateCase = (props) => {
           <TouchableOpacity
             style={styles.saveSend}
             onPress={async () => {
+              let patientDownloadURL = "";
               if (isCompletedPatient) {
                 // add to firestore
                 let pUid = '';
@@ -298,20 +299,25 @@ const CreateCase = (props) => {
                 console.log(patientEmail, patientPassword);
                 await auth()
                   .createUserWithEmailAndPassword(patientEmail, patientPassword)
-                  .then((res) => {
+                  .then(async (res) => {
                     console.log(res.user.uid);
                     pUid = res.user.uid;
-                    
-                    const pngRef = storage().ref(`logo/${pUid}.png`); // Patient Avatar Add to Storage and get Download URL
-                    pngRef.put(patientAvatar);
-                    setPatientAvatar(pngRef.getDownloadURL());
+
+                    const reference = storage().ref(`avatar/${pUid}.png`);  // Patient Avatar Add to Storage and get Download URL
+                    const pathToFile = patientAvatar;
+                    // uploads file
+                    await reference.putFile(pathToFile);
+                    const url = await storage()
+                      .ref(`avatar/${pUid}.png`)
+                      .getDownloadURL();
+                    patientDownloadURL = url;
 
                     firestore().collection('Patients').doc(res.user.uid).set({});
                     firestore().collection('Patients').doc(res.user.uid).collection("Patient").doc().set({
                       DOB: firestore.Timestamp.fromDate(new Date(patientDob)),
                       SSN: patientSsn,
                       address: "",
-                      avatar: patientAvatar,
+                      avatar: url,
                       cityState: patientCityState,
                       email: patientEmail,
                       geoLocation: "",
@@ -334,9 +340,16 @@ const CreateCase = (props) => {
                   patientProfileID: pDocId
                 };
 
-                const attorPngRef = await storage().ref(`logo/${pUid}_attor.png`); // Patient Avatar Add to Storage and get Download URL
-                attorPngRef.put(attorAvatar);
-                await setAttorAvatar(attorPngRef.getDownloadURL());
+                // const attorPngRef = await storage().ref(`logo/${pUid}_attor.png`); // Patient Avatar Add to Storage and get Download URL
+                // attorPngRef.put(attorAvatar);
+                // setAttorAvatar(attorPngRef.getDownloadURL());
+                const reference1 = storage().ref(`avatar/${pUid}_attor.png`);  // Patient Avatar Add to Storage and get Download URL
+                const pathToFile1 = attorAvatar;
+                // uploads file
+                await reference1.putFile(pathToFile1);
+                const url1 = await storage()
+                  .ref(`avatar/${pUid}_attor.png`)
+                  .getDownloadURL();
 
                 firestore().collection('Cases').doc(pUid).set({});
                 firestore().collection('Patients').doc(pUid).set({});
@@ -356,7 +369,7 @@ const CreateCase = (props) => {
                     attorneyEmail: attorEmail,
                     attorneyFax: attorFax,
                     attorneyName: attorName,
-                    attorneyAvatar: attorAvatar,
+                    attorneyAvatar: url1,
                     attorneyPhone: attorPhone,
                     attorneyReference: "(WE DON'T USE THIS ONE YET)",
                     attorneyZip: attorZip,
@@ -379,11 +392,11 @@ const CreateCase = (props) => {
                       authorName: noteAuthorName,
                       authorReference: "",
                       createDate: firestore.Timestamp.fromDate(new Date(noteCreateDate)),
-                      noteDescription: 'noteDescription',
+                      note: 'noteDescription',
                     },
                   ],
                   patientInfo: {
-                    avatar: patientAvatar,
+                    avatar: patientDownloadURL,
                     patientName: patientName,
                     patientReference: ''
                   },

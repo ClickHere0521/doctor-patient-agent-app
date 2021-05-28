@@ -9,9 +9,10 @@ import {
   BackHandler,
   Image,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { Block, Text, theme, Icon } from "galio-framework";
-import { LinearGradient } from "expo-linear-gradient";
+import LinearGradient from 'react-native-linear-gradient';
 
 import products from "../constants/images/home";
 import { materialTheme } from "../constants";
@@ -61,8 +62,8 @@ const PatientView = (props) => {
     React.useCallback(() => {
       const onBackPress = () => {
         Alert.alert(
-          "Are you sure?",
-          "Do you want to really log out?",
+          'Log out',
+          'Are you sure you want to log out?',
           [
             {
               text: "OK",
@@ -95,7 +96,7 @@ const PatientView = (props) => {
     }, []),
   );
 
-  useEffect(() => {
+  // useEffect(() => {
     firestore()
       .collection("Cases")
       .get()
@@ -121,7 +122,7 @@ const PatientView = (props) => {
           setCases(usersArray);
         });
       });
-  }, []);
+  // }, []);
 
   const renderEvents = (events) => {
     let { eventHeading, eventContent } = { ...events };
@@ -236,7 +237,8 @@ const PatientView = (props) => {
       <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
         <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
 
-          {cases.length === 0 ? <></> :
+          {cases.length === 0 ? (
+            <ActivityIndicator style={{marginTop: 30}} size={50} color="#6E78F7" />) :
             cases.map((val, index) =>
             (
               <ListItem key={index} category={val} product={products[0]} horizontal role="agentPatient" />

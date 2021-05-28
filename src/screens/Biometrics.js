@@ -4,18 +4,15 @@ import {
   Dimensions,
   ScrollView,
   Platform,
-  TouchableOpacity,
   Alert,
+  Image
 } from "react-native";
 import { Block, Button, Input, Text, theme } from "galio-framework";
-
 import { materialTheme } from "../constants/";
 import { HeaderHeight } from "../constants/utils";
 import { IMLocalized, init } from "../localization/IMLocalization";
 import { useSelector } from "react-redux";
-import SvgUri from "react-native-svg-uri";
-import * as LocalAuthentication from "expo-local-authentication";
-import AsyncStorage from '@react-native-community/async-storage';
+import ReactNativeBiometrics from 'react-native-biometrics'
 
 const { width, height } = Dimensions.get("window");
 
@@ -23,58 +20,64 @@ const Biometrics = (props) => {
   const { navigation } = props;
   const { bioTypeProp } = props.route.params;
   const userRole = useSelector((state) => state.user.role);  
-  const [scanned, setScanned] = useState(false);
   const [bioType, setBioType] = useState('');
 
   useEffect(() => {
-    setBioType(bioType);
-    checkDeviceForHardware();
-    checkForBiometrics();
-    if (!scanned) handleLoginPress();
+    setBioType(bioTypeProp);
+
+    ReactNativeBiometrics.isSensorAvailable()
+    .then((resultObject) => {
+      const { available, biometryType } = resultObject
+   
+      if (available && biometryType === ReactNativeBiometrics.TouchID) {
+        console.log('TouchID is supported')
+      } else if (available && biometryType === ReactNativeBiometrics.FaceID) {
+        console.log('FaceID is supported')
+      } else if (available && biometryType === ReactNativeBiometrics.Biometrics) {
+        console.log('Biometrics is supported')
+      } else {
+        console.log('Biometrics not supported')
+      }
+    })
+
+    ReactNativeBiometrics.createKeys('WORKFORCE')
+    .then((resultObject) => {
+      const { publicKey } = resultObject
+      console.log(publicKey)
+      sendPublicKeyToServer(publicKey)
+    });
+
+    let epochTimeSeconds = Math.round((new Date()).getTime() / 1000).toString()
+    let payload = epochTimeSeconds + 'some message'
+    
+    ReactNativeBiometrics.createSignature({
+        promptMessage: 'Sign in',
+        payload: payload
+      })
+      .then((resultObject) => {
+        const { success, signature } = resultObject
+    
+        if (success) {
+          console.log(signature)
+          verifySignatureWithServer(signature, payload)
+        }
+      })
+
+    ReactNativeBiometrics.simplePrompt({promptMessage: 'Confirm fingerprint'})
+    .then((resultObject) => {
+      const { success } = resultObject
+    
+      if (success) {
+        navigation.replace("App");
+      } else {
+        console.log('user cancelled biometric prompt')
+      }
+    })
+    .catch(() => {
+      console.log('biometrics failed')
+    }) 
   }, []);
 
-  const checkDeviceForHardware = async () => {
-    let compatible = await LocalAuthentication.hasHardwareAsync();
-    if (compatible) {
-      console.log("Compatible Device!");
-    } else 
-    Alert.alert(
-        "Warning",
-        "Current device does not have the necessary hardware!",
-        [
-          { text: "OK", onPress: () => navigation.navigate("SignIn") }
-        ]
-      );
-  };
-
-  const checkForBiometrics = async () => {
-    let biometricRecords = await LocalAuthentication.isEnrolledAsync();   
-    if (!biometricRecords) {
-      Alert.alert(
-        "Warning",
-        "No Biometrics Found, please register a new",
-        [
-          { text: "OK", onPress: () => navigation.navigate("SignIn") }
-        ]
-      );
-    } else {
-      console.log("Biometrics Found");
-    }
-  };
-
-  const handleLoginPress = async () => {
-    handleAuthentication();
-  };
-
-  const handleAuthentication = async () => {
-    let result = await LocalAuthentication.authenticateAsync();
-    if (result.success) {
-      setScanned(true);
-      navigation.replace("App");
-    } else {
-      console.log("Error! Enter your username and password!");
-    }
-  };
 
   const gotoSignUp = () => {
     if (userRole != "agent") {
@@ -135,17 +138,8 @@ const Biometrics = (props) => {
             style={{ marginTop: height * 0.05 }}
             center
           >
-            <SvgUri
-              width="50"
-              height="50"
-              source={require("../assets/icons/face.svg")}
-            />
-            <SvgUri
-              width="50"
-              height="50"
-              source={require("../assets/icons/finger.svg")}
-              style={{ marginLeft: theme.SIZES.BASE * 2 }}
-            />
+            <Image source={require("../assets/images/facial.png")} style={{ width: 50, height: 50 }}/>
+            <Image source={require("../assets/images/finger.png")} style={{ marginLeft: theme.SIZES.BASE * 2, width: 50, height: 50 }}/>
           </Block>
           {signInBlock()}
         </Block>

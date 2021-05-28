@@ -9,9 +9,10 @@ import {
   BackHandler,
   Image,
   Alert,
+  ActivityIndicator
 } from "react-native";
 import { Block, Text, theme, Icon } from "galio-framework";
-import { LinearGradient } from "expo-linear-gradient";
+import LinearGradient from "react-native-linear-gradient";
 
 import products from "../constants/images/home";
 import { materialTheme } from "../constants";
@@ -52,17 +53,17 @@ const CaseView = (props) => {
   let caseLists = [];
   const { navigation } = props;
   const [sortDirection, setSortDirection] = useState({
-    patientName: true, 
-    caseCreateTime: true, 
-    caseStatus: true, 
+    patientName: true,
+    caseCreateTime: true,
+    caseStatus: true,
   });
-  
+
   useFocusEffect(
     React.useCallback(() => {
       const onBackPress = () => {
         Alert.alert(
-          "Are you sure?",
-          "Do you want to really log out?",
+          "Log out",
+          "Are you sure you want to log out?",
           [
             {
               text: "OK",
@@ -181,7 +182,7 @@ const CaseView = (props) => {
           });
           setCases(sortArray);
           let temSort1 = { ...sortDirection };
-          setSortDirection({...temSort1, patientName: !temSort1.patientName})
+          setSortDirection({ ...temSort1, patientName: !temSort1.patientName })
           break;
         case 'Date':
           const sortArray1 = [...cases].sort((a, b) => {
@@ -191,7 +192,7 @@ const CaseView = (props) => {
           });
           setCases(sortArray1);
           let temSort2 = { ...sortDirection };
-          setSortDirection({...temSort2, caseCreateTime: !temSort2.caseCreateTime})
+          setSortDirection({ ...temSort2, caseCreateTime: !temSort2.caseCreateTime })
           break;
         case 'Current Status':
           const sortArray2 = [...cases].sort((a, b) => {
@@ -201,7 +202,7 @@ const CaseView = (props) => {
           });
           setCases(sortArray2);
           let temSort3 = { ...sortDirection };
-          setSortDirection({...temSort3, caseStatus: !temSort3.caseStatus})
+          setSortDirection({ ...temSort3, caseStatus: !temSort3.caseStatus })
           break;
       }
     }
@@ -237,7 +238,8 @@ const CaseView = (props) => {
       <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
         <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
 
-        {cases.length === 0 ? <></> :
+          {cases.length === 0 ? (
+            <ActivityIndicator size={50} color="#6E78F7" />):
             cases.map((val, index) =>
             (
               <ListItem key={index} category={val} product={products[0]} horizontal role="agentCases" />
@@ -296,7 +298,7 @@ const CaseView = (props) => {
             </TouchableOpacity>
             <Text size={10} style={{ left: 26 }}>
               Add
-        </Text>
+            </Text>
 
           </Block>
         </Block>
