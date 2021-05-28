@@ -1,4 +1,4 @@
-import validators from '../../constants/validators';
+import validators from '../constants/validators';
 
 exports.isValid = (type = 'default', value = '') =>
   validators[type.toLowerCase()].regex.test(value);
