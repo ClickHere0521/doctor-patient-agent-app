@@ -8,7 +8,6 @@ import {
 } from "react-native";
 import { Block, Text, theme } from "galio-framework";
 import Icon from "./Icon";
-import SvgUri from "react-native-svg-uri";
 const { width } = Dimensions.get("screen");
 
 const HorizontalList = (props) => {
@@ -49,11 +48,11 @@ const HorizontalList = (props) => {
             {product.title}
           </Text>
           <Block flex flexDirection="row" middle>
-              <SvgUri
+              {/* <SvgUri
                 width="20"
                 height="20"
                 source={require("../assets/icons/star.svg")}
-              />
+              /> */}
             <Text size={14}>{product.price}</Text>
           </Block>
         </Block>

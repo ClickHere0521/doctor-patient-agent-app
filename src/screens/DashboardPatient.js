@@ -15,7 +15,6 @@ import { Products, Images } from "../constants";
 import { Product, HorizontalListItem } from "../components";
 import SwitchButton from "switch-button-react-native";
 import { IMLocalized } from "../localization/IMLocalization";
-import SvgUri from "react-native-svg-uri";
 import {
   useFocusEffect
  } from '@react-navigation/native';
@@ -113,11 +112,11 @@ const DashboardPatient = (props) => {
         <Block flexDirection={"column"} style={[styles.navbarBtn]} center>
           <TouchableOpacity>
             <Block center middle style={[styles.imageBtn]}>
-              <SvgUri
+              {/* <SvgUri
                 width="50"
                 height="50"
                 source={require("../assets/icons/microscope.svg")}
-              />
+              /> */}
             </Block>
           </TouchableOpacity>
           <Block center style={styles.typeIconText}>
@@ -150,7 +149,7 @@ const DashboardPatient = (props) => {
         <Block flexDirection={"column"} style={[styles.navbarBtn]} center>
           <TouchableOpacity  onPress={() => navigation.navigate("PatientActiveCase")}>
             <Block center middle style={[styles.imageBtn]}>
-              <>
+              {/* <>
                 {activeSwitch > 1 ? (
                   <SvgUri
                     width="40"
@@ -164,7 +163,7 @@ const DashboardPatient = (props) => {
                     source={require("../assets/icons/people.svg")}
                   />
                 )}
-              </>
+              </> */}
             </Block>
           </TouchableOpacity>
           <Block center style={styles.typeIconText}>
@@ -187,11 +186,11 @@ const DashboardPatient = (props) => {
         <Block flexDirection={"column"} style={[styles.navbarBtn]} center>
           <TouchableOpacity onPress={() => navigation.navigate("BookDoctor")}>
             <Block center middle style={[styles.imageBtn]}>
-              <SvgUri
+              {/* <SvgUri
                 width="50"
                 height="50"
                 source={require("../assets/icons/nurse.svg")}
-              />
+              /> */}
             </Block>
             <Block center style={styles.typeIconText}>
               <Text size={12} bold center color={"#333348"}>

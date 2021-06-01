@@ -3,17 +3,9 @@ import {
   StyleSheet,
   Dimensions,
   ScrollView,
-  Image,
-  ImageBackground,
-  Platform,
   TouchableOpacity,
 } from "react-native";
 import { Button, Block, Text, theme, Input, Icon } from "galio-framework";
-
-import { materialTheme } from "../constants";
-import { CheckBox } from "react-native-elements";
-import SvgUri from "react-native-svg-uri";
-// import { set } from "react-native-reanimated";
 import { IMLocalized, init } from "../localization/IMLocalization";
 import DateTime from "./DateTime";
 import _, { stubString } from "lodash";

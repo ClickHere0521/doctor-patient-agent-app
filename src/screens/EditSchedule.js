@@ -11,7 +11,6 @@ import { Block, Text, theme, Icon } from "galio-framework";
 import { materialTheme } from "../constants";
 import { IMLocalized } from "../localization/IMLocalization";
 import SwitchButton from "switch-button-react-native";
-import SvgUri from "react-native-svg-uri";
 import firestore from '@react-native-firebase/firestore';
 
 const { width, height } = Dimensions.get("screen");

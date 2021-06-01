@@ -5,10 +5,8 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
-import { Button, Block, Text, theme, Input, Icon } from "galio-framework";
+import { Block, Text, theme, Icon } from "galio-framework";
 import { materialTheme } from "../constants";
-import * as ImagePicker from "expo-image-picker";
-import { SvgUri } from "react-native-svg";
 import { IMLocalized, init } from "../localization/IMLocalization";
 
 const { width, height } = Dimensions.get("screen");
@@ -333,8 +331,8 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 24,
     borderBottomLeftRadius: 24,
     width: width,
-    height: height * 0.16,
-    paddingTop: theme.SIZES.BASE * 2,
+    height: height * 0.1,
+    paddingTop: theme.SIZES.BASE,
     paddingLeft: theme.SIZES.BASE,
   },
   notes: {

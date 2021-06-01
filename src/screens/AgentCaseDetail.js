@@ -13,7 +13,6 @@ import {
 } from "../components/";
 // import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 // import { SliderBox } from "react-native-image-slider-box";
-import SvgUri from "react-native-svg-uri";
 import { CheckBox } from "react-native-elements";
 import { weekdays } from "moment";
 import firestore from '@react-native-firebase/firestore';

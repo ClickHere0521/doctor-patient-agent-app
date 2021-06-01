@@ -304,7 +304,7 @@ const ListItem = (props) => {
       <TouchableWithoutFeedback onPress={() => console.log("Patient Pressed")}>
         <Block flex={1}>
           <Text size={11} style={styles.times} color={"#06D81E"}>
-            {category.caseCreateTime.toDate().toDateString()}
+            {category && category.caseCreateTime.toDate().toDateString()}
           </Text>
           {renderButtons(role)}
         </Block>

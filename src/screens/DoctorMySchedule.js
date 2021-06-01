@@ -10,7 +10,6 @@ import { Block, Text, theme, Icon } from "galio-framework";
 import { materialTheme } from "../constants";
 import { IMLocalized } from "../localization/IMLocalization";
 import SwitchButton from "switch-button-react-native";
-import SvgUri from "react-native-svg-uri";
 
 const { width, height } = Dimensions.get("screen");
 const thumbMeasure = (width - 48 - 32) / 3;
@@ -68,42 +67,6 @@ const EditSchedule = (props) => {
     );
   };
 
-  const renderStatus = (status) => {
-    switch (status) {
-      case "income": {
-        return (
-          <SvgUri
-            width="24 "
-            height="24"
-            source={require("../assets/icons/check.svg")}
-            style={{
-              position: "absolute",
-              right: -4,
-              top: -4,
-            }}
-          />
-        );
-      }
-      case "miss": {
-        return (
-          <SvgUri
-            width="24 "
-            height="24"
-            source={require("../assets/icons/redCheck.svg")}
-            style={{
-              position: "absolute",
-              right: -4,
-              top: -4,
-            }}
-          />
-        );
-      }
-      case "complete": {
-        return <></>;
-      }
-    }
-  };
-
   const renderSchedules = (details) => {
     let { time, status, number } = { ...details };
 
@@ -150,12 +113,12 @@ const EditSchedule = (props) => {
                 <Text color={"white"} size={16}>
                   {time}
                 </Text>
-                <SvgUri
+                {/* <SvgUri
                   width="20"
                   height="20"
                   source={require("../assets/icons/dot.svg")}
                   style={{ position: "absolute", right: 0, top: -10 }}
-                />
+                /> */}
                 <Text bold size={12} color={"white"} style={styles.number}>
                   {number}
                 </Text>
@@ -205,7 +168,7 @@ const EditSchedule = (props) => {
               source={require("../assets/images/grayscale-photo-of-man2.png")}
               style={styles.imageStyle}
             ></Image>
-            <SvgUri
+            {/* <SvgUri
               width="20"
               height="20"
               source={require("../assets/icons/dot.svg")}
@@ -214,7 +177,7 @@ const EditSchedule = (props) => {
                 right: 0,
                 top: 0,
               }}
-            />
+            /> */}
           </Block>
           <Text size={20}>Dr. Ronald Joseph</Text>
           <Text>neurosergion specialist</Text>
@@ -238,11 +201,15 @@ const EditSchedule = (props) => {
             />
           </Block>
         </Block>
-        <Block row style={styles.Container}>
-          <Text style={styles.schedules}>Schedules</Text>
-          <TouchableOpacity onPress={() => navigation.navigate("Calendar")}>
-            <Text style={styles.calendar}>Calendar</Text>
-          </TouchableOpacity>
+        <Block flexDirection="row" style={styles.Container}>
+          <Block flex={5}>
+            <Text>Schedules</Text>
+          </Block>
+          <Block flex={1}>
+            <TouchableOpacity onPress={() => navigation.navigate("Calendar", {schedule: null, childDay: null})}>
+              <Text style={styles.calendar}>Calendar</Text>
+            </TouchableOpacity>
+          </Block>
         </Block>
         {weekBar()}
         <Block style={styles.renderSchedules}>
@@ -431,15 +398,14 @@ const styles = StyleSheet.create({
   },
   calendar: {
     color: "#06D81E",
-    paddingLeft: width * 0.5,
   },
   navbar: {
     backgroundColor: "#6E78F7",
     borderBottomRightRadius: 24,
     borderBottomLeftRadius: 24,
     width: width,
-    height: height * 0.16,
-    paddingTop: theme.SIZES.BASE * 2,
+    height: height * 0.1,
+    paddingTop: theme.SIZES.BASE,
     paddingLeft: theme.SIZES.BASE,
   },
   time: {

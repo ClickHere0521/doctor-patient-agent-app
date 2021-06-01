@@ -6,7 +6,6 @@ import Icon from "./Icon";
 import Button from "./Button";
 import { useSelector } from "react-redux";
 import { IMLocalized } from "../localization/IMLocalization";
-import SvgUri from "react-native-svg-uri";
 const { width } = Dimensions.get("screen");
 
 const ListItem = (props) => {
@@ -71,11 +70,11 @@ const ListItem = (props) => {
         }}
       >
         <Block flex middle center>
-          <SvgUri
+          {/* <SvgUri
             width="25"
             height="25"
             source={require("../assets/icons/locate.svg")}
-          />
+          /> */}
         </Block>
       </TouchableOpacity>
     </Block>

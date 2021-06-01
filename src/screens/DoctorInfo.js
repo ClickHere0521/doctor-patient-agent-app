@@ -35,8 +35,9 @@ const AgentDoctorDetail = (props) => {
 
   const navbar = () => {
     return (
-      <Block row style={styles.navbar} center>
-        <TouchableOpacity
+      <Block row flexDirection="row" style={styles.navbar} center>
+        <Block flex={1}>
+          <TouchableOpacity
             onPress={() => navigation.openDrawer()}
           >
             <Icon
@@ -44,24 +45,26 @@ const AgentDoctorDetail = (props) => {
               family="font-awesome"
               color="white"
               size={16}
-              style={styles.chevronLeft}
             />
           </TouchableOpacity>
-        <Text
-          color="white"
-          style={{ paddingLeft: theme.SIZES.BASE }}
-          size={17}
-          bold
-        >
-          Profile Info
-        </Text>
-        <TouchableOpacity>
-          <Image
-            source={require("../assets/icons/editHeaderWhite.png")}
-            alt=""
-            style={{ marginLeft: width * 0.54 }}
-          />
-        </TouchableOpacity>
+        </Block>
+        <Block flex={14}>
+          <Text
+            color="white"
+            size={17}
+            bold
+          >
+            Profile Info
+          </Text>
+        </Block>
+        <Block flex={2}>
+          <TouchableOpacity>
+            <Image
+              source={require("../assets/icons/editHeaderWhite.png")}
+              alt=""
+            />
+          </TouchableOpacity>
+        </Block>
       </Block>
     );
   };
@@ -71,7 +74,7 @@ const AgentDoctorDetail = (props) => {
       {navbar()}
       <ScrollView vertical={true} showsVerticalScrollIndicator={false} style={{height: height * 0.8}}>
         <Block style={styles.container}>
-          <Block style={{borderWidth: 1, borderColor:'black', borderRadius: theme.SIZES.BASE * 2, margin: theme.SIZES.BASE, padding: theme.SIZES.BASE, marginTop: theme.SIZES.BASE *4}}>
+          <Block style={{ backgroundColor: 'white', shadowColor: '#ccc', shadowOffset: { width: 6, height: 6 }, shadowOpacity: 0.3, elevation: 2, borderRadius:30, margin: theme.SIZES.BASE, padding: theme.SIZES.BASE ,  marginTop: theme.SIZES.BASE *4 }}>
             <Block row center style={{marginTop: -theme.SIZES.BASE * 3.5}}>
               <Block middle>
                 <TouchableOpacity
@@ -139,7 +142,7 @@ const AgentDoctorDetail = (props) => {
               </Block>
             </Block>
           </Block>
-          <Block style={{borderWidth: 1,padding: theme.SIZES.BASE, borderColor:'black', borderRadius: theme.SIZES.BASE * 2, margin: theme.SIZES.BASE}}>
+          <Block style={{ padding: theme.SIZES.BASE, borderRadius: theme.SIZES.BASE * 2, margin: theme.SIZES.BASE}}>
             <Block row>
               <Icon
                 name="map-marker"
@@ -156,17 +159,21 @@ const AgentDoctorDetail = (props) => {
               alt=""
               style={{ margin: width * 0.01, alignSelf: "center" }}
             />
-            <Block row style={{ margin: 10 }}>
-              <Text color="black" style={{ alignSelf: "flex-start" }}>
-                Tel
+            <Block flexDirection="row" style={{margin: 10}}>
+              <Block flex={1}>
+                <Text color="black">
+                  Tel
                 <Text color="red">*</Text>
-              </Text>
-              <Text color="grey" style={{ paddingLeft: 10 }}>
-                +1234567890
-              </Text>
+                </Text>
+              </Block>
+              <Block flex={4}>
+                <Text color="grey">
+                  +1234567890
+                </Text>
+              </Block>      
             </Block>
             <Block>
-              <Text color="black" style={styles.info} size={14}>
+              <Text color="black" style={{margin: 10}} size={14}>
                 Account Info
                 <Text color="red">*</Text>
               </Text>
@@ -195,23 +202,23 @@ const AgentDoctorDetail = (props) => {
               </Block>
             </Block>
             <Block>
-              <Text color="black" style={styles.info} size={14}>
+              <Text color="black" style={{margin: 10}} size={14}>
                 Description
-                <Text color="red">*</Text>
+              <Text color="red">*</Text>
               </Text>
               <Text color="grey" size={16} style={styles.descriptionText}>
                 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
                 diam nonu my eirmod tempor invidun.
               </Text>
             </Block>
-            <Block flex flexDirection="row"  style={styles.info} >
-              <Block>
+            <Block flex flexDirection="row" style={{margin: 10}} >
+              <Block flex={6}>
                 <Text color="black" size={14}>
                   Schedule
                   <Text color="red">*</Text>
                 </Text>
               </Block>
-              <Block style={{marginLeft: width * 0.4}}>
+              <Block flex={1}>
                 <TouchableOpacity
                   onPress={() => navigation.navigate("DoctorMySchedule")}
                 >
@@ -236,8 +243,8 @@ const styles = StyleSheet.create({
   navbar: {
     backgroundColor: "#6E78F7",
     width: width,
-    height: height * 0.16,
-    paddingTop: theme.SIZES.BASE * 2,
+    height: height * 0.1,
+    paddingTop: theme.SIZES.BASE,
     paddingLeft: theme.SIZES.BASE,
   },
   input: {

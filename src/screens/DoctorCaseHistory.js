@@ -8,18 +8,12 @@ import {
   Dimensions,
 } from "react-native";
 import { Block, Text, theme } from "galio-framework";
-
 import products from "../constants/images/home";
 import {
-  Select,
   Icon,
-  Header,
-  Product,
-  Switch,
-  Tabs,
   ListItem,
 } from "../components/";
-import { LinearGradient } from "expo-linear-gradient";
+import LinearGradient from "react-native-linear-gradient";
 import { IMLocalized } from "../localization/IMLocalization";
 
 const { width, height } = Dimensions.get("screen");
@@ -62,10 +56,9 @@ const filterCategories = [
 
 const DoctorCaseHistory = (props) => {
   const [filterIndex, setFilterIndex] = useState(0);
+  const { navigation } = props;
 
   const renderPatient = (item, index) => {
-    const { navigation } = props;
-
     return (
       <TouchableWithoutFeedback
         style={{ zIndex: 3 }}
@@ -191,7 +184,7 @@ const DoctorCaseHistory = (props) => {
 
   const renderFilter = () => {
     return (
-      <Block flex flexDirection="row" style={{ marginTop: 10 }}>
+      <Block flex flexDirection="row" style={{ margin: 10 }}>
         {filterCategories.map((value, index) => {
           return (
             <Block
@@ -379,8 +372,8 @@ const styles = StyleSheet.create({
   navbar: {
     backgroundColor: "#6E78F7",
     width: width,
-    height: height * 0.16,
-    paddingTop: theme.SIZES.BASE * 2,
+    height: height * 0.1,
+    paddingTop: theme.SIZES.BASE,
     paddingLeft: theme.SIZES.BASE,
   },
 });

@@ -12,7 +12,6 @@ import { materialTheme } from "../constants/";
 import { HeaderHeight } from "../constants/utils";
 import { IMLocalized, init } from "../localization/IMLocalization";
 import { useSelector } from "react-redux";
-import SvgUri from "react-native-svg-uri";
 import { CheckBox } from "react-native-elements";
 import { isValid } from "../utils/helpers";
 import Input from "../components/InputType1";
@@ -94,11 +93,6 @@ const SignIn = (props) => {
               <Text center color={theme.COLORS.WHITE} size={16}>
                 {"Don't have an account? SIGN UP "}
               </Text>
-              <SvgUri
-                width="36"
-                height="36"
-                source={require("../assets/icons/arrow-long-right.svg")}
-              />
             </Block>
           </Button>
         </Block>

@@ -11,7 +11,6 @@ import materialTheme from "../constants/Theme";
 import { IMLocalized, init } from "../localization/IMLocalization";
 import { Icon } from "../components/";
 import { ScrollView } from "react-native-gesture-handler";
-import SvgUri from "react-native-svg-uri";
 
 const { height, width } = Dimensions.get("screen");
 
@@ -75,15 +74,15 @@ const TimeSlot = (props) => {
             </Block>
           </Block>
           <Block row center style={{height: 50}}>
-            <SvgUri
+            {/* <SvgUri
               source={require("../assets/icons/circle-left.svg")}
               style={styles.circleArrow}
-            />
+            /> */}
             <Text>Tomorrow, 9 Dec</Text>
-            <SvgUri
+            {/* <SvgUri
               source={require("../assets/icons/circle-right.svg")}
               style={styles.circleArrow}
-            />
+            /> */}
           </Block>
           <Block
             center

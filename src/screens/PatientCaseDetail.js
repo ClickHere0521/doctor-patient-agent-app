@@ -22,7 +22,6 @@ import {
 } from "../components/";
 // import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 // import { SliderBox } from "react-native-image-slider-box";
-import SvgUri from "react-native-svg-uri";
 
 const { width, height } = Dimensions.get("screen");
 
@@ -185,7 +184,7 @@ const Components = (props) => {
           </Block>
           <Block column>
             <Text style={{ alignSelf: "flex-end" }} color={"#06D81E"}></Text>
-            <SvgUri
+            {/* <SvgUri
               width="20"
               height="20"
               source={require("../assets/icons/editGreen.svg")}
@@ -193,7 +192,7 @@ const Components = (props) => {
                 right: -theme.SIZES.BASE * 2,
                 paddingTop: theme.SIZES.BASE,
               }}
-            />
+            /> */}
           </Block>
         </Block>
 
@@ -225,7 +224,7 @@ const Components = (props) => {
           </Block>
           <Block column>
             <Text style={{ alignSelf: "flex-end" }} color={"#06D81E"}></Text>
-            <SvgUri
+            {/* <SvgUri
               width="20"
               height="20"
               source={require("../assets/icons/editGreen.svg")}
@@ -233,7 +232,7 @@ const Components = (props) => {
                 right: -theme.SIZES.BASE * 2,
                 paddingTop: theme.SIZES.BASE,
               }}
-            />
+            /> */}
           </Block>
         </Block>
         <Block style={styles.interval}>
@@ -248,7 +247,7 @@ const Components = (props) => {
           <Block row>
             <Block style={{ marginLeft: 30 }}>
               <Block row>
-                <SvgUri
+                {/* <SvgUri
                   width="25"
                   height="25"
                   source={require("../assets/icons/rect_check.svg")}
@@ -257,13 +256,13 @@ const Components = (props) => {
                     marginLeft: -16,
                     marginTop: 6,
                   }}
-                />
+                /> */}
                 <Text size={16} style={styles.text}>
                   New case
                 </Text>
               </Block>
               <Block row>
-                <SvgUri
+                {/* <SvgUri
                   width="25"
                   height="25"
                   source={require("../assets/icons/rect_check.svg")}
@@ -272,13 +271,13 @@ const Components = (props) => {
                     marginLeft: -16,
                     marginTop: 6,
                   }}
-                />
+                /> */}
                 <Text size={16} style={styles.text}>
                   Waiting schedule
                 </Text>
               </Block>
               <Block row>
-                <SvgUri
+                {/* <SvgUri
                   width="25"
                   height="25"
                   source={require("../assets/icons/rect_check.svg")}
@@ -287,7 +286,7 @@ const Components = (props) => {
                     marginLeft: -16,
                     marginTop: 6,
                   }}
-                />
+                /> */}
                 <Text size={16} style={styles.text}>
                   Scheduled
                 </Text>
@@ -295,7 +294,7 @@ const Components = (props) => {
             </Block>
             <Block style={{ marginLeft: 30 }}>
               <Block row>
-                <SvgUri
+                {/* <SvgUri
                   width="25"
                   height="25"
                   source={require("../assets/icons/rect_check.svg")}
@@ -304,13 +303,13 @@ const Components = (props) => {
                     marginLeft: -16,
                     marginTop: 6,
                   }}
-                />
+                /> */}
                 <Text size={16} style={styles.text}>
                   Treatment
                 </Text>
               </Block>
               <Block row>
-                <SvgUri
+                {/* <SvgUri
                   width="25"
                   height="25"
                   source={require("../assets/icons/rect_check.svg")}
@@ -319,7 +318,7 @@ const Components = (props) => {
                     marginLeft: -16,
                     marginTop: 6,
                   }}
-                />
+                /> */}
                 <TouchableOpacity
                   onPress={() => navigation.navigate("AgentReview")}
                 >
@@ -329,7 +328,7 @@ const Components = (props) => {
                 </TouchableOpacity>
               </Block>
               <Block row>
-                <SvgUri
+                {/* <SvgUri
                   width="25"
                   height="25"
                   source={require("../assets/icons/rect_check.svg")}
@@ -338,7 +337,7 @@ const Components = (props) => {
                     marginLeft: -16,
                     marginTop: 6,
                   }}
-                />
+                /> */}
                 <Text color={"black"} size={16} style={styles.text}>
                   Discharged
                 </Text>

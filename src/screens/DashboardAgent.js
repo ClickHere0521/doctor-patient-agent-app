@@ -20,7 +20,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { IMLocalized } from "../localization/IMLocalization";
 import { ScrollView } from "react-native-gesture-handler";
 import { ListItem } from "../components/";
-import SvgUri from "react-native-svg";
 import firestore from '@react-native-firebase/firestore';
 
 import _ from "lodash";

@@ -9,16 +9,8 @@ import {
   Dimensions,
 } from "react-native";
 import { Button, Block, Text, Input, theme } from "galio-framework";
-
-import { materialTheme, products, Images, tabs } from "../constants";
 import {
-  Select,
   Icon,
-  Header,
-  Product,
-  Switch,
-  Tabs,
-  HorizontalListItem,
 } from "../components";
 import {
   useFocusEffect
@@ -30,7 +22,6 @@ const thumbMeasure = (width - 48 - 32) / 3;
 const cardWidth = width - theme.SIZES.BASE * 2;
 
 const Components = (props) => {
-  
   useFocusEffect(
     React.useCallback(() => {
       const onBackPress = () => {
@@ -234,8 +225,8 @@ const styles = StyleSheet.create({
   navbar: {
     backgroundColor: "#6E78F7",
     width: width,
-    height: height * 0.16,
-    paddingTop: theme.SIZES.BASE * 2,
+    height: height * 0.1,
+    paddingTop: theme.SIZES.BASE,
     paddingLeft: theme.SIZES.BASE,
   },
   insideSchduleItem: {

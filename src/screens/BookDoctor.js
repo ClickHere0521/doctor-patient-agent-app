@@ -7,7 +7,6 @@ import { useFonts } from 'expo-font';
 import AppLoading from 'expo-app-loading';
 import { useDispatch, useSelector } from 'react-redux';
 import { roleSelector } from '../store/duck/action'
-import SvgUri from "react-native-svg-uri";
 import { Icon } from "../components";
 import SearchBar from "react-native-dynamic-search-bar";
 import LocateItem from "../components/LocateItem";

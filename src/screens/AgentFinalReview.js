@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import { Block, Text, theme, Input, Icon } from "galio-framework";
 import { CheckBox } from "react-native-elements";
-import SvgUri from "react-native-svg-uri";
 // import { set } from "react-native-reanimated";
 import { IMLocalized, init } from "../localization/IMLocalization";
 

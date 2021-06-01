@@ -22,7 +22,6 @@ import { IMLocalized } from "../localization/IMLocalization";
 import { ScrollView } from "react-native-gesture-handler";
 import { ListItem } from "../components/";
 import firestore from '@react-native-firebase/firestore';
-import SvgUri from "react-native-svg-uri";
 
 import _ from "lodash";
 

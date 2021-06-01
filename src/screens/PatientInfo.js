@@ -16,8 +16,6 @@ import { Images, materialTheme } from "../constants";
 import { HeaderHeight } from "../constants/utils";
 import { IMLocalized } from "../localization/IMLocalization";
 
-import SvgUri from "react-native-svg-uri";
-
 const { width, height } = Dimensions.get("screen");
 const thumbMeasure = (width - 48 - 32) / 3;
 
@@ -61,12 +59,12 @@ const PatientInfo = (props) => {
             source={require("../assets/images/doctor1.png")}
             style={styles.imageStyle}
           ></Image>
-          <SvgUri
+          {/* <SvgUri
             width="20"
             height="20"
             source={require("../assets/icons/dot.svg")}
             style={{ position: "absolute", right: -10, top: -5 }}
-          />
+          /> */}
         </Block>
         <TouchableWithoutFeedback style={{ marginLeft: theme.SIZES.BASE * 2 }}>
           <Text

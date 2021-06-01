@@ -14,7 +14,6 @@ import { useFonts } from "expo-font";
 import AppLoading from "expo-app-loading";
 import { useDispatch, useSelector } from "react-redux";
 import { roleSelector } from "../store/duck/action";
-import SvgUri from "react-native-svg-uri";
 import { Icon } from "../components";
 
 const { height, width } = Dimensions.get("screen");
@@ -55,12 +54,12 @@ const InsuranceInfo = (props) => {
         >
           Add Insurance Info
         </Text>
-        <SvgUri
+        {/* <SvgUri
           width="26"
           height="26"
           source={require("../assets/icons/editGreen.svg")}
           style={{ paddingLeft: width * 0.45 }}
-        />
+        /> */}
       </Block>
     );
   };
@@ -124,11 +123,11 @@ const InsuranceInfo = (props) => {
         </Block>
         <Block style={([styles.cardStyle], { borderWidth: 0 })} center>
           <Block row style={[styles.location]} center>
-            <SvgUri
+            {/* <SvgUri
               width="26"
               height="26"
               source={require("../assets/icons/location.svg")}
-            />
+            /> */}
             <Text>92/6, 3rd Floor, Outer Ring Road, Chandra Layout</Text>
           </Block>
           <Block style={[styles.location]}>

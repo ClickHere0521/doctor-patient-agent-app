@@ -95,11 +95,11 @@ const Biometrics = (props) => {
               <Text center color={theme.COLORS.WHITE} size={16}>
                 {"Don't have an account? SIGN UP "}
               </Text>
-              <SvgUri
+              {/* <SvgUri
                 width="36"
                 height="36"
                 source={require("../assets/icons/arrow-long-right.svg")}
-              />
+              /> */}
             </Block>
           </Button>
         </Block>

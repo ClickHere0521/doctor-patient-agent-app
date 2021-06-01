@@ -10,7 +10,6 @@ import {
 import { Block, Text, theme, Icon, NavBar } from "galio-framework";
 import { materialTheme } from "../constants";
 import SwitchButton from "switch-button-react-native";
-import SvgUri from "react-native-svg-uri";
 import { set } from "react-hook-form";
 import firestore from '@react-native-firebase/firestore';
 
@@ -111,42 +110,6 @@ const DoctorScheduleDetail = (props) => {
     );
   };
 
-  const renderStatus = (status) => {
-    switch (status) {
-      case "income": {
-        return (
-          <SvgUri
-            width="24 "
-            height="24"
-            source={require("../assets/icons/check.svg")}
-            style={{
-              position: "absolute",
-              right: -4,
-              top: -4,
-            }}
-          />
-        );
-      }
-      case "miss": {
-        return (
-          <SvgUri
-            width="24 "
-            height="24"
-            source={require("../assets/icons/redCheck.svg")}
-            style={{
-              position: "absolute",
-              right: -4,
-              top: -4,
-            }}
-          />
-        );
-      }
-      case "complete": {
-        return <></>;
-      }
-    }
-  };
-
   const navbar = () => {
     return (
       <Block row style={styles.navbar} center>
@@ -181,7 +144,7 @@ const DoctorScheduleDetail = (props) => {
               source={{ uri : doctor && doctor.avatar }}
               style={styles.imageStyle}
             ></Image>
-            <SvgUri
+            {/* <SvgUri
               width="20"
               height="20"
               source={{ uri : doctor && doctor.avatar }}
@@ -190,7 +153,7 @@ const DoctorScheduleDetail = (props) => {
                 right: 0,
                 top: 0,
               }}
-            />
+            /> */}
           </Block>
           <Text size={20}>{doctor.name}</Text>
           <Text>Tel: +{doctor.phone}</Text>

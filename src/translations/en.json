@@ -261,5 +261,17 @@
     "approved": "Approved",
     "Schedule Patient List": "Schedule Patient List",
     "schedules": "Schedule View",
-    "yearsExp": "years Exp"
+    "yearsExp": "years Exp",
+    "My Schedule": "My Schedule",
+    "Case History": "Case History",
+    "Name": "Name",
+    "Status": "Status",
+    "Date": "Date",
+    "New Case": "New Case",
+    "Waiting": "Waiting",
+    "Scheduled": "Scheduled",
+    "Treatment": "Treatment",
+    "Review": "Review",
+    "Discharged": "Discharged",
+    "See all": "See all"
 }

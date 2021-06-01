@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Block, Text, theme, Icon } from "galio-framework";
-import { SvgUri } from "react-native-svg";
 
 const { width, height } = Dimensions.get("screen");
 

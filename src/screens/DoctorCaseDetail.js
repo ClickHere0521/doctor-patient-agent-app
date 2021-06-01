@@ -22,7 +22,6 @@ import {
 } from "../components/";
 // import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 // import { SliderBox } from "react-native-image-slider-box";
-import SvgUri from "react-native-svg-uri";
 import { IMLocalized } from "../localization/IMLocalization";
 import { CheckBox } from "react-native-elements";
 
@@ -180,7 +179,7 @@ const Components = (props) => {
           </Block>
           <Block column>
             <Text style={{ alignSelf: "flex-end" }} color={"#06D81E"}></Text>
-            <SvgUri
+            {/* <SvgUri
               width="20"
               height="20"
               source={require("../assets/icons/editGreen.svg")}
@@ -188,7 +187,7 @@ const Components = (props) => {
                 right: -theme.SIZES.BASE * 2,
                 paddingTop: theme.SIZES.BASE,
               }}
-            />
+            /> */}
           </Block>
         </Block>
 
@@ -220,7 +219,7 @@ const Components = (props) => {
           </Block>
           <Block column>
             <Text style={{ alignSelf: "flex-end" }} color={"#06D81E"}></Text>
-            <SvgUri
+            {/* <SvgUri
               width="20"
               height="20"
               source={require("../assets/icons/editGreen.svg")}
@@ -228,7 +227,7 @@ const Components = (props) => {
                 right: -theme.SIZES.BASE * 2,
                 paddingTop: theme.SIZES.BASE,
               }}
-            />
+            /> */}
           </Block>
         </Block>
         <Block style={styles.interval}>
@@ -580,8 +579,8 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 24,
     borderBottomLeftRadius: 24,
     width: width,
-    height: height * 0.16,
-    paddingTop: theme.SIZES.BASE * 2,
+    height: height * 0.1,
+    paddingTop: theme.SIZES.BASE,
     paddingLeft: theme.SIZES.BASE,
   },
   textCenter: {
