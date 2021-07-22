@@ -1,33 +1,64 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  TouchableWithoutFeedback,
   Image,
-  ImageBackground,
   Dimensions,
-  Touchable,
 } from "react-native";
 import { Button, Block, Text, Input, theme } from "galio-framework";
-import { materialTheme, products, Images, tabs } from "../constants/";
 import {
-  Select,
   Icon,
-  Header,
-  Product,
-  Switch,
-  Tabs,
   ListItem,
 } from "../components/";
 // import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 // import { SliderBox } from "react-native-image-slider-box";
+import SvgUri from "react-native-svg-uri";
+import { CheckBox } from "react-native-elements";
+import { weekdays } from "moment";
+import firestore from '@react-native-firebase/firestore';
 
 const { width, height } = Dimensions.get("screen");
 
+
 const Components = (props) => {
+
   const { navigation } = props;
+  // let { category } = props.route.params;
   const [imageSource, setImageSource] = useState(null);
+  const [weekState, setWeekState] = useState([
+    {
+      date: "MON",
+      status: true,
+    },
+    {
+      date: "TUE",
+      status: false,
+    },
+    {
+      date: "WED",
+      status: false,
+    },
+    {
+      date: "THU",
+      status: false,
+    },
+    {
+      date: "FRI",
+      status: false,
+    },
+    {
+      date: "SAT",
+      status: false,
+    },
+    {
+      date: "SUN",
+      status: false,
+    },
+  ]);
+
+  // const [caseStatus, setCaseStatus] = useState(category.caseStatus);
+
   const options = {
     title: "Load Photo",
     customButtons: [
@@ -41,6 +72,12 @@ const Components = (props) => {
   };
 
   const weekBar = () => {
+    const handleWeekbar = index => {
+      weekState.map((value, indexTemp) => {
+        weekState[indexTemp].status = (index == indexTemp) ? true : false;
+      })
+      setWeekState([...weekState]);
+    }
     return (
       <ScrollView
         horizontal={true}
@@ -52,47 +89,23 @@ const Components = (props) => {
         snapToInterval={theme.SIZES.BASE * 0.375}
         style={styles.weekScrollView}
       >
-        <TouchableOpacity style={styles.dateActive}>
-          <Text size={16} color={"white"}>
-            WED
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 3 }}>
-            THU
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 8 }}>
-            FRI
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 6 }}>
-            SAT
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 4 }}>
-            SUN
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16}>MON</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 4 }}>
-            THE
-          </Text>
-        </TouchableOpacity>
+        {weekState.map((value, index) => {
+          return (
+            <TouchableOpacity key={index} onPress={() => { handleWeekbar(index) }} style={value.status ? styles.dateActive : styles.dateInActive}>
+              <Text size={16} color={value.status ? "white" : "black"}>
+                {value.date}
+              </Text>
+            </TouchableOpacity>
+          )
+        })}
       </ScrollView>
     );
   };
 
   const renderNotes = (notes) => {
-    let { author, date, content } = notes;
+    let { author, date, content, index } = notes;
     return (
-      <Block row center style={styles.patientHeading}>
+      <Block key={index} row center style={styles.patientHeading}>
         <Block>
           <Image
             source={require("../assets/images/grayscale-photo-of-man2.png")}
@@ -103,62 +116,63 @@ const Components = (props) => {
             style={{ position: "absolute", right: 0 }}
           />
         </Block>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Note", { notes })}
+        >
+          <Block column style={{ paddingLeft: 10, width: width * 0.7 }}>
+            <Text bold size={16}>
+              {author}
+            </Text>
+            <Text
+              color={"#909CA1"}
+              style={{ paddingTop: theme.SIZES.BASE * 0.5 }}
+            >
+              {date}
+            </Text>
+            <Text
+              color={"#909CA1"}
+              style={{ paddingTop: theme.SIZES.BASE * 0.5 }}
+            >
+              {content}
+            </Text>
+          </Block>
 
-        <Block column style={{ paddingLeft: 10, width: width * 0.7 }}>
-          <Text bold size={16}>
-            {author}
-          </Text>
-          <Text
-            color={"#909CA1"}
-            style={{ paddingTop: theme.SIZES.BASE * 0.5 }}
-          >
-            {date}
-          </Text>
-          <Text
-            color={"#909CA1"}
-            style={{ paddingTop: theme.SIZES.BASE * 0.5 }}
-          >
-            {content}
-          </Text>
-        </Block>
+        </TouchableOpacity>
       </Block>
     );
   };
-
+  // const changeStatus = (statusNum) => {
+  //   setCaseStatus(statusNum);
+  //   firestore().collection('Cases').doc(category.uID).collection("Case").doc(category.caseID).update({
+  //     caseStatus: statusNum
+  //   });
+  // }
+  const navbar = () => {
+    return (
+      <Block row style={styles.navbar} center>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Icon
+            name="arrow-left"
+            family="font-awesome"
+            color="white"
+            size={16}
+            style={styles.chevronLeft}
+          />
+        </TouchableOpacity>
+        <Text
+          color="white"
+          style={{ paddingLeft: theme.SIZES.BASE }}
+          size={17}
+          bold
+        >
+          Case Detail
+        </Text>
+      </Block>
+    );
+  };
   return (
     <Block flex style={styles.agentCaseDetail}>
-      <Block style={styles.roundBlock}>
-        <Block row style={styles.heading}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Icon
-              size={16}
-              name="chevron-left"
-              family="font-awesome"
-              color={"white"}
-              style={{ padding: 7 }}
-            />
-          </TouchableOpacity>
-          <Block>
-            <Text
-              color="white"
-              size={20}
-              style={{ fontFamily: "Inter-Black" }}
-              bold
-            >
-              Case Details
-            </Text>
-          </Block>
-          <Block
-            style={{
-              position: "absolute",
-              right: 10,
-              padding: 7,
-            }}
-          >
-            <Image source={require("../assets/images/editWhite.png")} />
-          </Block>
-        </Block>
-      </Block>
+      {navbar()}
       <ScrollView
         style={styles.components}
         showsVerticalScrollIndicator={false}
@@ -171,31 +185,21 @@ const Components = (props) => {
             source={require("../assets/images/patient1.png")}
             style={{ width: 60, height: 60 }}
           />
+          {/* <Image source={{ uri: (category && category.patientInfo.avatar) }} style={styles.avatar} /> */}
           <Block column style={{ paddingLeft: 10, width: width * 0.55 }}>
-            <Text bold size={16}>
-              Edie Sparks Turie
+            <Text size={16}>
+              {/* {category.patientInfo.patientName} */}
+              PatientName
             </Text>
             <Text
               color={"#909CA1"}
               style={{ paddingTop: theme.SIZES.BASE * 0.5 }}
             >
-              1993/04/29
+              {/* {category.caseCreateTime.toDate().toDateString()} */}
+              CaseCreateTime
             </Text>
           </Block>
-          <Block column>
-            <Text style={{ alignSelf: "flex-end" }} color={"#06D81E"}></Text>
-            {/* <SvgUri
-              width="20"
-              height="20"
-              source={require("../assets/icons/editGreen.svg")}
-              style={{
-                right: -theme.SIZES.BASE * 2,
-                paddingTop: theme.SIZES.BASE,
-              }}
-            /> */}
-          </Block>
         </Block>
-
         <Text bold size={18} style={{ paddingLeft: width * 0.05 }}>
           Doctor
         </Text>
@@ -205,122 +209,72 @@ const Components = (props) => {
               source={require("../assets/images/grayscale-photo-of-man2.png")}
               style={{ width: 60, height: 60 }}
             />
-            <Image
-              source={require("../assets/images/ok.png")}
-              style={{ position: "absolute", right: 0 }}
-            />
           </Block>
-
           <Block column style={{ paddingLeft: 10, width: width * 0.55 }}>
-            <Text bold size={16}>
-              Edie Sparks
+            <Text size={16}>
+              {/* {category.pcDoctorInfo.name} */}
+              pcDoctorInfo.name
             </Text>
             <Text
               color={"#909CA1"}
               style={{ paddingTop: theme.SIZES.BASE * 0.5 }}
             >
-              1993/04/29
+              {/* {category.pcDoctorInfo.phone} */}
+              pcDoctorInfo.phone
             </Text>
-          </Block>
-          <Block column>
-            <Text style={{ alignSelf: "flex-end" }} color={"#06D81E"}></Text>
-            {/* <SvgUri
-              width="20"
-              height="20"
-              source={require("../assets/icons/editGreen.svg")}
-              style={{
-                right: -theme.SIZES.BASE * 2,
-                paddingTop: theme.SIZES.BASE,
-              }}
-            /> */}
           </Block>
         </Block>
         <Block style={styles.interval}>
           <Text bold size={18} style={{ paddingLeft: width * 0.05 }}>
             Status
           </Text>
-          <Text size={16} style={styles.startTimeRight}>
-            Case start time：2020.09.23
+          <Text size={14} style={styles.startTimeRight}>
+            {/* Case start time：{category.caseCreateTime.toDate().toDateString()} */}
+            Case start time：caseCreateTime
           </Text>
         </Block>
         <Block center>
           <Block row>
-            <Block style={{ marginLeft: 30 }}>
+            <Block>
               <Block row>
-                {/* <SvgUri
-                  width="25"
-                  height="25"
-                  source={require("../assets/icons/rect_check.svg")}
-                  style={{
-                    position: "absolute",
-                    marginLeft: -16,
-                    marginTop: 6,
-                  }}
-                /> */}
-                <Text size={16} style={styles.text}>
-                  New case
-                </Text>
+                <CheckBox checked={caseStatus >= 1 ? true : false} onPress={() => changeStatus(1)} />
+                <Block style={styles.textCenter}>
+                  <Text size={16} style={styles.text}>
+                    New case
+                  </Text>
+                </Block>
               </Block>
               <Block row>
-                {/* <SvgUri
-                  width="25"
-                  height="25"
-                  source={require("../assets/icons/rect_check.svg")}
-                  style={{
-                    position: "absolute",
-                    marginLeft: -16,
-                    marginTop: 6,
-                  }}
-                /> */}
-                <Text size={16} style={styles.text}>
-                  Waiting schedule
-                </Text>
+                <CheckBox checked={caseStatus >= 2 ? true : false} onPress={() => changeStatus(2)} />
+                <Block style={styles.textCenter}>
+                  <Text size={16} style={styles.text}>
+                    Waiting Schedule
+                  </Text>
+                </Block>
               </Block>
               <Block row>
-                {/* <SvgUri
-                  width="25"
-                  height="25"
-                  source={require("../assets/icons/rect_check.svg")}
-                  style={{
-                    position: "absolute",
-                    marginLeft: -16,
-                    marginTop: 6,
-                  }}
-                /> */}
-                <Text size={16} style={styles.text}>
-                  Scheduled
-                </Text>
+                <CheckBox checked={caseStatus >= 3 ? true : false} onPress={() => changeStatus(3)} />
+                <Block style={styles.textCenter}>
+                  <Text size={16} style={styles.text}>
+                    Schedules
+                  </Text>
+                </Block>
               </Block>
             </Block>
-            <Block style={{ marginLeft: 30 }}>
+            <Block>
               <Block row>
-                {/* <SvgUri
-                  width="25"
-                  height="25"
-                  source={require("../assets/icons/rect_check.svg")}
-                  style={{
-                    position: "absolute",
-                    marginLeft: -16,
-                    marginTop: 6,
-                  }}
-                /> */}
-                <Text size={16} style={styles.text}>
-                  Treatment
-                </Text>
+                <CheckBox checked={caseStatus >= 4 ? true : false} onPress={() => changeStatus(4)} />
+                <Block style={styles.textCenter}>
+                  <Text size={16} style={styles.text}>
+                    Treatment
+                  </Text>
+                </Block>
               </Block>
               <Block row>
-                {/* <SvgUri
-                  width="25"
-                  height="25"
-                  source={require("../assets/icons/rect_check.svg")}
-                  style={{
-                    position: "absolute",
-                    marginLeft: -16,
-                    marginTop: 6,
-                  }}
-                /> */}
+                <CheckBox checked={caseStatus >= 5 ? true : false} onPress={() => changeStatus(5)} />
                 <TouchableOpacity
                   onPress={() => navigation.navigate("AgentReview")}
+                  style={styles.textCenter}
                 >
                   <Text color={"#6E78F7"} size={16} style={styles.text}>
                     Case final review
@@ -328,19 +282,12 @@ const Components = (props) => {
                 </TouchableOpacity>
               </Block>
               <Block row>
-                {/* <SvgUri
-                  width="25"
-                  height="25"
-                  source={require("../assets/icons/rect_check.svg")}
-                  style={{
-                    position: "absolute",
-                    marginLeft: -16,
-                    marginTop: 6,
-                  }}
-                /> */}
-                <Text color={"black"} size={16} style={styles.text}>
-                  Discharged
-                </Text>
+                <CheckBox checked={caseStatus >= 6 ? true : false} onPress={() => changeStatus(6)} />
+                <Block style={styles.textCenter}>
+                  <Text color="black" size={16} style={styles.text}>
+                    Discharged
+                  </Text>
+                </Block>
               </Block>
             </Block>
           </Block>
@@ -350,25 +297,50 @@ const Components = (props) => {
             Date of Injury
           </Text>
           <Text size={16} style={styles.startTime}>
-            23.09.2020
+            {/* {category.dateOfInjury.toDate().toDateString()} */}
+            Date of Injury
           </Text>
         </Block>
         <Block row style={styles.interval}>
-          <Text bold size={18} color={"black"} style={{ paddingLeft: width * 0.05 }}>
+          <Text
+            bold
+            size={18}
+            color={"black"}
+            style={{ paddingLeft: width * 0.05 }}
+          >
             Attorney Info
           </Text>
-          <TouchableOpacity onPress={() => navigation.navigate("AddAfforney")}>
-            <Text size={16} color={"#6E78F7"} style={styles.startTimeDetail, {marginLeft: width * 0.2}}>
+          <TouchableOpacity>
+            {/* <TouchableOpacity onPress={() => navigation.navigate("AddAttorney", { info: category.attorneyInfo })}> */}
+            <Text
+              size={16}
+              color={"#6E78F7"}
+              style={
+                (styles.startTimeDetail, { marginLeft: theme.SIZES.BASE * 5 })
+              }
+            >
               Detail
             </Text>
           </TouchableOpacity>
         </Block>
         <Block row style={styles.interval}>
-          <Text bold size={18} color={"black"} style={{ paddingLeft: width * 0.05 }}>
+          <Text
+            bold
+            size={18}
+            color={"black"}
+            style={{ paddingLeft: width * 0.05 }}
+          >
             Insurance Info
           </Text>
-          <TouchableOpacity onPress={() => navigation.navigate("AddInsurance")}>
-            <Text size={16} color={"#6E78F7"} style={styles.startTimeDetail, {marginLeft: width * 0.18}}>
+          <TouchableOpacity>
+            {/* <TouchableOpacity onPress={() => navigation.navigate("AddInsurance", {info: category.InsuranceInfo})}> */}
+            <Text
+              size={16}
+              color={"#6E78F7"}
+              style={
+                (styles.startTimeDetail, { marginLeft: theme.SIZES.BASE * 4.4 })
+              }
+            >
               Detail
             </Text>
           </TouchableOpacity>
@@ -386,7 +358,7 @@ const Components = (props) => {
         <Block row center>
           <TouchableOpacity
             style={styles.save}
-            onPress={() => navigation.navigate('PatientCaseFile')}
+            onPress={() => navigation.navigate("PatientCaseFile")}
           >
             <Text color={"white"} size={16}>
               Case file
@@ -398,39 +370,44 @@ const Components = (props) => {
           <Text bold size={18} style={{ paddingLeft: width * 0.05 }}>
             Notes
           </Text>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={{
               right: theme.SIZES.BASE * 1,
               top: theme.SIZES.BASE * 0.3,
               position: "absolute",
               zIndex: 10,
             }}
-            onPress={() => navigation.navigate("CreateCase")}
+            onPress={() => navigation.navigate("AddNotes")}
           >
             <Text color={"white"}>
-              {/* <SvgUri
+              <SvgUri
                 width="16"
                 height="16"
                 source={require("../assets/icons/add.svg")}
-              /> */}
+              />
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </Block>
-        {renderNotes({
-          author: "DR.Adila Tahir",
-          date: "21/02/2021",
-          content: "Please don't say that...",
+        {/* {category.notes.map((value, index) => {
+          return (
+            renderNotes({
+              author: value.authorName,
+              date: value.createDate.toDate().toDateString(),
+              content: value.note,
+              index
+            })
+          )
+        })} */}
+        {/* {renderNotes({
+          author: category.notes[0].authorName,
+          date: category.notes[0].createDate.toDate().toDateString(),
+          content: category.notes[0].note,
         })}
         {renderNotes({
-          author: "DR.Adila Tahir",
-          date: "21/02/2021",
-          content: "Please don't say that...",
-        })}
-        {renderNotes({
-          author: "DR.Adila Tahir",
-          date: "21/02/2021",
-          content: "Please don't say that...",
-        })}
+          author: category.notes[1].authorName,
+          date: category.notes[1].createDate.toDate().toDateString(),
+          content: category.notes[1].note,
+        })} */}
         <Block style={{ marginBottom: 50 }}></Block>
       </ScrollView>
     </Block>
@@ -438,6 +415,11 @@ const Components = (props) => {
 };
 
 const styles = StyleSheet.create({
+  avatar: {
+    width: 60,
+    height: 60,
+    borderRadius: 15
+  },
   components: {
     paddingTop: theme.SIZES.BASE,
     backgroundColor: "white",
@@ -480,7 +462,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   text: {
-    marginHorizontal: 10,
     marginVertical: 10,
   },
   startTime: {
@@ -509,15 +490,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     marginLeft: theme.SIZES.BASE * 2,
   },
-  roundBlock: {
-    borderBottomLeftRadius: 34,
-    borderBottomRightRadius: 34,
-    backgroundColor: "rgba(100, 120, 247, 0.84)",
-    height: height * 0.16,
-    width: width,
-    top: -10,
-    zIndex: 2,
-  },
   heading: {
     marginTop: height * 0.08,
     paddingHorizontal: theme.SIZES.BASE * 0.5,
@@ -532,7 +504,10 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     shadowColor: "grey",
     shadowOpacity: 0.2,
-    shadowOpacity: 5,
+    shadowOffset: {
+      width: 0,
+      height: 5
+    },
     elevation: 2,
     backgroundColor: "#FEFEFE",
     padding: 10,
@@ -544,6 +519,7 @@ const styles = StyleSheet.create({
   weekScrollView: {
     marginVertical: theme.SIZES.BASE,
     padding: theme.SIZES.BASE,
+    marginRight: theme.SIZES.BASE,
     paddingTop: 0,
   },
   dateActive: {
@@ -574,8 +550,10 @@ const styles = StyleSheet.create({
   save: {
     backgroundColor: "#00CE30",
     borderRadius: 15,
-    paddingVertical: 10,
-    paddingHorizontal: 50,
+    width: width * 0.35,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 10,
     marginHorizontal: 20,
   },
@@ -589,6 +567,19 @@ const styles = StyleSheet.create({
   startTimeDetail: {
     textDecorationLine: "underline",
     marginHorizontal: 10,
+  },
+  navbar: {
+    backgroundColor: "#6E78F7",
+    borderBottomRightRadius: 24,
+    borderBottomLeftRadius: 24,
+    width: width,
+    height: height * 0.1,
+    paddingTop: theme.SIZES.BASE,
+    paddingLeft: theme.SIZES.BASE,
+  },
+  textCenter: {
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

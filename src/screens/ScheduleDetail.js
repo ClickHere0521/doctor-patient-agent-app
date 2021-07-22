@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   StyleSheet,
   Dimensions,
@@ -7,231 +7,285 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { Block, Text, theme } from "galio-framework";
-import DateTime from "./DateTime";
 import _ from "lodash";
 import { Icon } from "../components";
 import { ActivityIndicator } from "react-native";
 import firestore from '@react-native-firebase/firestore';
+import { useIsFocused } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get("screen");
 
 const ScheduleDetail = (props) => {
+  const isFocused = useIsFocused();
+  const scrollRef = useRef();
   const { navigation } = props;
   const { section } = props.route.params;
-  const [isOpenCalendar, setIsOpenCalendar] = useState(false);
-  const [schedules, setSchedules] = useState([]);
-  const [childDays, setChildDays] = useState([]);
+  const [spinner, setSpinner] = useState(false);
+  const [schedule, setSchedule] = useState([]);
+  const [scheduleCalendar, setScheduleCalendar] = useState([]);
+  const [childDay, setChildDay] = useState([]);
   const [time, setTime] = useState("");
-  const scheduleList = [];
-  const childDayList = [];
+  const [weekState, setWeekState] = useState([]);
+
   useEffect(() => {
-    firestore().collection('PCDoctors').doc(section.doctorId).collection('PCDoctor').get().then((querySnapshot) => {
-      querySnapshot.forEach((doctorDoc) => {
-        firestore().collection('PCDoctors').doc(section.doctorId).collection('PCDoctor').doc(doctorDoc.id).collection('ScheduleInfo').get().then((querySnapshot) => {
-          querySnapshot.forEach((res) => {
-            const { caseID, caseReference, scheduleTime, patientName, patientReference } = res.data();
-            const time = new Date(scheduleTime.seconds * 1000 + scheduleTime.nanoseconds/1000000);
-            childDayList.push(`${time.getFullYear()}-${time.getMonth()<10 ? 0 : null}${time.getMonth()+1}-${time.getDate()}`);
-            scheduleList.push({
-              patientName,
-              time: time.toUTCString(),
-              caseID,
-            });
-          })
-          setChildDays(childDayList);
-          setSchedules(scheduleList);
-        })
-      })
-    })    
-  }, []);
+    if (isFocused) {
+      scrollRef.current.scrollTo({x: 0, y: 100, animated: true})
+      setWeekState([
+        {
+          date: "MON",
+          status: true,
+        },
+        {
+          date: "TUE",
+          status: false,
+        },
+        {
+          date: "WED",
+          status: false,
+        },
+        {
+          date: "THU",
+          status: false,
+        },
+        {
+          date: "FRI",
+          status: false,
+        },
+        {
+          date: "SAT",
+          status: false,
+        },
+        {
+          date: "SUN",
+          status: false,
+        },
+      ]);
+    }
+  }, [isFocused]);
+
+  const tempSchedule = [];
+  const childDayList = [];
+  const tempScheduleCalendar = [];
+
+  useEffect(() => {
+    const { realPrevMonday, realLaterSunday } = getPreviousMonday();
+    setSpinner(true);
+    firestore().collection('PCDoctors').doc(section.uid).collection('Schedules').get().then((querySnapShot) => {
+      querySnapShot.forEach((scheduleDoc) => {
+        const { scheduleTime } = scheduleDoc.data(); 
+        const time = new Date(scheduleTime.seconds * 1000 + scheduleTime.nanoseconds/1000000);
+        childDayList.push(`${time.getFullYear()}-${(time.getMonth()+1)<10 ? 0 : ''}${time.getMonth()+1}-${time.getDate()<10 ? 0 : ''}${time.getDate()}`);
+        tempScheduleCalendar.push(scheduleDoc.data());
+      });
+      setChildDay(childDayList);
+      setScheduleCalendar(tempScheduleCalendar);
+    }).then((res) => {
+      if (childDayList.length == 0) {
+        setChildDay([]);
+        setScheduleCalendar([]);
+      }
+      firestore().collection('PCDoctors').doc(section.uid).collection('Schedules').where("scheduleTime", ">=", realPrevMonday).where("scheduleTime", "<=", realLaterSunday).get().then((querySnapShot) => {
+        querySnapShot.forEach((scheduleDoc) => {
+          tempSchedule.push(scheduleDoc.data());
+        });
+        setSchedule(tempSchedule);
+      }).then((res) => {
+        if (tempSchedule.length == 0) {
+          setSchedule([]);
+        }
+        setSpinner(false);
+      });
+    });
+  }, [section]);
+
+  const getPreviousMonday = () => {
+    var date = new Date();
+    var day = date.getDay();
+    var prevMonday = new Date();
+    var laterSunday = new Date();
+    if(date.getDay() == 0){
+        prevMonday.setDate(date.getDate() - 7);
+    }
+    else{
+        prevMonday.setDate(date.getDate() - (day-1));
+    }
+    laterSunday.setDate(prevMonday.getDate() + 6);
+    var prevMondayStr = `${prevMonday.getFullYear()}-${(prevMonday.getMonth()+1)<10 ? 0 : ''}${prevMonday.getMonth()+1}-${prevMonday.getDate()<10 ? 0 : ''}${prevMonday.getDate()}`;
+    var laterSundayStr = `${laterSunday.getFullYear()}-${(laterSunday.getMonth()+1)<10 ? 0 : ''}${laterSunday.getMonth()+1}-${laterSunday.getDate()<10 ? 0 : ''}${laterSunday.getDate()}`;
+    var realPrevMonday = new Date(prevMondayStr);
+    var realLaterSunday = new Date(laterSundayStr);
+    return { realPrevMonday, realLaterSunday };
+  }
+
+  const handleNavigateCaseDetail = (caseReference) => {
+    var category = {};
+    caseReference.get().then((querySnapShot) => {
+      category = querySnapShot.data();
+    }).then(() => {
+      navigation.navigate("AgentCaseDetail", {category});
+    })
+  };
 
   const renderDetils = (details) => {
-    let { index, patientName, scheduleTime, caseID } = {
+    let { index, patientName, scheduleTime, caseReference, avatar } = {
       ...details,
     };
-    return (
-      <Block style={styles.schedule} key={index}>
-        <TouchableOpacity
-          // onPress={() => navigation.navigate("AgentCaseDetail", {caseID})}
-        >
-          <Block row>
-            <Image
-              source={require("../assets/images/check.png")}
-              style={styles.check}
-            />
-            <Block middle>
-              <Image source={require("../assets/images/avatar.png")} />
-            </Block>
-            <Block middle style={{ paddingTop: 10 }}>
-              <Text
-                bold
-                size={18}
-                style={{ alignSelf: "flex-start", paddingVertical: 5 }}
-              >
-                {patientName}
-              </Text>
-              <Block row style={{ paddingVertical: 8 }}>
-                <Block middle>
-                  <Icon
-                    name="map-marker"
-                    family="font-awesome"
-                    color={theme.COLORS.CUSTOM}
-                    size={16}
-                  >
-                    {" "}
-                  </Icon>
-                </Block>
-                <Block middle style={{ marginRight: 40 }}>
-                  <Text>{scheduleTime}</Text>
+    const tempTime = new Date(scheduleTime.seconds * 1000 + scheduleTime.nanoseconds/1000000);
+    const tempDay = tempTime.getDay() == 0 ? 6 : tempTime.getDay() - 1;
+    if (weekState[tempDay].status)
+      return (
+        <Block style={styles.schedule} key={index}>
+          <TouchableOpacity
+            onPress={() => handleNavigateCaseDetail(caseReference)}
+          >
+            <Block row style={{paddingVertical: 10}}>
+              <Image
+                source={require("../assets/images/check.png")}
+                style={styles.check}
+              />
+              <Block flex={2}>
+                {avatar ? (
+                  <Image source={{uri: avatar}} style={styles.imageStyle} />
+                ) : (
+                  <Image source={require("../assets/images/avatar.png")} style={styles.imageStyle} />
+                )}
+              </Block>
+              <Block flex={1}></Block>    
+              <Block flex={10}>
+                <Text
+                  bold
+                  size={18}
+                  style={{ alignSelf: "flex-start" }}
+                >
+                  {patientName}
+                </Text>
+                <Block row style={{ paddingVertical: 8 }}>
+                  <Block middle>
+                    <Icon
+                      name="map-marker"
+                      family="font-awesome"
+                      color={theme.COLORS.CUSTOM}
+                      size={16}
+                    >
+                      {" "}
+                    </Icon>
+                  </Block>
+                  <Block middle style={{ marginRight: 40 }}>
+                    <Text>{scheduleTime.toDate().toDateString()}</Text>
+                  </Block>
                 </Block>
               </Block>
             </Block>
+          </TouchableOpacity>
+        </Block>
+      );
+    else return null;
+  };
+
+  const weekBar = () => {
+    const handleWeekbar = index => {
+      scrollRef.current.scrollTo({x: 38*index, y: 100, animated: true});
+      weekState.map((value, indexTemp) => {
+        weekState[indexTemp].status = (index == indexTemp) ? true : false;
+      })
+      setWeekState([...weekState]);
+    }
+    return (
+      <ScrollView
+        ref={scrollRef}
+        horizontal={true}
+        pagingEnabled={true}
+        decelerationRate={0}
+        scrollEventThrottle={16}
+        snapToAlignment="center"
+        showsHorizontalScrollIndicator={false}
+        snapToInterval={theme.SIZES.BASE * 0.375}
+        style={styles.weekScrollView}
+      >
+        {weekState.map((value, index) => {
+          return (
+            <TouchableOpacity key={index} onPress={() => { handleWeekbar(index) }} style={value.status ? styles.dateActive : styles.dateInActive}>
+              <Text size={16} color={value.status ? "white" : "black"}>
+                {value.date}
+              </Text>
+            </TouchableOpacity>
+          )
+        })}
+      </ScrollView>
+    );
+  };
+  const navbar = () => {
+    return (
+      <Block row style={styles.navbar} center>
+        <Block row flex={1}>
+          <Block flex={1}>
+            <TouchableOpacity style={styles.touchableArea} onPress={() => navigation.goBack()}>
+              <Icon
+                name="arrow-left"
+                family="font-awesome"
+                color="white"
+                size={16}
+              />
+            </TouchableOpacity>
           </Block>
-        </TouchableOpacity>
+          <Block flex={6}>
+            <Text
+              color="white"
+              size={16}
+              bold
+              style={{ padding: theme.SIZES.BASE * 0.3 }}
+            >
+              {section.name}
+            </Text>
+          </Block>
+        </Block>
+        <Block flex={1} style={{alignItems: 'flex-end', marginRight: 20}}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Calendar", {scheduleCalendar, childDay})}
+          >
+            <Block row>
+              <Text color="white">Calendar</Text>
+              <Icon
+                name="chevron-right"
+                family="font-awesome"
+                color={"white"}
+                size={10}
+                style={{ padding: 6 }}
+              />
+            </Block>
+          </TouchableOpacity>
+        </Block>
       </Block>
     );
   };
-
-  const onChangeDate = (date) => {
-    alert(date);
-  };
-
-  const renderChildDay = (day) => {    
-    console.log(childDays)
-    if (_.includes(childDays, day)) {
-      return (
-        <Block style={styles.icLockRed}></Block>
-      );
-    }
-  };
-
-  const checkCalendar = () => {
-    if (isOpenCalendar) {
-      return (
-        <Block style={{ marginTop: 150, position: "absolute" }}>
-          <DateTime
-            date={time}
-            changeDate={(date) => onChangeDate(date)}
-            format="YYYY-MM-DD"
-            renderChildDay={(day) => renderChildDay(day)}
-            warpRowWeekdays={{ backgroundColor: "rgba(0,0,0,0)" }}
-            warpDayStyle={{
-              backgroundColor: "rgba(0,0,0,0)",
-              borderColor: "rgba(0,0,0,0)",
-            }}
-          />
-        </Block>
-      );
-    } else {
-      return <Block></Block>;
-    }
-  };
-
   return (
-    <Block>
-      <Block>
-        <Block>
-          <Block style={styles.roundBlock}>
-            <Block row style={styles.heading}>
-              <TouchableOpacity onPress={() => navigation.goBack()}>
-                <Icon
-                  size={16}
-                  name="chevron-left"
-                  family="font-awesome"
-                  color={"white"}
-                  style={{ padding: 7 }}
-                />
-              </TouchableOpacity>
-              <Block>
-                <Text
-                  color="white"
-                  size={20}
-                  style={{ fontFamily: "Inter-Black" }}
-                  bold
-                >
-                  {section.name}
-                </Text>
+    <Block style={styles.scheduleDetail}>
+      <Block style={{backgroundColor: 'white', height: height}}>
+        {navbar()}
+        <ScrollView
+          vertical={true}
+          showsVerticalScrollIndicator={false}
+        >
+          <Block style={{marginBottom: 20}}>
+          {weekBar()}
+            {spinner ? (
+              <Block flex style={{marginTop: 40, alignItems: 'center', justifyContent: 'center'}}>
+                <ActivityIndicator size={50} color="#6E78F7" />
               </Block>
-            </Block>
-            <Block style={styles.btnCalendar}>
-              <TouchableOpacity
-                onPress={() => setIsOpenCalendar(!isOpenCalendar)}
-              >
-                <Block row>
-                  <Text color="white">Calendar</Text>
-                  <Icon
-                    name="chevron-right"
-                    family="font-awesome"
-                    color={"white"}
-                    size={10}
-                    style={{ padding: 6 }}
-                  />
-                </Block>
-              </TouchableOpacity>
-            </Block>
-          </Block>
-          <Block style={styles.body}>
-            <ScrollView
-              horizontal={true}
-              pagingEnabled={true}
-              decelerationRate={0}
-              scrollEventThrottle={16}
-              snapToAlignment="center"
-              showsHorizontalScrollIndicator={false}
-              snapToInterval={theme.SIZES.BASE * 0.375}
-              contentContainerStyle={{
-                paddingHorizontal: theme.SIZES.BASE / 2,
-              }}
-            >
-              <TouchableOpacity style={styles.dateActive}>
-                <Text size={16} color={"white"}>
-                  Today
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.dateInActive}>
-                <Text size={16}>5.5</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.dateInActive}>
-                <Text size={16}>5.6</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.dateInActive}>
-                <Text size={16}>5.7</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.dateInActive}>
-                <Text size={16}>5.8</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.dateInActive}>
-                <Text size={16}>5.9</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.dateInActive}>
-                <Text size={16}>5.10</Text>
-              </TouchableOpacity>
-            </ScrollView>
-          </Block>
-        </Block>
-        <Block style={{ marginTop: theme.SIZES.BASE * 2 }}>
-          <ScrollView
-            vertical={true}
-            showsVerticalScrollIndicator={false}
-            style={{ height: height * 0.75 }}
-          >
-            {schedules.length ==0 ? (
-              <ActivityIndicator size={50} color="#6E78F7" />
             ) : (
-              schedules.map((val, index) => {                
+              schedule.map((val, index) => {                
                 return renderDetils({
                   index,
                   patientName: val.patientName,
-                  scheduleTime: val.time,
-                  caseID: val.caseID,
+                  scheduleTime: val.scheduleTime,
+                  caseReference: val.caseReference,
+                  avatar: val.patientAvatar,
                 })
               })
-            ) }
-          </ScrollView>
-        </Block>
+            )}
+          </Block>
+        </ScrollView>
       </Block>
-
-      {checkCalendar()}
     </Block>
   );
 };
@@ -249,14 +303,20 @@ const styles = StyleSheet.create({
     top: 29,
     left: 15,
   },
+  touchableArea: {
+    width: 30, 
+    height: 30, 
+    justifyContent: 'center', 
+    alignItems: 'center'
+  },
   schedule: {
     paddingHorizontal: width * 0.03,
     marginHorizontal: width * 0.04,
-    marginVertical: theme.SIZES.BASE,
+    marginTop: theme.SIZES.BASE,
     borderRadius: 13,
-    backgroundColor: theme.COLORS.WHITE,
+    backgroundColor: "#f9f9f9",
     shadowColor: "black",
-    shadowOffset: { width: 0, height: 0 },
+    // shadowOffset: { width: 0, height: 0 },
     shadowRadius: 8,
     shadowOpacity: 0.2,
     elevation: 3,
@@ -306,6 +366,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.SIZES.BASE * 0.5,
     position: "absolute",
   },
+  navbar: {
+    backgroundColor: "#6E78F7",
+    borderBottomRightRadius: 24,
+    borderBottomLeftRadius: 24,
+    width: width,
+    height: height * 0.1,
+    paddingTop: theme.SIZES.BASE,
+    paddingLeft: theme.SIZES.BASE * 0.5,
+  },
+  scheduleDetail: {
+    backgroundColor: 'white',
+  },  
   btnCalendar: {
     position: "absolute",
     right: width * 0.05,
@@ -317,9 +389,46 @@ const styles = StyleSheet.create({
   },
   check: {
     position: "absolute",
-
     right: -width * 0.05,
     top: -height * 0.01,
+  },
+  imageStyle: {
+    width: 60,
+    height: 60,
+    borderRadius: 20,
+    borderWidth: 3,
+    borderColor: "#CCC",
+  },
+  weekScrollView: {
+    marginTop: theme.SIZES.BASE,
+    padding: theme.SIZES.BASE,
+    marginRight: theme.SIZES.BASE,
+    paddingTop: 0,
+  },
+  dateActive: {
+    backgroundColor: "#00CE30",
+    borderRadius: theme.SIZES.BASE * 1.5,
+    paddingHorizontal: 8,
+    paddingVertical: 20,
+    marginRight: theme.SIZES.BASE,
+    width: theme.SIZES.BASE * 4,
+    height: theme.SIZES.BASE * 5,
+    alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "center",
+  },
+  dateInActive: {
+    borderWidth: 1,
+    borderColor: "#EDEDED",
+    borderRadius: theme.SIZES.BASE * 1.5,
+    paddingHorizontal: 4,
+    paddingVertical: 20,
+    marginRight: theme.SIZES.BASE,
+    width: theme.SIZES.BASE * 4,
+    height: theme.SIZES.BASE * 5,
+    alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "center",
   },
 });
 

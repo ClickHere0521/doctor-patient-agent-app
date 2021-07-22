@@ -1,187 +1,145 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  TouchableWithoutFeedback,
-  Image,
   Dimensions,
 } from "react-native";
 import { Block, Text, theme } from "galio-framework";
-import products from "../constants/images/home";
 import {
   Icon,
   ListItem,
 } from "../components/";
 import LinearGradient from "react-native-linear-gradient";
-import { IMLocalized } from "../localization/IMLocalization";
+import { IMLocalized, init } from "../localization/IMLocalization";
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 const { width, height } = Dimensions.get("screen");
-
-const thumbMeasure = (width - 48 - 32) / 3;
 const cardWidth = theme.SIZES.BASE * 4;
 
-const sortCategories = [
-  {
-    title: IMLocalized("Name"),
-  },
-  {
-    title: IMLocalized("Status"),
-  },
-  {
-    title: IMLocalized("Date"),
-  },
-];
-
-const filterCategories = [
-  {
-    title: IMLocalized("New Case"),
-  },
-  {
-    title: IMLocalized("Waiting"),
-  },
-  {
-    title: IMLocalized("Scheduled"),
-  },
-  {
-    title: IMLocalized("Treatment"),
-  },
-  {
-    title: IMLocalized("Review"),
-  },
-  {
-    title: IMLocalized("Discharged"),
-  },
-];
-
 const DoctorCaseHistory = (props) => {
-  const [filterIndex, setFilterIndex] = useState(0);
   const { navigation } = props;
+  const [filterIndex, setFilterIndex] = useState(0);
+  const [sortIndex, setSortIndex] = useState(0);
+  const [doctor, setDoctor] = useState([]);
+  const [cases, setCases] = useState(null);
+  let doctorTemp = {};
+  const sortCategories = [
+    {
+      title: IMLocalized("name"),    
+    },
+    {
+      title: IMLocalized("status"),
+    },
+    {
+      title: IMLocalized("date"),
+    },
+  ];
+  const filterCategories = [
+    {
+      title: IMLocalized("newCase"),
+    },
+    {
+      title: IMLocalized("waiting"),
+    },
+    {
+      title: IMLocalized("scheduled"),
+    },
+    {
+      title: IMLocalized("treatment"),
+    },
+    {
+      title: IMLocalized("review"),
+    },
+    {
+      title: IMLocalized("discharged"),
+    },
+  ];
 
-  const renderPatient = (item, index) => {
-    return (
-      <TouchableWithoutFeedback
-        style={{ zIndex: 3 }}
-        key={`product-${item.title}`}
-        onPress={() => navigation.navigate("Pro", { product: item })}
-      >
-        <Block center style={styles.productItem}>
-          <Block style={[styles.productRounded]}>
-            <Image
-              resizeMode="cover"
-              style={styles.productImage}
-              source={{ uri: item.image }}
-            />
-          </Block>
-          <Block center>
-            <Text center size={10}>
-              {item.title}
-            </Text>
-          </Block>
-        </Block>
-      </TouchableWithoutFeedback>
-    );
-  };
+  useEffect(() => {
+    const currentUserUid = auth().currentUser.uid;
+    firestore().collection('PCDoctors').doc(currentUserUid).collection('PCDoctor').get().then((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        doctorTemp = doc.data();        
+      });
+      const caseTemp = [];
+      const caseArrayPromise = doctorTemp.linkedCases.map((val) => {
+        const refArray = val.caseReference.get().then((refVal) => {
+          const refValData = refVal.data();
+          // console.log('refValData === >', refValData);
+          caseTemp.push({...refValData});
+          return caseTemp;  
+        });
+        return refArray;
+      });
+      Promise.all(caseArrayPromise).then((array) => {
+        // console.log('caseTemp === >', array[0]);
+        setCases(array[0]);
+      });
+      setDoctor(doctorTemp);
+    });
+  }, []);
 
   const renderSort = (item, index) => {
-    const { navigation } = props;
-
     return (
-      <TouchableWithoutFeedback
+      <TouchableOpacity
         style={{ zIndex: 3 }}
         key={`product-${item.title}`}
-        onPress={() => navigation.navigate("Pro", { product: item })}
+        onPress={() => setSortIndex(index)}
       >
         <LinearGradient
           start={{ x: 0, y: 0 }}
           end={{ x: 0.25, y: 1.1 }}
           locations={[0.2, 1]}
-          colors={["#EFEFEF", "#FFF"]}
+          colors={index == sortIndex ? ["#06D81E", "#06D81E"] : ["#EFEFEF", "#FFF"]}
           style={styles.sortItem}
+          flex={1}
         >
           <Block center>
-            <Text center size={15} fontWeight="semiBold">
+            <Text center size={15} fontWeight="semiBold" color={ index == sortIndex ? "white" : "black" }>
               {item.title}
             </Text>
           </Block>
         </LinearGradient>
-      </TouchableWithoutFeedback>
+      </TouchableOpacity>
     );
   };
-
-  const renderPatients = () => {
-    return (
-      <Block flex>
-        <Block flex>
-          <Block flex style={{ marginTop: theme.SIZES.BASE / 2 }}>
-            <ScrollView
-              horizontal={true}
-              pagingEnabled={true}
-              decelerationRate={0}
-              scrollEventThrottle={16}
-              snapToAlignment="center"
-              style={{ width }}
-              showsHorizontalScrollIndicator={false}
-              snapToInterval={cardWidth + theme.SIZES.BASE * 0.375}
-              contentContainerStyle={{
-                paddingHorizontal: theme.SIZES.BASE / 2,
-              }}
-            >
-              {categories &&
-                categories.map((item, index) => renderPatient(item, index))}
-            </ScrollView>
-          </Block>
-        </Block>
-      </Block>
-    );
-  };
-
   const renderSorts = () => {
     return (
-      <Block flex>
-        <Block flex>
-          <Block flex style={{ marginTop: theme.SIZES.BASE / 2 }}>
-            <ScrollView
-              horizontal={true}
-              pagingEnabled={true}
-              decelerationRate={0}
-              scrollEventThrottle={16}
-              snapToAlignment="center"
-              style={{ width }}
-              showsHorizontalScrollIndicator={false}
-              snapToInterval={cardWidth + theme.SIZES.BASE * 0.375}
-              contentContainerStyle={{
-                paddingHorizontal: theme.SIZES.BASE / 2,
-              }}
-            >
-              {sortCategories &&
-                sortCategories.map((item, index) => renderSort(item, index))}
-            </ScrollView>
-          </Block>
-        </Block>
-      </Block>
-    );
-  };
-
-  const renderPatientsList = () => {
-    return (
-      <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
-        <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
-          <ListItem product={products[0]} horizontal role="doctorCase" />
-          <ListItem product={products[1]} horizontal role="doctorCase" />
-          <ListItem product={products[2]} horizontal role="doctorCase" />
-          <ListItem product={products[3]} horizontal role="doctorCase" />
-          <ListItem product={products[4]} horizontal role="doctorCase" />
-          <ListItem product={products[0]} horizontal role="doctorCase" />
-          <ListItem product={products[1]} horizontal role="doctorCase" />
-          <ListItem product={products[2]} horizontal role="doctorCase" />
-          <ListItem product={products[3]} horizontal role="doctorCase" />
-          <ListItem product={products[4]} horizontal role="doctorCase" />
+      <Block flex style={{ marginTop: theme.SIZES.BASE / 2 }}>
+        <ScrollView
+          horizontal={true}
+          pagingEnabled={true}
+          decelerationRate={0}
+          scrollEventThrottle={16}
+          snapToAlignment="center"
+          style={{ width }}
+          showsHorizontalScrollIndicator={false}
+          snapToInterval={cardWidth + theme.SIZES.BASE * 0.375}
+          contentContainerStyle={{
+            paddingHorizontal: theme.SIZES.BASE / 2,
+          }}
+        >
+          {sortCategories &&
+            sortCategories.map((item, index) => renderSort(item, index))}
         </ScrollView>
       </Block>
     );
   };
-
+  const renderCasesList = () => {
+    return (
+      <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
+        <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
+          { 
+            cases && cases.map((val) => {
+              return <ListItem category={val} horizontal role="doctorCase"/>;
+            })
+          }
+        </ScrollView>
+      </Block>
+    );
+  };
   const renderFilter = () => {
     return (
       <Block flex flexDirection="row" style={{ margin: 10 }}>
@@ -208,7 +166,6 @@ const DoctorCaseHistory = (props) => {
       </Block>
     );
   };
-
   const navbar = () => {
     return (
       <Block row style={styles.navbar} center>
@@ -232,7 +189,6 @@ const DoctorCaseHistory = (props) => {
       </Block>
     );
   };
-
   return (
     <Block flex>
       {navbar()}
@@ -242,7 +198,7 @@ const DoctorCaseHistory = (props) => {
       >
         {renderSorts()}
         {renderFilter()}
-        {renderPatientsList()}
+        {renderCasesList()}
       </ScrollView>
     </Block>
   );
@@ -317,6 +273,7 @@ const styles = StyleSheet.create({
     borderRadius: 1000,
     borderColor: "#FFF",
     paddingVertical: 8,
+    width: 100,
     paddingHorizontal: width * 0.03,
     marginHorizontal: theme.SIZES.BASE * 0.5,
     shadowColor: "black",

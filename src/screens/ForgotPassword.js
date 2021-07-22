@@ -34,7 +34,6 @@ const ForgotPassword = (props) => {
   const handleRequestResent = () => {
     if (validemail) {
       auth().sendPasswordResetEmail(email).then(() => {
-        // setRequest(2);
         setRequested(false);
         Alert.alert("Success", `We have sent a link to ${email}`, [
           {

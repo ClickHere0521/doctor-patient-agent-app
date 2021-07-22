@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -8,13 +8,16 @@ import {
   Alert,
   Dimensions,
 } from "react-native";
-import { Button, Block, Text, Input, theme } from "galio-framework";
+import { Block, Text, theme } from "galio-framework";
 import {
   Icon,
 } from "../components";
 import {
   useFocusEffect
  } from '@react-navigation/native';
+import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const { width, height } = Dimensions.get("screen");
 
@@ -22,6 +25,9 @@ const thumbMeasure = (width - 48 - 32) / 3;
 const cardWidth = width - theme.SIZES.BASE * 2;
 
 const Components = (props) => {
+  const { navigation } = props;
+  const [doctor, setDoctor] = useState(null);
+  const [activeCase, setActiveCase] = useState(0);
   useFocusEffect(
     React.useCallback(() => {
       const onBackPress = () => {
@@ -31,7 +37,7 @@ const Components = (props) => {
         [
           {
             text: "OK",
-            onPress: () => {navigation.navigate("UserSelectStack")}
+            onPress: () => handleLogout()
           },
           {
             text: "Cancel",
@@ -59,22 +65,45 @@ const Components = (props) => {
       };
     }, []),
   );
+  useEffect(() => {
+    const currentUserUid = auth().currentUser.uid;
+    firestore().collection('PCDoctors').doc(currentUserUid).collection('PCDoctor').get().then((querySnapshot) => {
+      let doctorTemp = {};
+      querySnapshot.forEach((doc) => {
+        doctorTemp = doc.data();
+      });
+      setDoctor(doctorTemp);
+      // ------------ Active Cases ------------ //
+      let activeCaseNum = 0;
+      doctorTemp.linkedCases.forEach((value) => {
+        if (value.isActive) activeCaseNum ++;
+      });
+      setActiveCase(activeCaseNum);
+    });
+  }, []);
 
-  const { navigation } = props;
+  const handleLogout = async () => {
+    await AsyncStorage.setItem(
+      'reminder',
+      JSON.stringify({ reminder: false }),
+      () => {}
+    );  
+    navigation.navigate("UserSelectStack");
+  };
+
   const cardBox = () => {
     return (
       <Block style={styles.listBox}>
         <Text style={[styles.headerText, { paddingTop: 0 }]} size={21} bold>
           Current Active Case List
         </Text>
-        <Text style={styles.mutedText} size={7} muted bold>
+        {/* <Text style={styles.mutedText} size={12} muted bold>
           Admitted on 02/02/2021
-        </Text>
+        </Text> */}
         <Text style={styles.headerText} size={13}>
-          Total case 50| Next visit on 5:00pm
+          {`Total case ${doctor && doctor.linkedCases.length}, Active case ${activeCase}`}
         </Text>
-
-        <TouchableWithoutFeedback>
+        <TouchableOpacity onPress={() => navigation.navigate("Case History")}>
           <Block flex flexDirection="row">
             <Text style={styles.headerText} size={13}>
               View Details
@@ -89,23 +118,41 @@ const Components = (props) => {
               {" "}
             </Icon>
           </Block>
-        </TouchableWithoutFeedback>
+        </TouchableOpacity>
       </Block>
     );
   };
-  const scheduleItem = () => {
+  const convertMonth = (mon) => {
+    switch (mon) {
+      case 0: return 'Jan';
+      case 1: return 'Feb';
+      case 2: return 'Mar';
+      case 3: return 'Apr';
+      case 4: return 'May';
+      case 5: return 'Jun';
+      case 6: return 'Jul';
+      case 7: return 'Aug';
+      case 8: return 'Sep';
+      case 9: return 'Oct';
+      case 10: return 'Nov';
+      case 11: return 'Dec';
+      default: return null;
+    }
+  };
+  const scheduleItem = (val, index) => {
+    const time = new Date(val.scheduleTime.seconds * 1000 + val.scheduleTime.nanoseconds/1000000);
     return (
-      <Block flex style={styles.scheduleItem}>
+      <Block key={index} flex style={styles.scheduleItem}>
         <Block flex flexDirection="row" style={styles.insideSchduleItem}>
           <Block flex={1.6} flexDirection="column" style={styles.flexCardItem}>
             <Text bold size={20} color="#6695FF" style={styles.pText}>
-              20<Text size={11}>th</Text>
+              {time.getDate()}<Text size={11}>th</Text>
             </Text>
             <Text bold size={20} color="#6695FF" style={styles.pText}>
-              Feb
+              {convertMonth(time.getUTCMonth())}
             </Text>
             <Text bold size={11} color="#6695FF" style={styles.pText}>
-              11:00 am
+              {`${time.getHours()}:${time.getMinutes()}:00`}
             </Text>
           </Block>
           <Block flex={5} flexDirection="column">
@@ -119,12 +166,12 @@ const Components = (props) => {
             </Text>
             <Block flex flex={5} flexDirection="row">
               <TouchableWithoutFeedback>
-                <Text color="white" style={styles.underLineText}>
+                <Text color="white" size={12} style={styles.underLineText}>
                   View case detail
                 </Text>
               </TouchableWithoutFeedback>
               <TouchableWithoutFeedback>
-                <Text color="white" style={styles.underLineText}>
+                <Text color="white" size={12} style={styles.underLineText}>
                   Send Reminders
                 </Text>
               </TouchableWithoutFeedback>
@@ -137,8 +184,15 @@ const Components = (props) => {
   const scheduleList = () => {
     return (
       <Block>
-        {scheduleItem()}
-        {scheduleItem()}
+        { 
+          doctor && doctor.ScheduleInfo.map((val, index) => {
+            const time = new Date(val.scheduleTime.seconds * 1000 + val.scheduleTime.nanoseconds/1000000);
+            const currentTime = new Date();
+            if (time.getFullYear() == currentTime.getFullYear() && time.getDate() == currentTime.getDate() && time.getUTCMonth() == currentTime.getUTCMonth()) {
+              return scheduleItem(val, index);
+            } 
+          })
+        }
       </Block>
     );
   };
@@ -153,7 +207,7 @@ const Components = (props) => {
           }}
         >
           <Text color={"#0033A7"} size={26} bold>
-            Hello Doctor
+            {`Hello ${doctor && doctor.name}`}
           </Text>
         </Block>
         {cardBox()}
@@ -181,7 +235,6 @@ const Components = (props) => {
       </Block>
     );
   };
-
   const navbar = () => {
     return (
       <Block row style={styles.navbar} center>
@@ -207,12 +260,10 @@ const Components = (props) => {
       </Block>
     );
   };
-
   return (
-    <Block flex>
+    <Block flex style={{backgroundColor: 'white'}}>
       {navbar()}
       <ScrollView
-        style={styles.components}
         showsVerticalScrollIndicator={false}
       >
         {doctorDash()}

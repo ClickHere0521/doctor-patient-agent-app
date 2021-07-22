@@ -16,9 +16,45 @@ const thumbMeasure = (width - 48 - 32) / 3;
 
 const EditSchedule = (props) => {
   const { navigation } = props;
+  const { doctor } = props.route.params;
   const [activeSwitch, setActiveSwitch] = useState(1);
-
+  const [weekState, setWeekState] = useState([
+    {
+      date: "MON",
+      status: true,
+    },
+    {
+      date: "TUE",
+      status: false,
+    },
+    {
+      date: "WED",
+      status: false,
+    },
+    {
+      date: "THU",
+      status: false,
+    },
+    {
+      date: "FRI",
+      status: false,
+    },
+    {
+      date: "SAT",
+      status: false,
+    },
+    {
+      date: "SUN",
+      status: false,
+    },
+  ]);
   const weekBar = () => {
+    const handleWeekbar = index => {
+      weekState.map((value, indexTemp) => {
+        weekState[indexTemp].status = (index == indexTemp) ? true : false;
+      })        
+      setWeekState([...weekState]);      
+    }
     return (
       <ScrollView
         horizontal={true}
@@ -30,39 +66,15 @@ const EditSchedule = (props) => {
         snapToInterval={theme.SIZES.BASE * 0.375}
         style={styles.weekScrollView}
       >
-        <TouchableOpacity style={styles.dateActive}>
-          <Text size={16} color={"white"}>
-            WED
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 3 }}>
-            THU
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 8 }}>
-            FRI
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 6 }}>
-            SAT
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 4 }}>
-            SUN
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16}>MON</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.dateInActive}>
-          <Text size={16} style={{ paddingLeft: 4 }}>
-            THE
-          </Text>
-        </TouchableOpacity>
+        {weekState.map((value, index) => {
+          return (
+            <TouchableOpacity key={index} onPress={() => {handleWeekbar(index)}} style={value.status ? styles.dateActive : styles.dateInActive}>
+              <Text size={16} color={value.status ? "white" : "black"}>
+                {value.date}
+              </Text>
+            </TouchableOpacity>
+          )
+        })}
       </ScrollView>
     );
   };
@@ -148,7 +160,7 @@ const EditSchedule = (props) => {
         </TouchableOpacity>
         <Text
           color="white"
-          style={{ paddingLeft: theme.SIZES.BASE }}
+          style={{ paddingLeft: theme.SIZES.BASE * 0.5 }}
           size={17}
           bold
         >
@@ -158,6 +170,25 @@ const EditSchedule = (props) => {
     );
   };
 
+  const NavigationToCalendar = () => {
+    const childDayList = [];
+    const tempSchedule = [];
+    doctor && doctor.ScheduleInfo.forEach((res) => {
+      const { scheduleTime, patientName, caseID } = res;
+      const time = new Date(scheduleTime.seconds * 1000 + scheduleTime.nanoseconds/1000000);
+      childDayList.push(`${time.getFullYear()}-${time.getMonth()<10 ? 0 : null}${time.getMonth()+1}-${time.getDate()<10 ? 0 : null}${time.getDate()}`);
+      tempSchedule.push({
+        patientName,
+        time: time.toUTCString(),
+        caseID,
+        year: time.getFullYear(),
+        month: time.getMonth(),
+        day: time.getDate(),
+      });
+    })
+    navigation.navigate("Calendar", {schedule: tempSchedule, childDay: childDayList});
+  };
+
   return (
     <Block flex style={styles.notification}>
       {navbar()}
@@ -165,7 +196,7 @@ const EditSchedule = (props) => {
         <Block center style={{ paddingTop: theme.SIZES.BASE * 2 }}>
           <Block>
             <Image
-              source={require("../assets/images/grayscale-photo-of-man2.png")}
+              source={{ uri : doctor && doctor.avatar }}
               style={styles.imageStyle}
             ></Image>
             {/* <SvgUri
@@ -179,9 +210,8 @@ const EditSchedule = (props) => {
               }}
             /> */}
           </Block>
-          <Text size={20}>Dr. Ronald Joseph</Text>
-          <Text>neurosergion specialist</Text>
-
+          <Text size={20}>{doctor.name}</Text>
+          <Text>Tel: +{doctor.phone}</Text>
           <Block center style={styles.centerBlock}>
             <SwitchButton
               onValueChange={(val) => setActiveSwitch(val)}
@@ -206,7 +236,7 @@ const EditSchedule = (props) => {
             <Text>Schedules</Text>
           </Block>
           <Block flex={1}>
-            <TouchableOpacity onPress={() => navigation.navigate("Calendar", {schedule: null, childDay: null})}>
+            <TouchableOpacity onPress={() => NavigationToCalendar()}>
               <Text style={styles.calendar}>Calendar</Text>
             </TouchableOpacity>
           </Block>
@@ -240,8 +270,10 @@ const EditSchedule = (props) => {
 
 const styles = StyleSheet.create({
   weekScrollView: {
+    marginVertical: theme.SIZES.BASE,
+    padding: theme.SIZES.BASE,
+    marginRight: theme.SIZES.BASE,
     paddingTop: 0,
-    paddingLeft: 10,
   },
   dateActive: {
     backgroundColor: "#00CE30",
@@ -271,6 +303,9 @@ const styles = StyleSheet.create({
   imageStyle: {
     width: 80,
     height: 80,
+    borderRadius: 50,
+    borderWidth: 3,
+    borderColor: "white",
   },
   centerBlock: {
     marginTop: 30,

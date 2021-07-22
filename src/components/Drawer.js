@@ -6,6 +6,7 @@ import Icon from "./Icon";
 import materialTheme from "../constants/Theme";
 import { IMLocalized, init } from "../localization/IMLocalization";
 import auth from '@react-native-firebase/auth';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const DrawerItem = (props) => {
   const renderIcon = () => {
@@ -178,6 +179,16 @@ const DrawerItem = (props) => {
         return null;
     }
   };
+  
+  const handleLogout = async () => {
+    await AsyncStorage.setItem(
+      'reminder',
+      JSON.stringify({ reminder: false }),
+      () => {}
+    );  
+    navigation.navigate("UserSelectStack");
+  };
+
   const { title, focused, navigation, modal } = props;
   return (
     <TouchableOpacity
@@ -193,8 +204,7 @@ const DrawerItem = (props) => {
                   auth()
                   .signOut()
                   .then(() => {
-                    // console.log("success")
-                    navigation.navigate("UserSelectStack")
+                    handleLogout()
                   })
                   .catch((error) => {
                     console.log(error);

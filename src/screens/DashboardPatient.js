@@ -1,4 +1,4 @@
-  import React, { useState } from "react";
+import React, { useState } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -7,6 +7,7 @@ import {
   Dimensions,
   TouchableOpacity,
   Alert,
+  Image,
 } from "react-native";
 import { Button, Block, Text, theme, Icon } from "galio-framework";
 
@@ -17,28 +18,30 @@ import SwitchButton from "switch-button-react-native";
 import { IMLocalized } from "../localization/IMLocalization";
 import {
   useFocusEffect
- } from '@react-navigation/native';
+} from '@react-navigation/native';
+import { TouchableHighlight } from "react-native";
+import AsyncStorage from '@react-native-community/async-storage';
 
 const { width, height } = Dimensions.get("screen");
 const DashboardPatient = (props) => {
-
+  const { navigation } = props;
   useFocusEffect(
     React.useCallback(() => {
       const onBackPress = () => {
-       Alert.alert(
-        'Log out',
-        'Are you sure you want to log out?',
-        [
-          {
-            text: "OK",
-            onPress: () => {navigation.navigate("UserSelectStack")}
-          },
-          {
-            text: "Cancel",
-            onPress: () => {}
-          }
-        ]
-       );
+        Alert.alert(
+          'Log out',
+          'Are you sure you want to log out?',
+          [
+            {
+              text: "OK",
+              onPress: () => handleLogout()
+            },
+            {
+              text: "Cancel",
+              onPress: () => { }
+            }
+          ]
+        );
         // Return true to stop default back navigaton
         // Return false to keep default back navigaton
         return true;
@@ -60,9 +63,15 @@ const DashboardPatient = (props) => {
     }, []),
   );
 
-  const { navigation } = props;
-  const [activeSwitch, setActiveSwitch] = useState(null);
-  console.log(activeSwitch);
+  const handleLogout = async () => {
+    await AsyncStorage.setItem(
+      'reminder',
+      JSON.stringify({ reminder: false }),
+      () => {}
+    );  
+    navigation.navigate("UserSelectStack");
+  };
+
   const firstTimeCheck = () => {
     return (
       <Block
@@ -94,11 +103,10 @@ const DashboardPatient = (props) => {
           <Text
             color="black"
             style={{ paddingLeft: theme.SIZES.BASE }}
-            size={22}
+            size={16}
             fontWeight="semiBold"
           >
-            {/* {IMLocalized("Dashboard")} */}
-            Dashboard
+            {IMLocalized("Dashboard")}
           </Text>
         </Block>
         <Block style={{ borderTopWidth: 1, borderColor: "white" }}></Block>
@@ -110,24 +118,17 @@ const DashboardPatient = (props) => {
     return (
       <Block flex flexDirection={"row"} style={[styles.navbarBtnGroup]}>
         <Block flexDirection={"column"} style={[styles.navbarBtn]} center>
-          <TouchableOpacity>
+          <TouchableOpacity style={[styles.shadow]}>
             <Block center middle style={[styles.imageBtn]}>
-              {/* <SvgUri
-                width="50"
-                height="50"
-                source={require("../assets/icons/microscope.svg")}
-              /> */}
+              <Image source={require('../assets/images/microscope.png')} alt="" />
             </Block>
           </TouchableOpacity>
           <Block center style={styles.typeIconText}>
             <Text size={12} center bold color={"#333348"}>
               <>
-                {/* {activeSwitch > 1
-                  ? IMLocalized("caseDetail")
-                  : IMLocalized("previousCase")} */}
                 {activeSwitch > 1
-                  ? "caseDetail"
-                  : "previousCase"}
+                  ? IMLocalized("caseDetail")
+                  : IMLocalized("previousCase")}
               </>
             </Text>
             <Text
@@ -137,17 +138,14 @@ const DashboardPatient = (props) => {
               center
               style={{ paddingVertical: 5 }}
             >
-              {/* {activeSwitch > 1
-                ? IMLocalized("lookMedical")
-                : IMLocalized("lookRecent")} */}
               {activeSwitch > 1
-                ? "lookMedical"
-                : "lookRecent"}
+                ? IMLocalized("lookMedical")
+                : IMLocalized("lookRecent")}
             </Text>
           </Block>
         </Block>
         <Block flexDirection={"column"} style={[styles.navbarBtn]} center>
-          <TouchableOpacity  onPress={() => navigation.navigate("PatientActiveCase")}>
+          <TouchableOpacity onPress={() => navigation.navigate("PatientActiveCase")}>
             <Block center middle style={[styles.imageBtn]}>
               {/* <>
                 {activeSwitch > 1 ? (
@@ -168,8 +166,7 @@ const DashboardPatient = (props) => {
           </TouchableOpacity>
           <Block center style={styles.typeIconText}>
             <Text size={12} bold center color={"#333348"}>
-                {/* {IMLocalized("activeCase")} */}
-                activeCase
+              {IMLocalized("activeCase")}
             </Text>
             <Text
               size={10}
@@ -178,8 +175,7 @@ const DashboardPatient = (props) => {
               center
               style={{ paddingVertical: 5 }}
             >
-              {/* {IMLocalized("physicalStatus")} */}
-              physicalStatus
+              {IMLocalized("physicalStatus")}
             </Text>
           </Block>
         </Block>
@@ -194,8 +190,7 @@ const DashboardPatient = (props) => {
             </Block>
             <Block center style={styles.typeIconText}>
               <Text size={12} bold center color={"#333348"}>
-                {/* {IMLocalized("bookDoctor")} */}
-                bookDoctor
+                {IMLocalized("bookDoctor")}
               </Text>
               <Text
                 size={10}
@@ -204,8 +199,7 @@ const DashboardPatient = (props) => {
                 center
                 style={{ paddingVertical: 5 }}
               >
-                {/* {IMLocalized("searchDoctor")} */}
-                searchDoctor
+                {IMLocalized("searchDoctor")}
               </Text>
             </Block>
           </TouchableOpacity>
@@ -274,16 +268,14 @@ const DashboardPatient = (props) => {
             </ScrollView>
             <Block flex flexDirection="row" style={styles.marginV2Base}>
               <Text color={"#3F4079"} bold size={14}>
-                {/* {IMLocalized("doctorsNearbyYou")} */}
-                doctorsNearbyYou
+                {IMLocalized("doctorsNearbyYou")}
               </Text>
               <TouchableOpacity
                 onPress={() => navigation.navigate("Primary Care Doctor View")}
                 style={{ marginLeft: width * 0.5 }}
               >
                 <Text color={"#3A58FC"} bold size={14}>
-                  {/* {IMLocalized("seeAll")} */}
-                  seeAll
+                  {IMLocalized("seeAll")}
                 </Text>
               </TouchableOpacity>
             </Block>
@@ -332,13 +324,10 @@ const styles = StyleSheet.create({
   imageBtn: {
     width: theme.SIZES.BASE * 5,
     height: theme.SIZES.BASE * 5,
-    borderRadius: 1000,
+    borderRadius: 50,
+    borderWidth: 0.5,
+    borderColor: "lightgrey",
     backgroundColor: "white",
-    shadowColor: "black",
-    shadowOffset: { width: 5, height: 10 },
-    shadowRadius: 10,
-    shadowOpacity: 0.5,
-    elevation: 8,
   },
   navbarBtn: {
     width: theme.SIZES.BASE * 4,
@@ -361,7 +350,7 @@ const styles = StyleSheet.create({
   navbar: {
     backgroundColor: "white",
     width: width,
-    height: height * 0.16,
+    height: height * 0.1,
     paddingTop: theme.SIZES.BASE * 2,
     paddingLeft: theme.SIZES.BASE,
     borderBottomWidth: 1,
@@ -372,7 +361,7 @@ const styles = StyleSheet.create({
   },
   shadow: {
     shadowColor: "black",
-    shadowOffset: { width: 0, height: 0 },
+    shadowOffset: { width: 2, height: 2 },
     shadowRadius: 4,
     shadowOpacity: 0.4,
     elevation: 3,

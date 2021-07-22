@@ -4,7 +4,6 @@ import {
   Dimensions,
   ImageBackground,
   Platform,
-  TouchableWithoutFeedback,
   TouchableOpacity,
   BackHandler,
   Alert,
@@ -15,18 +14,14 @@ import { Block, Text, theme, Icon } from "galio-framework";
 import LinearGradient from "react-native-linear-gradient";
 import products from "../constants/images/home";
 import { materialTheme } from "../constants";
-import { HeaderHeight } from "../constants/utils";
 import { useDispatch, useSelector } from "react-redux";
 import { IMLocalized } from "../localization/IMLocalization";
 import { ScrollView } from "react-native-gesture-handler";
 import { ListItem } from "../components/";
 import firestore from '@react-native-firebase/firestore';
-
+import AsyncStorage from '@react-native-community/async-storage';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 import _ from "lodash";
-
-import {
-  useFocusEffect
-} from '@react-navigation/native';
 
 const { width, height } = Dimensions.get("screen");
 const cardWidth = theme.SIZES.BASE * 4;
@@ -43,57 +38,21 @@ const sortCategories = [
   },
 ];
 
-
 const DashboardAgent = (props) => {
-
-  const [cases, setCases] = useState([]);
-
-  let caseLists = [];
+  const isFocused = useIsFocused();
   const { navigation } = props;
-  const [caseSort, setCaseSort] = useState(true);
-  const [dateSort, setDateSort] = useState(true);
-  const [statusSort, setStatusSort] = useState(true);
-
-  const [activeCases, setActiveCases] = useState(0);
-  const [thisYear, setThisYear] = useState(0);
-  const [resolvedYear, setResolvedYear] = useState(0);
-
-  const caseStatuses = useSelector((state) => state.caseStatus.caseStatus);
-
+  const [cases, setCases] = useState([]);
   const [sortDirection, setSortDirection] = useState({
     patientName: true,
     caseCreateTime: true,
     caseStatus: true,
   });
 
-  // useEffect(() => {
-  firestore()
-    .collection("Cases")
-    .get()
-    .then((querySnapshot) => {
-      const caseArrayPromise = querySnapshot.docs.map((doc) => {
-        return firestore()
-          .collection("Cases")
-          .doc(doc.id)
-          .collection("Case")
-          .get()
-          .then((querySnapshot) => {
-            const caseId = doc.id;
-            var caseData = {};
-            querySnapshot.forEach((caseDoc) => {
-              const { patientName, avatar, patientReference, caseStatus, caseCreateTime, caseID, caseWarning, docId } =
-                caseDoc.data();
-              caseData = { ...caseDoc.data() };
-            });
-            return caseData;
-          });
-      });
-      Promise.all(caseArrayPromise).then((usersArray) => {
-        setCases(usersArray);
-      });
-    });
-  // }, []);
-
+  useEffect(() => {
+    if (isFocused) {
+      getInitialData();
+    }
+  }, [isFocused]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -104,7 +63,7 @@ const DashboardAgent = (props) => {
           [
             {
               text: "OK",
-              onPress: () => { navigation.navigate("UserSelectStack") }
+              onPress: () => handleLogout()
             },
             {
               text: "Cancel",
@@ -133,9 +92,49 @@ const DashboardAgent = (props) => {
     }, []),
   );
 
+  const getInitialData  = () => {
+    setCases([]);
+    firestore()
+      .collection("Cases")
+      .get()
+      .then((querySnapshot) => {
+        const caseArrayPromise = querySnapshot.docs.map((doc) => {
+          return firestore()
+            .collection("Cases")
+            .doc(doc.id)
+            .collection("Case")
+            .get()
+            .then((querySnapshot) => {
+              var caseData = [];
+              querySnapshot.forEach((caseDoc) => {
+                caseData.push(caseDoc.data());
+              });
+              return caseData;
+            });
+        });
+        Promise.all(caseArrayPromise).then((usersArray) => {
+          let temp = [];
+          usersArray.forEach((user_groups) => {
+            user_groups.forEach(user => {
+              temp = [...temp, user];
+            })
+          })
+          setCases(temp);
+        });
+      });
+  }
+
+  const handleLogout = async () => {
+    await AsyncStorage.setItem(
+      'reminder',
+      JSON.stringify({ reminder: false }),
+      () => {}
+    );  
+    navigation.navigate("UserSelectStack");
+  };
+
   const renderEvents = (events) => {
     let { eventHeading, eventContent } = { ...events };
-    const userRole = useSelector((state) => state.user.role);
     return (
       <Block style={styles.options}>
         <Block column space="between" style={styles.events} flex flexDirection="row">
@@ -171,7 +170,7 @@ const DashboardAgent = (props) => {
             paddingHorizontal: theme.SIZES.BASE / 4,
           }}
         >
-          <Block flexDirection="row" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
+          <Block flexDirection="row" style={{ paddingBottom: theme.SIZES.BASE * 0.5 }}>
             {sortCategories &&
               sortCategories.map((item, index) => renderSort(item, index))}
           </Block>
@@ -185,8 +184,8 @@ const DashboardAgent = (props) => {
       switch (item.title) {
         case 'Case':
           const sortArray = [...cases].sort((a, b) => {
-            if (a.patientName < b.patientName) return (sortDirection.patientName ? -1 : 1);
-            if (a.patientName > b.patientName) return (sortDirection.patientName ? 1 : -1);
+            if (a.patientInfo.patientName.toUpperCase() < b.patientInfo.patientName.toUpperCase()) return (sortDirection.patientName ? -1 : 1);
+            if (a.patientInfo.patientName.toUpperCase() > b.patientInfo.patientName.toUpperCase()) return (sortDirection.patientName ? 1 : -1);
             return 0;
           });
           setCases(sortArray);
@@ -245,16 +244,14 @@ const DashboardAgent = (props) => {
     return (
       <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
         <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
-
           {cases.length === 0 ? (
-            <ActivityIndicator style={{marginTop: 40}} size={50} color="#6E78F7" />) :
+            <ActivityIndicator style={{ marginTop: 50 }} size={50} color="#6E78F7" />) :
             cases.map((val, index) =>
             (
               <ListItem key={index} category={val} product={products[0]} horizontal role="agentDashboard" />
             )
             )
           }
-
         </ScrollView>
       </Block>
     );
@@ -265,6 +262,7 @@ const DashboardAgent = (props) => {
       <Block>
         <Block row style={styles.navbar} center>
           <TouchableOpacity
+            style={styles.touchableArea}
             onPress={() => navigation.openDrawer()}
           >
             <Icon
@@ -272,12 +270,11 @@ const DashboardAgent = (props) => {
               family="font-awesome"
               color="black"
               size={16}
-              style={styles.chevronLeft}
             />
           </TouchableOpacity>
           <Text
             color="black"
-            style={{ paddingLeft: theme.SIZES.BASE }}
+            style={{ paddingLeft: theme.SIZES.BASE * 0.5 }}
             size={16}
             fontWeight="semiBold"
           >
@@ -302,7 +299,7 @@ const DashboardAgent = (props) => {
           break;
         case "year":
           var currentYear = new Date().getFullYear();
-          console.log(element.caseCreateTime.toDate());
+          // console.log(element.caseCreateTime.toDate());
           if (element.caseCreateTime.toDate().getFullYear() == currentYear) {
             yearCnt += 1;
           }
@@ -336,8 +333,7 @@ const DashboardAgent = (props) => {
           colors={["rgba(110,120,247,0.2)", "rgba(110,120,247,0.3)"]}
           style={styles.gradient}
         >
-          <Block
-          >
+          <Block>
             {renderEvents({
               eventHeading: IMLocalized("Total active case"),
               eventContent: CasesFilter("total"),
@@ -369,25 +365,17 @@ const DashboardAgent = (props) => {
               </Text>
               <Text color={"red"}> *</Text>
               <TouchableOpacity
-                onPress={() => navigation.navigate("CreateCase")}
+                onPress={() => navigation.navigate("CreateCase", { selectedPatient: null })}
                 style={{
                   justifyContent: "center",
-                  alignItems: "flex-end", marginLeft: width * 0.55,
-                  width: 20,
-                  height: 20,
+                  alignItems: "flex-end", marginLeft: width * 0.5,
+                  width: 30,
+                  height: 30,
                 }}
               >
                 <Image source={require('../assets/images/add.png')} alt="" />
-                {/* <SvgUri
-                  width="16"
-                  height="16"     
-                  fill={"black"}             
-                  source={require("../assets/icons/add.svg")}
-                  style={{color: 'red', zIndex: 20, width: 16, height: 16}}
-                /> */}
               </TouchableOpacity>
             </Block>
-
           </Block>
         </Block>
         {renderSorts()}
@@ -423,6 +411,12 @@ const styles = StyleSheet.create({
     paddingVertical: theme.SIZES.BASE * 2,
     zIndex: 2,
   },
+  touchableArea: {
+    width: 30, 
+    height: 30, 
+    justifyContent: 'center', 
+    alignItems: 'center'
+  },
   pro: {
     backgroundColor: materialTheme.COLORS.LABEL,
     paddingHorizontal: 6,
@@ -448,7 +442,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.SIZES.BASE * 0.3,
     paddingVertical: theme.SIZES.BASE * 0.1,
     marginHorizontal: theme.SIZES.BASE,
-    marginTop: theme.SIZES.BASE / 1.7,
+    marginTop: theme.SIZES.BASE / 1.3,
     borderRadius: 40,
     backgroundColor: theme.COLORS.WHITE,
     shadowColor: "black",
@@ -572,7 +566,7 @@ const styles = StyleSheet.create({
     width: width,
     height: height * 0.1,
     paddingTop: theme.SIZES.BASE * 2,
-    paddingLeft: theme.SIZES.BASE,
+    paddingLeft: theme.SIZES.BASE * 0.5,
     borderBottomWidth: 1,
     borderColor: "rgba(112, 112, 112, 0.1)",
   },

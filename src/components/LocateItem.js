@@ -58,9 +58,9 @@ const ListItem = (props) => {
             size={16}
             muted={!priceColor}
             color={priceColor}
-            style={{ paddingTop: 8 }}
+            style={{ padding:0, paddingLeft: 5 }}
           >
-            ${product.price}
+            ${product.price}10
           </Text>
         </Block>
       </TouchableOpacity>
@@ -70,11 +70,11 @@ const ListItem = (props) => {
         }}
       >
         <Block flex middle center>
-          {/* <SvgUri
-            width="25"
+          <SvgUri
+            width="30"
             height="25"
             source={require("../assets/icons/locate.svg")}
-          /> */}
+          /> 
         </Block>
       </TouchableOpacity>
     </Block>
@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
   userName: {
     padding: theme.SIZES.BASE / 2,
     paddingBottom: theme.SIZES.BASE / 2,
-    width: width * 0.62,
+    width: width * 0.58,
   },
   icons: {
     paddingTop: 10,

@@ -1,38 +1,36 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
-  Modal,
   Image,
-  View,
   StyleSheet,
   Dimensions,
   TouchableOpacity,
-  TouchableHighlight,
 } from "react-native";
 import { Block, Button, Text, theme, Input } from "galio-framework";
-
-const { height, width } = Dimensions.get("screen");
 import materialTheme from "../constants/Theme";
 import { IMLocalized, init } from "../localization/IMLocalization";
 import { Icon } from "../components/";
 import { ScrollView } from "react-native-gesture-handler";
-import * as ImagePicker from "expo-image-picker";
+import MapView, { Marker } from "react-native-maps";
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+
+const { height, width } = Dimensions.get("screen");
 
 const AgentDoctorDetail = (props) => {
   const { navigation } = props;
-  const [imageUri, setImageUri] = useState(null);
+  const [doctor, setDoctor] = useState(null);
 
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [3, 3],
-      quality: 1,
+  useEffect(() => {
+    const currentUserUid = auth().currentUser.uid;
+    firestore().collection('PCDoctors').doc(currentUserUid).collection('PCDoctor').get().then((querySnapshot) => {
+      let doctorTemp = {};
+      querySnapshot.forEach((doc) => {
+        doctorTemp = doc.data();
+      });
+      setDoctor(doctorTemp);
     });
-    if (!result.cancelled) {
-      setImageUri(result.uri);
-    }
-  };
-
+  }, []);
+  
   const navbar = () => {
     return (
       <Block row flexDirection="row" style={styles.navbar} center>
@@ -54,17 +52,17 @@ const AgentDoctorDetail = (props) => {
             size={17}
             bold
           >
-            Profile Info
+            {IMLocalized('profileInfo')}
           </Text>
         </Block>
-        <Block flex={2}>
+        {/* <Block flex={2}>
           <TouchableOpacity>
             <Image
               source={require("../assets/icons/editHeaderWhite.png")}
               alt=""
             />
           </TouchableOpacity>
-        </Block>
+        </Block> */}
       </Block>
     );
   };
@@ -77,12 +75,12 @@ const AgentDoctorDetail = (props) => {
           <Block style={{ backgroundColor: 'white', shadowColor: '#ccc', shadowOffset: { width: 6, height: 6 }, shadowOpacity: 0.3, elevation: 2, borderRadius:30, margin: theme.SIZES.BASE, padding: theme.SIZES.BASE ,  marginTop: theme.SIZES.BASE *4 }}>
             <Block row center style={{marginTop: -theme.SIZES.BASE * 3.5}}>
               <Block middle>
-                <TouchableOpacity
-                  onPress={() => pickImage()}
-                >
-                  {imageUri ? (
+                {/* <TouchableOpacity
+                  onPress={() => {}}
+                > */}
+                  {doctor && doctor.avatar ? (
                     <Image
-                      source={{ uri: imageUri }}
+                      source={{ uri: doctor.avatar }}
                       style={{ width: 80, height: 80, borderRadius: 50, borderWidth: 3, borderColor: "white" }}
                     />
                   ) : (
@@ -91,58 +89,28 @@ const AgentDoctorDetail = (props) => {
                       style={{ width: 80, height: 80, borderRadius: 50, borderWidth: 3, borderColor: "white" }}
                     />
                   )}
-                </TouchableOpacity>
-                <Icon
+                {/* </TouchableOpacity> */}
+                {/* <Icon
                   name="camera"
                   family="font-awesome"
                   color="#555"
                   size={20}
                   style={{position: 'absolute', bottom: 4, right: 4}}
-                />
+                /> */}
               </Block>
             </Block>
-            <Text size={14} style={{ marginTop: theme.SIZES.BASE * 2 }} center>
-              Dr. Ronald Joseph
+            <Text size={20} style={{ marginVertical: 10 }} center>
+              { doctor && doctor.name }
             </Text>
-            <Text color={"grey"} text={12} center>
+            {/* <Text color={"grey"} text={12} center>
               B.Sc, MBBS, DDVL, MD- Dermitologist
-            </Text>
-            <Block style={styles.headBottom}>
-              <Text color="grey" size={12} style={{marginBottom: theme.SIZES.BASE}}>
-                <Text color="black" size={14}>
-                  16
-                </Text>{" "}
-                yrs. Experience
-              </Text>
-              <Block row center>
-                <Block style={{ paddingHorizontal: theme.SIZES.BASE / 2 }}>
-                  <Image
-                    style={{ width: 70, height: 70 }}
-                    source={require("../assets/images/grayscale-photo-of-man2.png")}
-                  ></Image>
-                </Block>
-                <Block style={{ paddingHorizontal: theme.SIZES.BASE / 2 }}>
-                  <Image
-                    style={{ width: 70, height: 70 }}
-                    source={require("../assets/images/grayscale-photo-of-man2.png")}
-                  ></Image>
-                </Block>
-                <Block style={{ paddingHorizontal: theme.SIZES.BASE / 2 }}>
-                  <Image
-                    style={{ width: 70, height: 70 }}
-                    source={require("../assets/images/grayscale-photo-of-man2.png")}
-                  ></Image>
-                </Block>
-                <Block style={{ paddingHorizontal: theme.SIZES.BASE / 2 }}>
-                  <Image
-                    style={{ width: 70, height: 70 }}
-                    source={require("../assets/images/grayscale-photo-of-man2.png")}
-                  ></Image>
-                </Block>
-              </Block>
-            </Block>
-          </Block>
-          <Block style={{ padding: theme.SIZES.BASE, borderRadius: theme.SIZES.BASE * 2, margin: theme.SIZES.BASE}}>
+            </Text> */}
+            {/* <Text color="grey" size={12} style={{marginBottom: theme.SIZES.BASE}}>
+              <Text color="black" size={14}>
+                16
+              </Text>{" "}
+              yrs. Experience
+            </Text> */}
             <Block row>
               <Icon
                 name="map-marker"
@@ -151,14 +119,31 @@ const AgentDoctorDetail = (props) => {
                 style={{ margin: 10 }}
               />
               <Text size={12} color={"grey"} style={{ marginTop: 10 }}>
-                92/6, 3rd Floor, Outer Ring Road, Chandra Layout
+                {doctor && doctor.address} {doctor && doctor.city_state}
               </Text>
             </Block>
-            <Image
-              source={require("../assets/images/map.png")}
-              alt=""
-              style={{ margin: width * 0.01, alignSelf: "center" }}
-            />
+            <Block style={{ borderRadius: 10 }}>
+              <MapView
+                region={{
+                  latitude: 41.880032,
+                  longitude: -87.623177,
+                  latitudeDelta: 0.005,
+                  longitudeDelta: 0.005,
+                }}
+                style={styles.mapView}
+              >
+                <Marker
+                  coordinate={{
+                    latitude: 41.880032,
+                    longitude: -87.623177,
+                  }}
+                  title={doctor ? `${doctor.address} ${doctor.city_state}` : null}
+                  onDragEnd={(e) => {
+                    console.log("dragEnd", e.nativeEvent.coordinate);
+                  }}
+                />
+              </MapView>
+            </Block>
             <Block flexDirection="row" style={{margin: 10}}>
               <Block flex={1}>
                 <Text color="black">
@@ -168,7 +153,7 @@ const AgentDoctorDetail = (props) => {
               </Block>
               <Block flex={4}>
                 <Text color="grey">
-                  +1234567890
+                  +{doctor && doctor.phone}
                 </Text>
               </Block>      
             </Block>
@@ -188,16 +173,9 @@ const AgentDoctorDetail = (props) => {
                     <Text color="grey">*</Text>
                   </Text>
                 </Block>
-                <Block flex={2}>
-                  <Text color="grey">Joseph@gmail.com</Text>
-                  <Input
-                    password
-                    viewPass
-                    bgColor="transparent"
-                    placeholder="password"
-                    color="black"
-                    style={[styles.input, styles.inputDefault]}
-                  />
+                <Block flex={3}>
+                  <Text color="grey">{doctor && doctor.email}</Text>
+                  <Text color="grey" style={{paddingTop: theme.SIZES.BASE}}>{doctor && doctor.password}</Text>
                 </Block>
               </Block>
             </Block>
@@ -207,8 +185,7 @@ const AgentDoctorDetail = (props) => {
               <Text color="red">*</Text>
               </Text>
               <Text color="grey" size={16} style={styles.descriptionText}>
-                Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
-                diam nonu my eirmod tempor invidun.
+                {doctor && doctor.description}
               </Text>
             </Block>
             <Block flex flexDirection="row" style={{margin: 10}} >
@@ -220,7 +197,7 @@ const AgentDoctorDetail = (props) => {
               </Block>
               <Block flex={1}>
                 <TouchableOpacity
-                  onPress={() => navigation.navigate("DoctorMySchedule")}
+                  onPress={() => navigation.navigate("DoctorMySchedule", {doctor})}
                 >
                   <Text
                     color={"#00CE30"}
@@ -231,7 +208,7 @@ const AgentDoctorDetail = (props) => {
                 </TouchableOpacity>
               </Block>
             </Block>
-            <Button color="#00CE30" style={{borderRadius: 16, width: width * 0.8}}>UPDATE</Button>
+            {/* <Button color="#00CE30" style={{borderRadius: 16, width: width * 0.8}}>UPDATE</Button> */}
           </Block>
         </Block>
       </ScrollView>
@@ -360,6 +337,12 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
     paddingHorizontal: 10,
     marginLeft: 10,
+  },
+  mapView: {
+    width: width * 0.8,
+    height: 150,
+    margin: width * 0.01,
+    alignSelf: "center",
   },
 });
 

@@ -2,81 +2,104 @@ import React, { useState } from "react";
 import {
   StyleSheet,
   Dimensions,
-  ScrollView,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
-import { Button, Block, Text, theme, Input, Icon } from "galio-framework";
+import { Block, Text, theme, Icon } from "galio-framework";
 import { materialTheme } from "../constants";
-import * as ImagePicker from "expo-image-picker";
+import Input from '../components/InputType2';
+import { isValid } from '../utils/helpers';
+import firestore from '@react-native-firebase/firestore';
 
 const { width, height } = Dimensions.get("screen");
 const thumbMeasure = (width - 48 - 32) / 3;
 
-const DoctorAddNotes = (props) => {
+const AddNotes = (props) => {
   const { navigation } = props;
-
-  const [vals, setVals] = useState({
-    email: "-",
-    password: "-",
-    active: {
-      email: false,
-      password: false,
-    },
-  });
-  const [activeSwitch, setActiveSwitch] = useState(1);
-  const [imageUri, setImageUri] = useState(null);
-  // const imageUri = "../assets/images/avatar.png";
-  const handleChange = (name, value) => {
-    setVals({ [name]: value });
-  };
-
-  const handleAvatar = (val) => {
-    setActiveSwitch(val);
-    if (val == 2) pickImage();
-    else setImageUri(null);
-  };
-
+  const {category, notes, edit} = props.route.params;
+  const [authorName, setAuthorName] = useState(notes ? notes.author : '');
+  const [dob, setDob] = useState(notes ? `${notes.date.toDate().getMonth() < 9 ? 0 : ''}${notes.date.toDate().getMonth()+1}/${notes.date.toDate().getDate() < 10 ? 0 : ''}${notes.date.toDate().getDate()}/${notes.date.toDate().getFullYear()}` : '');
+  const [description, setDescription] = useState(notes ? notes.content : '');
+  const [editFlg, setEditFlg] = useState(false);
+  const [requested, setRequested] = useState(false);
+  const [noteInfo, setNoteInfo] = useState([]);
+  const validDob = isValid('date', dob);
+  const validAuthorName = isValid('username', authorName);
+  const validDescription = isValid('description', description);
   const renderUserDetail = (detail) => {
-    let { author, heading, content, note } = { ...detail };
-    if(author){
-      return (
-        <Block style={styles.detail}>
-          <Text>{author}</Text>
-        </Block>
-      )
-    }
-    else if(note) {
-      return (
-        <Block style={styles.shadow}>
-          <Text>{note}</Text>
-        </Block>
-      )
-    }
-    else {
-        return (
-            <Block style={styles.detail}>
-              <Block row>
-                <Text color={"black"}>{heading}:</Text>
-                <Text color={"grey"} size={12} style={styles.content} >{content}</Text>
-              </Block>
-            </Block>
-          );
-    }
+    let { heading, content, handleValue, handleName, handleLabel, handlePlaceholder } = { ...detail };
+    return (
+      <Block style={styles.detailStyle}>
+        <Input
+          label={handleLabel}
+          value={handleValue}
+          onChangeText={(res) => {
+            handleName(res)
+            setSaveEnable()
+          }}
+          placeholder={handlePlaceholder}
+          keyboardType="email-address"
+          leftIcon=""
+          rightIcon=""
+          validate
+          requested={requested}
+          style={styles.valiInput}
+        />
+      </Block>
+    );
   };
-
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [3, 3],
-      quality: 1,
-    });
-
-    if (!result.cancelled) {
-      setImageUri(result.uri);
+  const setSaveEnable = () => {
+    if (validDob && validAuthorName && validDescription) {
+      setEditFlg(true);
     }
-  };
-
+    else{
+      setEditFlg(false);
+    }
+  }
+  const handleSave = async () => {
+    if (edit) {
+      firestore().collection('Cases').doc(category.patientInfo.patientUid).collection('Case').get().then((shot) => {
+        let noteInfoTemp = [];
+        shot.docs.forEach((shotVal) => {
+          noteInfoTemp = shotVal.data().notes;
+        });
+        setNoteInfo(noteInfoTemp);
+      });
+      const index = noteInfo.findIndex(element => element.note == notes.content);
+      // alert(noteInfo.createDate.toDate());
+      // console.log("noteInfo->", index);
+      noteInfo[index] = {
+        authorName: authorName,
+        createDate: firestore.Timestamp.fromDate(new Date(dob)),
+        note: description,
+      }
+      firestore().collection('Cases').doc(category.patientInfo.patientUid).collection('Case').doc(category.caseID).update({
+        notes: noteInfo,
+      }).then((res) => {
+        alert('Successfully saved');
+        // navigation.goBack();
+      });
+    } else {
+      firestore().collection('Cases').doc(category.patientInfo.patientUid).collection('Case').get().then((shot) => {
+        let noteInfoTemp = [];
+        shot.docs.forEach((shotVal) => {
+          noteInfoTemp = shotVal.data().notes;
+        });
+        setNoteInfo(noteInfoTemp);
+      });
+      noteInfo.push({
+        authorName: authorName,
+        createDate: firestore.Timestamp.fromDate(new Date(dob)),
+        note: description,
+      });
+      firestore().collection('Cases').doc(category.patientInfo.patientUid).collection('Case').doc(category.caseID).update({
+        notes: noteInfo,
+      }).then((res) => {
+        alert('Successfully saved');
+        navigation.goBack();
+      });
+    }
+  }
   const navbar = () => {
     return (
       <Block row style={styles.navbar} center>
@@ -97,54 +120,78 @@ const DoctorAddNotes = (props) => {
           size={17}
           bold
         >
-          {/* {IMLocalized("Add Notes")} */}
-          Add Notes
+          {edit ? 'Edit a Note' : 'Add a Note'}
         </Text>
-        {/* <TouchableOpacity>
+        {/* <TouchableOpacity onPress={
+          () => setEditFlg(true)
+        }>
           <Image
             source={require("../assets/icons/editHeaderWhite.png")}
             alt=""
-            style={{ marginLeft: width * 0.54 }}
+            style={{ marginLeft: width * 0.55 }}
           />
         </TouchableOpacity> */}
       </Block>
     );
   };
-  
   return (
     <Block center flex style={styles.profile}>
       {navbar()}
       <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
-        <Block center style={styles.userDetail}>
+        <Block style={styles.userDetail}>
           {renderUserDetail({
-            author: "General Physician @99"
+            heading: "General Physician @99",
+            handlePlaceholder: "Fill with note create date",
+            handleName: setDob,
+            handleValue: dob,
+            handleLabel: "Date",
           })}
           {renderUserDetail({
-            heading: "Create Date",
-            content: "14/03/2021",
+            heading: "General Physician @99",
+            handlePlaceholder: "Fill with author Name",
+            handleName: setAuthorName,
+            handleValue: authorName,
+            handleLabel: "Username",
           })}
-          {renderUserDetail({
-            heading: "Author name",
-            content: "***********",
-          })}
-          {renderUserDetail({
-            note: "Cold, fever, cough or flu? Chat with a doctor now.Cold, fever, cough or flu? Chat with a doctor now.Cold, fever, cough or flu? Chat with a doctor now.Cold, fever, cough or flu? Chat with a doctor now.Cold, fever, cough or flu? Chat with a doctor now.Cold, fever, cough or flu? Chat with a doctor now.Cold, fever, cough or flu? Chat with a doctor now.Cold, fever, cough or flu? Chat with a doctor now.Coldfever, cough or flu? Chat with a doctor now.Cold, fever, cough or flu? Chat with a doctor now.Cold, fevercough or flu?"
-          })}
-        </Block>      
-        <Block row style={{marginTop: 20, alignSelf: 'flex-end'}}>
+          <Block style={[styles.detailStyle, { height: theme.SIZES.BASE * 10 }]}>
+            <Input
+              label="Description"
+              value={description}
+              onChangeText={(res) => {
+                setDescription(res)
+                setSaveEnable()
+              }}
+              placeholder="Write descriptions here."
+              leftIcon=""
+              rightIcon=""
+              validate
+              requested={requested}
+              multiline={true}
+              style={styles.valiInput}
+            />
+          </Block>
+        </Block>
+        <Block row style={{ marginTop: 20, alignSelf: 'flex-end' }}>
           <TouchableOpacity
-            style={styles.save}
-            onPress={() => console.log("save")}
+            style={editFlg ? styles.save : styles.saveDisable}
+            onPress={() => handleSave()}
+            disabled={!editFlg}
           >
-            <Text color={"#3A58FC"} size={14} style={{alignSelf: 'center'}}>
+            <Text color={"#3A58FC"} size={14} style={{ alignSelf: 'center' }}>
               Save
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.save}
-            onPress={() => console.log("cancel")}
+            onPress={() => {
+              setEditFlg(false);
+              setDob("");
+              setAuthorName("");
+              setDescription("");
+              navigation.goBack();
+            }}
           >
-            <Text color={"#3A58FC"} size={14} style={{alignSelf: 'center'}}>
+            <Text color={"#3A58FC"} size={14} style={{ alignSelf: 'center' }}>
               Cancel
             </Text>
           </TouchableOpacity>
@@ -155,6 +202,14 @@ const DoctorAddNotes = (props) => {
 };
 
 const styles = StyleSheet.create({
+  detailStyle: {
+    borderWidth: 1,
+    borderRadius: theme.SIZES.BASE,
+    borderColor: 'grey',
+    padding: theme.SIZES.BASE * 1.2,
+    paddingBottom: 0,
+    marginVertical: theme.SIZES.BASE,
+  },
   profile: {
     // marginTop: Platform.OS === "android" ? height * 0.02 : height * 0.02,
     backgroundColor: "white",
@@ -314,6 +369,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 0,
   },
+  saveDisable: {
+    backgroundColor: "lightgrey",
+    borderRadius: 20,
+    borderColor: '#C7C7C7',
+    borderWidth: 1,
+    paddingVertical: 4,
+    paddingHorizontal: 6,
+    width: 90,
+    marginBottom: 10,
+    marginHorizontal: 10,
+  },
   save: {
     backgroundColor: "white",
     borderRadius: 20,
@@ -323,7 +389,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     width: 90,
     marginBottom: 10,
-    marginHorizontal: 10,        
+    marginHorizontal: 10,
   },
   location: {
     shadowOpacity: 0.2,
@@ -358,8 +424,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 24,
     paddingVertical: 20,
-    marginVertical: 10,   
-    width: width * 0.9 
+    marginVertical: 10,
+    width: width * 0.9
   },
   asteride: {
     position: "absolute",
@@ -373,7 +439,7 @@ const styles = StyleSheet.create({
     shadowColor: 'grey',
     shadowRadius: 30,
     shadowOpacity: 0.2,
-    shadowOffset: {width: 10, height: 10},
+    shadowOffset: { width: 10, height: 10 },
     backgroundColor: 'white',
     elevation: 2,
     borderRadius: 20,
@@ -381,8 +447,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 24,
     paddingVertical: 20,
-    marginVertical: 10,   
-    width: width * 0.9 
+    marginVertical: 10,
+    width: width * 0.9
   },
   navbar: {
     backgroundColor: "#6E78F7",
@@ -395,4 +461,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DoctorAddNotes;
+export default AddNotes;

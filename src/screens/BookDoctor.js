@@ -27,12 +27,12 @@ const InsuranceInfo = (props) => {
               style={styles.chevronLeft}
               />
               </TouchableOpacity>
-          <Text color="white" style={{paddingLeft: theme.SIZES.BASE}} size={17} bold>Book Doctor</Text>
+          <Text color="white" style={{paddingLeft: theme.SIZES.BASE}} size={16} bold>Book Doctor</Text>
           <Block style={styles.searchBox}>
             <SearchBar
                 placeholder="Search here"
                 onChangeText={(text) => console.log(text)}
-                style={{borderRadius: 50, color: 'grey', height: 50, 
+                style={{borderRadius: 50, color: 'grey', height: 40, 
                 borderWidth: 1,
                 borderColor: "#DDD"}}
             />
@@ -44,10 +44,10 @@ const InsuranceInfo = (props) => {
     return (
         <Block style={{backgroundColor: "white"}}>
             {navbar()}
-            <Block  style={{marginTop: theme.SIZES.BASE * 3, padding: theme.SIZES.BASE}}>
+            <Block  style={{marginTop: theme.SIZES.BASE * 2, padding: theme.SIZES.BASE}}>
                 {/* <Text style={{color: '#3F4079', marginBottom: theme.SIZES.BASE}} size={12}>{IMLocalized('doctorsNearbyYou')}</Text> */}
-                <Text style={{color: '#3F4079', marginBottom: theme.SIZES.BASE}} size={12}>Doctors Nearby you</Text>
-                <ScrollView style={{height: height * 0.65}}>
+                <Text style={{color: '#3F4079', marginBottom: theme.SIZES.BASE}} size={13}>Doctors Nearby you</Text>
+                <ScrollView style={{height: height * 0.65}} showsVerticalScrollIndicator={false}>
                     <Block flex>
                         <LocateItem product={products[0]} horizontal />
                         <LocateItem product={products[1]} horizontal />
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     searchBox: {
         position: "absolute",
         width: width,
-        top: height * 0.14,
+        top: height * 0.08,
     },
     inputNote: {
         width: width * 0.9,
@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
         borderBottomRightRadius: 24,
         borderBottomLeftRadius: 24,
         width: width,
-        height: height * 0.16,
+        height: height * 0.1,
         paddingTop: theme.SIZES.BASE * 2,
         paddingLeft: theme.SIZES.BASE,
     },

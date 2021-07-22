@@ -44,6 +44,7 @@ const Input = ({
           value={value}
           style={style}
           selectionColor="green"
+          
         />
         
         {validate && (

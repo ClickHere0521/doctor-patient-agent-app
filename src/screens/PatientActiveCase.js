@@ -140,7 +140,7 @@ const ScheduleDetail = (props) => {
               <Block>
                 <Text
                   color="white"
-                  size={20}
+                  size={16}
                   style={{ fontFamily: "Inter-Black" }}
                   bold
                 >
@@ -315,7 +315,6 @@ const styles = StyleSheet.create({
   heading: {
     marginTop: height * 0.08,
     paddingHorizontal: theme.SIZES.BASE * 0.5,
-    position: "absolute",
   },
   btnCalendar: {
     position: "absolute",

@@ -57,7 +57,7 @@ const CaseHistory = (props) => {
           <Text
             color="black"
             style={{ paddingLeft: theme.SIZES.BASE }}
-            size={22}
+            size={16}
             fontWeight="semiBold"
           >
             {IMLocalized("caseHistory")}
@@ -72,12 +72,12 @@ const CaseHistory = (props) => {
     <Block flex style={styles.notification}>
       {navbar()}
       <TouchableOpacity style={[styles.dateActive]}>
-        <Text size={16} color={"white"}>
+        <Text size={12} color={"white"}>
           {IMLocalized("recent")}
         </Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.dateInActive}>
-        <Text size={16}>
+        <Text size={12}>
           {IMLocalized('injuryTime')}
         </Text>
       </TouchableOpacity>
@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
   navbar: {
     backgroundColor: "white",
     width: width,
-    height: height * 0.16,
+    height: height * 0.1,
     paddingTop: theme.SIZES.BASE * 2,
     paddingLeft: theme.SIZES.BASE,
     borderBottomWidth: 1,
@@ -182,20 +182,20 @@ const styles = StyleSheet.create({
   dateActive: {
     backgroundColor: "#00CE30",
     borderRadius: 18,
-    width: 130,
-    height: 34,
+    width: 90,
+    height: 25,
     alignItems: 'center',
     justifyContent: 'center',
     position: 'absolute',
     zIndex: 5,
-    top: height * 0.15,
-    left: width * 0.1
+    top: height * 0.09,
+    left: width * 0.2
   },
   dateInActive: {
     backgroundColor: "white",
     borderRadius: 18,
-    width: 130,
-    height: 34,
+    width: 90,
+    height: 25,
     shadowColor: "black",
     shadowOffset: { width: 0, height: 0 },
     shadowRadius: 8,
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     zIndex: 5,
     zIndex: 5,
-    top: height * 0.15,
+    top: height * 0.09,
     left: width * 0.6
   },
 });

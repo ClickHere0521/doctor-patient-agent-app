@@ -166,6 +166,7 @@ const Settings = (props) => {
     return (
       <Block row style={styles.navbar} center>
         <TouchableOpacity
+          style={styles.touchableArea}
           onPress={() => navigation.goBack()}
         >
           <Icon
@@ -179,7 +180,7 @@ const Settings = (props) => {
 
         <Text
           color="white"
-          style={{ paddingLeft: theme.SIZES.BASE }}
+          style={{ paddingLeft: theme.SIZES.BASE * 0.5 }}
           size={17}
           bold
         >
@@ -276,6 +277,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.SIZES.BASE,
     marginBottom: theme.SIZES.BASE / 2,
   },
+  touchableArea: {
+    width: 30, 
+    height: 30, 
+    justifyContent: 'center', 
+    alignItems: 'center'
+  },
   navbar: {
     backgroundColor: "#6E78F7",
     borderBottomRightRadius: 24,
@@ -283,7 +290,7 @@ const styles = StyleSheet.create({
     width: width,
     height: height * 0.1,
     paddingTop: theme.SIZES.BASE,
-    paddingLeft: theme.SIZES.BASE,
+    paddingLeft: theme.SIZES.BASE * 0.5,
   },
 });
 

@@ -9,34 +9,93 @@ import {
   ActivityIndicator,
   PermissionsAndroid,
 } from "react-native";
-import {  Block, Text, theme, Input } from "galio-framework";
+import { Block, Text, theme } from "galio-framework";
+import InputEmailPassword from "../components/Input";
+import Input from '../components/InputType2';
 import { IMLocalized } from "../localization/IMLocalization";
 import { Modal } from 'react-native-paper';
 import { materialTheme } from "../constants/";
 import { Icon } from "../components/";
 import MapView, { Marker } from 'react-native-maps';
-import { patient } from "../store/duck/reducers";
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import { useIsFocused } from '@react-navigation/native';
+import { isValid } from '../utils/helpers';
+import firestore from '@react-native-firebase/firestore';
+import storage from '@react-native-firebase/storage';
+import axios from 'axios';
+import PhoneInput from 'react-phone-number-input/react-native-input'
+import { isValidPhoneNumber } from 'react-phone-number-input'
 
 const { width, height } = Dimensions.get("screen");
 
 const CreateDoctorAccount = (props) => {
+  const isFocused = useIsFocused();
   const { navigation, route } = props;
-  let { doctor } = route.params;
+  const { doctor } = route.params;
   const [imageUri, setImageUri] = useState(null);
-  const [email, setEmail] = useState("fdsfds");
-  const [password, setPassword] = useState("");
-  const [fullname, setFullname ] = useState("");
-  const [address, setAddress] = useState("");
-  const [description, setDescription] = useState("");
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [fullname, setFullname] = useState('');
+  const [address, setAddress] = useState('');
+  const [description, setDescription] = useState('');
   const [visible, setVisible] = useState(false);
+  const [spinner, setSpinner] = useState(false);
+  const [isCreatable, setIsCreatable] = useState(false);
+  const [isAvatarEdited, setIsAvatarEdited] = useState(false);
 
   const hideModal = () => setVisible(false);
   const showModal = () => setVisible(true);
+  const hideSpinner = () => setSpinner(false);
+  const showSpinner = () => setSpinner(true);
+
+  useEffect(() => {
+    if (isFocused && !doctor) {
+      setImageUri('');
+      setEmail('');
+      setPassword('');
+      setFullname('');
+      setAddress('');
+      setPhone('');
+      setDescription('');
+    }
+  }, [isFocused]);
+
 
   useEffect(() => {
     requestCameraPermission();
   }, []);
+
+  useEffect(() => {
+    setImageUri(doctor ? doctor.avatar : null);
+    setEmail(doctor ? doctor.email : '');
+    setPhone(doctor ? doctor.phone : '');
+    setPassword(doctor ? doctor.password : '');
+    setFullname(doctor ? doctor.name : '');
+    setAddress(doctor ? doctor.address : '');
+    setDescription(doctor ? doctor.description : '');
+    setIsAvatarEdited(false);
+  }, [doctor]);
+
+  useEffect(() => {
+    // alert(isValid('address', address))
+    if(        
+        imageUri &&
+        fullname != '' &&
+        phone != '' &&
+        address != '' &&
+        description != '' &&
+        isValid('username', fullname) && 
+        isValid('email', email) && 
+        isValid('address', address) &&  
+        isValid('password', password) &&
+        phoneValidation('tel', phone) &&
+        isValid('description', description)
+      ) 
+      setIsCreatable(true);
+    else
+      setIsCreatable(false);
+  }, [imageUri, email, phone, password, fullname, address, description]);
 
   const requestCameraPermission = async () => {
     try {
@@ -61,7 +120,6 @@ const CreateDoctorAccount = (props) => {
   };
 
   const openCamera = () => {
-    hideModal();
     launchCamera(
       {
         mediaType: 'photo',
@@ -71,14 +129,17 @@ const CreateDoctorAccount = (props) => {
         saveToPhotos: true,
       },
       response => {
-        console.log('====================',response.uri, response.fileName)
-        setImageUri(response.uri);
+        hideModal();
+        if (response.uri) {
+          if (doctor) setIsAvatarEdited(true);
+          setImageUri(response.uri);
+
+        }
       },
     );
   };
 
   const openLibrary = () => {
-    hideModal();
     launchImageLibrary(
       {
         mediaType: 'photo',
@@ -87,16 +148,23 @@ const CreateDoctorAccount = (props) => {
         maxWidth: 200,
       },
       response => {
-        console.log('====================',response.uri, response.fileName)
-        setImageUri(response.uri);
+        hideModal();
+        if (response.uri) {
+          if (doctor) setIsAvatarEdited(true);
+          setImageUri(response.uri);
+        }
       },
     );
   };
 
+  const phoneValidation = (phonenumber) => {
+    return phone ? (isValidPhoneNumber(phone) ? true : false) : false;
+  }
+
   const navbar = () => {
     return (
       <Block row style={styles.navbar} center>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity style={styles.touchableArea} onPress={() => navigation.goBack()}>
           <Icon
             name="arrow-left"
             family="font-awesome"
@@ -107,7 +175,7 @@ const CreateDoctorAccount = (props) => {
         </TouchableOpacity>
         <Text
           color="white"
-          style={{ paddingLeft: theme.SIZES.BASE }}
+          style={{ paddingLeft: theme.SIZES.BASE * 0.5 }}
           size={17}
           bold
         >
@@ -117,47 +185,76 @@ const CreateDoctorAccount = (props) => {
     );
   };
 
-  const handleCreate = () => {
-    if(email && password && fullname && address && description && imageUri)
-    {
-      auth()
-        .createUserWithEmailAndPassword(email, password)
-        .then( async (userCredential) => {
-          var uid = userCredential.user.uid;
-          const pngRef = storage.ref(`avatar/${uid}.png`);
-          await pngRef.put(imageUri);
-          const url = await pngRef.getDownloadURL();
-          firestore.collection('PCDoctors').doc(uid).set({});
-          firestore.collection('PCDoctors').doc(uid).collection('PCDoctor').doc()
+  const handleCreate = async () => {
+    if (email && password && fullname && phone && address && description && imageUri) {
+      showSpinner();
+      if (doctor) {
+        var url;
+        //--------- If the user changes his/her avatar ---------//
+        if (isAvatarEdited) {
+          var uid = doctor.uid;
+          const pngRef = storage().ref(`avatar/${uid}.png`);
+          // uploads avatar
+          await pngRef.putFile(imageUri);
+          url = await storage()
+            .ref(`avatar/${uid}.png`)
+            .getDownloadURL();
+        } else {
+          url = imageUri;
+        }
+
+        // updates info
+        firestore().collection('PCDoctors').doc(doctor.uid).update({
+          password,
+          avatar: url,
+          name: fullname,
+          phone,
+          address,
+          description,
+        }).then(() => {
+          hideSpinner();
+          navigation.navigate("Doctors");
+        }).catch((error) => console.log(error));
+      } else {
+        axios.post('http://us-central1-amgwf-70a28.cloudfunctions.net/createUser', {
+          email,
+          password,
+        })
+        .then(async(userCredential) => {
+          var uid = userCredential.data.uid;
+          const pngRef = storage().ref(`avatar/${uid}.png`);
+          // uploads file
+          await pngRef.putFile(imageUri);
+          const url = await storage()
+            .ref(`avatar/${uid}.png`)
+            .getDownloadURL();
+          firestore().collection('PCDoctors').doc(uid)
             .set({
-              email, password, name: fullname, address, description, avatar: url, timeSlot: {
-                Monday: { a: '0', b: '0', c: '0'},
-                Tuesday: { a: '0', b: '0', c: '0'},
-                Wednesday: { a: '0', b: '0', c: '0'},
-                Thursday: { a: '0', b: '0', c: '0'},
-                Friday: { a: '0', b: '0', c: '0'},
-                Saturday: { a: '0', b: '0', c: '0'},
-                Sundy: { a: '0', b: '0', c: '0'},
-              }
+              email, 
+              password, 
+              name: fullname, 
+              address, 
+              description, 
+              uid, 
+              phone,
+              avatar: url
             })
             .then(() => {
-
-              Alert.alert(
-                "Success",
-                "You have successfully created a new doctor account",
-                [
-                  {
-                    text: "OK",
-                    onPress: () => {}
-                  }
-                ]
-              );
+              hideSpinner();
+              navigation.navigate("Doctors");
             })
-            .catch((error) => console.log(error));
+            .catch((error) => {
+              hideSpinner();
+              alert(error)
+            });
         })
         .catch((error) => {
-          console.log(error);
+          hideSpinner();
+          // console.log("userCredential ========= ", userCredential.status(400));
+          // Alert.alert(userCredential.status(400).json({ error: error.message }));
+          alert(error);
         });
+      }
     }
   };
 
@@ -166,76 +263,54 @@ const CreateDoctorAccount = (props) => {
       {navbar()}
       <ScrollView showsVerticalScrollIndicator={false}>
         <Block center>
-          <Input
-            bgColor="transparent"
-            placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
-            borderless
-            color="black"
-            type="email-address"
-            placeholder={doctor ? doctor.email : "Email" }           
-            autoCapitalize="none"
-            style={styles.input}            
-            onChangeText={e => setEmail(e)}
-            iconContent={
-              <Icon
-                size={16}
-                style={{ marginRight: theme.SIZES.BASE }}
-                color="black"
-                name="envelope"
-                family="font-awesome"
-              />
-            }
-          />
-          <Input
-            bgColor="transparent"
-            placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
-            borderless
-            color="black"
-            password
-            viewPass
-            placeholder={doctor ? doctor.password : "Password"}
-            autoCapitalize="none"
-            style={styles.input}
-            onChangeText={e => setPassword(e)}
-            iconContent={
-              <Icon
-                size={16}
-                style={{ marginRight: theme.SIZES.BASE }}
-                color="black"
-                name="key"
-                family="font-awesome"
-              />
-            }
-          />
+          <Block row style={{ top: 20 }}>
+            <InputEmailPassword
+              label="Email"
+              value={email}
+              onChangeText={setEmail}
+              disabled={!doctor ? false : true}
+              keyboardType="email-password"
+              leftIcon="email"
+              rightIcon=""
+              validate
+              requested={false}
+            />
+          </Block>
+          <Block row style={{ top: 20 }}>
+            <InputEmailPassword
+              label="Password"
+              value={password}
+              onChangeText={setPassword}
+              keyboardType="password"
+              leftIcon="lock"
+              rightIcon="eye"
+              validate
+              requested={false}
+            />
+          </Block>
         </Block>
         <Block>
           <Text size={18} style={styles.heading}>
             Doctor Info
           </Text>
-          <Block center row style={{ top: 10 }}>
+          <Block center row style={{ marginVertical: 10 }}>
             <Block middle>
               <TouchableOpacity
                 onPress={() => showModal()}
               >
-                {imageUri ? (
-                  <Image
-                    source={{ uri: imageUri }}
-                    style={{ width: 80, height: 80, borderRadius: 50 }}
+                <Image
+                  source={imageUri ? { uri: imageUri } : require("../assets/images/userDefault.png")}
+                  style={styles.photo}
+                />
+                <Block style={styles.photoPick}>
+                  <Icon
+                    name="camera"
+                    family="font-awesome"
+                    color="#666"
+                    size={16}
                   />
-                ) : (
-                  <Image
-                    source={doctor ? { uri: doctor.avatar } : require("../assets/images/userDefault.png") }
-                    style={{ width: 80, height: 80, borderRadius: 50 }}
-                  />
-                )}
+                </Block>
               </TouchableOpacity>
-              <Icon
-                name="camera"
-                family="font-awesome"
-                color="#666"
-                size={24}
-                style={{position: 'absolute', bottom: 4, right: 4}}
-              />
             </Block>
           </Block>
           <Block style={styles.doctorInfo}>
@@ -247,15 +322,50 @@ const CreateDoctorAccount = (props) => {
                 </Block>
                 <Block>
                   <Input
-                    bgColor="transparent"
-                    placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
-                    borderless
-                    color="black"
-                    placeholder={doctor ? doctor.name : "Mark Veronich"}
-                    onChangeText={e => setFullname(e)}
-                    autoCapitalize="none"
-                    style={styles.name}
+                    label="Description"
+                    value={fullname}
+                    onChangeText={setFullname}
+                    placeholder="Mark Veronich"
+                    leftIcon=""
+                    rightIcon=""
+                    validate
+                    style={styles.valiInput}
+                    underlineColorAndroid="black"
+                    requested={false}
                   />
+                </Block>
+              </Block>
+              <Block style={styles.interval}>
+                <Block row>
+                  <Text color={"black"}>Phone</Text>
+                  <Text color={"red"}>*</Text>
+                </Block>
+                <Block>
+                  {/* <Input
+                    label="Tel"
+                    value={phone}
+                    onChangeText={setPhone}
+                    placeholder="1234567890"
+                    leftIcon=""
+                    rightIcon=""
+                    validate
+                    style={styles.valiInput}
+                    underlineColorAndroid="black"
+                    requested={false}
+                  /> */}
+                  <PhoneInput
+                    placeholder="+1234567890"
+                    value={phone}
+                    maxLength={16}
+                    onChange={setPhone}
+                    underlineColorAndroid="black"
+                  />
+                  <Block>
+                    <Text color="red">
+                      {
+                        phone ? (isValidPhoneNumber(phone) ? undefined : 'Invalid phone number') : ''
+                      }</Text>
+                  </Block>
                 </Block>
               </Block>
               <Block style={styles.interval}>
@@ -265,14 +375,16 @@ const CreateDoctorAccount = (props) => {
                 </Block>
                 <Block>
                   <Input
-                    bgColor="transparent"
-                    placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
-                    borderless
-                    color="black"
-                    placeholder={doctor ? doctor.address : "1587 West 3rd Avenue, Columbus, OH, USA"}
-                    onChangeText={e => setAddress(e)}
-                    autoCapitalize="none"
-                    style={styles.name}
+                    label="title"
+                    value={address}
+                    onChangeText={setAddress}
+                    placeholder="1587 West 3rd Avenue Columbus OH USA"
+                    leftIcon=""
+                    rightIcon=""
+                    validate
+                    style={styles.valiInput}
+                    underlineColorAndroid="black"
+                    requested={false}
                   />
                 </Block>
               </Block>
@@ -283,14 +395,16 @@ const CreateDoctorAccount = (props) => {
                 </Block>
                 <Block>
                   <Input
-                    bgColor="transparent"
-                    placeholderTextColor={materialTheme.COLORS.PLACEHOLDER}
-                    borderless
-                    color="black"
-                    placeholder={doctor ? doctor.description : "description here"}
-                    onChangeText={e => setDescription(e)}
-                    autoCapitalize="none"
-                    style={styles.name}
+                    label="Description"
+                    value={description}
+                    onChangeText={setDescription}
+                    placeholder="Your description here"
+                    leftIcon=""
+                    rightIcon=""
+                    validate
+                    style={styles.valiInput}
+                    underlineColorAndroid="black"
+                    requested={false}
                   />
                 </Block>
               </Block>
@@ -303,10 +417,10 @@ const CreateDoctorAccount = (props) => {
                 style={{ margin: 10 }}
               />
               <Text size={12} color={"grey"} style={{ marginTop: 10 }}>
-                {doctor ? doctor.address : "1587 West 3rd Avenue, Columbus, OH, USA"}{" "}{doctor ? doctor.city_state : "Chicago/IL"}
+                {"1587 West 3rd Avenue, Columbus, OH, USA"}{" "}{doctor ? doctor.cityState : "Chicago/IL"}
               </Text>
             </Block>
-            <Block style={{borderRadius: 10}}>
+            <Block style={{ borderRadius: 10 }}>
               <MapView
                 region={{
                   latitude: 41.880032,
@@ -329,10 +443,10 @@ const CreateDoctorAccount = (props) => {
               </MapView>
             </Block>
           </Block>
-          <Block center style={styles.saveBtn}>
-            <TouchableOpacity onPress={() => handleCreate()}>
+          <Block center>
+            <TouchableOpacity style={[styles.saveBtn, isCreatable ? { backgroundColor: '#00CE30' } : { backgroundColor: 'grey' }]} disabled={!isCreatable} onPress={() => handleCreate()}>
               <Text color={"white"} size={18}>
-                Create
+                {doctor ? 'Save' : 'Create'}
               </Text>
             </TouchableOpacity>
           </Block>
@@ -343,11 +457,21 @@ const CreateDoctorAccount = (props) => {
         onDismiss={hideModal}
         contentContainerStyle={styles.modal}>
         <TouchableOpacity style={styles.cameraButton} onPress={openCamera}>
-          <Text style={{color: '#FFF'}}>Open Camera</Text>
+          <Text style={{ color: '#FFF' }}>Open Camera</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.cameraButton} onPress={openLibrary}>
-          <Text style={{color: '#FFF'}}>Open Library</Text>
+          <Text style={{ color: '#FFF' }}>Open Library</Text>
         </TouchableOpacity>
+      </Modal>
+      <Modal
+        visible={spinner}
+        onDismiss={hideSpinner}
+        contentContainerStyle={styles.modal}
+        dismissable={false}>
+        <Text size={18} color="black">
+          Saving ...
+        </Text>
+        <ActivityIndicator size={50} color="#6E78F7" />
       </Modal>
     </Block>
   );
@@ -360,13 +484,21 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   mapView: {
-    width: width * 0.8, 
-    height: 150, 
-    margin: width * 0.01, 
-    alignSelf: "center" 
+    width: width * 0.8,
+    height: 150,
+    margin: width * 0.01,
+    alignSelf: "center"
   },
   emailPass: {
     padding: 4,
+  },
+  valiInput: {
+    width: '100%',
+    borderRadius: 9,
+    backgroundColor: 'white',
+    fontSize: 14,
+    height: 40,
+    padding: 10,
   },
   heading: {
     marginVertical: 20,
@@ -379,7 +511,7 @@ const styles = StyleSheet.create({
     borderColor: "#EDEDED",
     borderWidth: 1,
     paddingHorizontal: 24,
-    paddingVertical: 20,
+    paddingTop: 30,
     marginVertical: 10,
   },
   asteride: {
@@ -392,8 +524,13 @@ const styles = StyleSheet.create({
     width: 140,
     height: 36,
     borderRadius: 20,
-    backgroundColor: "#00CE30",
     marginVertical: 20,
+  },
+  touchableArea: {
+    width: 30,
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   navbar: {
     backgroundColor: "#6E78F7",
@@ -402,7 +539,7 @@ const styles = StyleSheet.create({
     width: width,
     height: height * 0.1,
     paddingTop: theme.SIZES.BASE,
-    paddingLeft: theme.SIZES.BASE,
+    paddingLeft: theme.SIZES.BASE * 0.5,
   },
   input: {
     marginTop: theme.SIZES.BASE * 0.5,
@@ -421,13 +558,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   interval: {
-    paddingBottom: 20,
+    paddingBottom: 10,
   },
   mapView: {
-    width: width * 0.8, 
-    height: 150, 
-    margin: width * 0.01, 
-    alignSelf: "center" 
+    width: width * 0.8,
+    height: 150,
+    margin: width * 0.01,
+    alignSelf: "center"
   },
   cameraButton: {
     width: width * 0.5,
@@ -447,6 +584,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-around',
     zIndex: 1000,
+  },
+  photoPick: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: '#eee',
+    borderRadius: 30,
+    width: 24,
+    height: 24
+  },
+  photo: {
+    width: 80,
+    height: 80,
+    borderRadius: 50,
+    borderColor: '#eee',
+    borderWidth: 2
   },
 });
 

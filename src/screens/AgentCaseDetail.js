@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -15,92 +15,96 @@ import {
 // import { SliderBox } from "react-native-image-slider-box";
 import { CheckBox } from "react-native-elements";
 import { weekdays } from "moment";
+import { useIsFocused } from '@react-navigation/native';
 import firestore from '@react-native-firebase/firestore';
 
 const { width, height } = Dimensions.get("screen");
 
-
 const Components = (props) => {
-
+  const isFocused = useIsFocused();
+  const scrollRef = useRef();
   const { navigation } = props;
   let { category } = props.route.params;
   const [imageSource, setImageSource] = useState(null);
-  const [weekState, setWeekState] = useState([
-    {
-      date: "MON",
-      status: true,
-    },
-    {
-      date: "TUE",
-      status: false,
-    },
-    {
-      date: "WED",
-      status: false,
-    },
-    {
-      date: "THU",
-      status: false,
-    },
-    {
-      date: "FRI",
-      status: false,
-    },
-    {
-      date: "SAT",
-      status: false,
-    },
-    {
-      date: "SUN",
-      status: false,
-    },
-  ]);
+  const [weekState, setWeekState] = useState([]);
+
+  useEffect(() => {
+    if (isFocused) {
+      scrollRef.current.scrollTo({ x: 0, y: 100, animated: true })
+      setWeekState([
+        {
+          date: "MON",
+          status: true,
+        },
+        {
+          date: "TUE",
+          status: false,
+        },
+        {
+          date: "WED",
+          status: false,
+        },
+        {
+          date: "THU",
+          status: false,
+        },
+        {
+          date: "FRI",
+          status: false,
+        },
+        {
+          date: "SAT",
+          status: false,
+        },
+        {
+          date: "SUN",
+          status: false,
+        },
+      ]);
+    }
+  }, [isFocused]);
 
   const [caseStatus, setCaseStatus] = useState(category.caseStatus);
 
-  const options = {
-    title: "Load Photo",
-    customButtons: [
-      { name: "button_id_1", title: "CustomButton 1" },
-      { name: "button_id_2", title: "CustomButton 2" },
-    ],
-    storageOptions: {
-      skipBackup: true,
-      path: "images",
-    },
-  };
-
   const weekBar = () => {
-    const handleWeekbar = index => {
-      weekState.map((value, indexTemp) => {
-        weekState[indexTemp].status = (index == indexTemp) ? true : false;
-      })
-      setWeekState([...weekState]);
-    }
-    return (
-      <ScrollView
-        horizontal={true}
-        pagingEnabled={true}
-        decelerationRate={0}
-        scrollEventThrottle={16}
-        snapToAlignment="center"
-        showsHorizontalScrollIndicator={false}
-        snapToInterval={theme.SIZES.BASE * 0.375}
-        style={styles.weekScrollView}
-      >
-        {weekState.map((value, index) => {
-          return (
-            <TouchableOpacity key={index} onPress={() => { handleWeekbar(index) }} style={value.status ? styles.dateActive : styles.dateInActive}>
-              <Text size={16} color={value.status ? "white" : "black"}>
-                {value.date}
-              </Text>
-            </TouchableOpacity>
-          )
-        })}
-      </ScrollView>
-    );
+    // if (caseStatus > 2) {
+      const handleWeekbar = index => {
+        scrollRef.current.scrollTo({ x: 38 * index, y: 100, animated: true });
+        weekState.map((value, indexTemp) => {
+          weekState[indexTemp].status = (index == indexTemp) ? true : false;
+        })
+        setWeekState([...weekState]);
+      }
+      return (
+        <ScrollView
+          ref={scrollRef}
+          horizontal={true}
+          pagingEnabled={true}
+          decelerationRate={0}
+          scrollEventThrottle={16}
+          snapToAlignment="center"
+          showsHorizontalScrollIndicator={false}
+          snapToInterval={theme.SIZES.BASE * 0.375}
+          style={styles.weekScrollView}
+        >
+          {weekState.map((value, index) => {
+            return (
+              <TouchableOpacity key={index} onPress={() => { handleWeekbar(index) }} style={value.status ? styles.dateActive : styles.dateInActive}>
+                <Text size={16} color={value.status ? "white" : "black"}>
+                  {value.date}
+                </Text>
+              </TouchableOpacity>
+            )
+          })}
+        </ScrollView>
+      );
+    // }
+    // else {
+    //   return (
+    //     <Block></Block>
+    //   )
+    // }
   };
-
   const renderNotes = (notes) => {
     let { author, date, content, index } = notes;
     return (
@@ -141,7 +145,10 @@ const Components = (props) => {
     );
   };
   const changeStatus = (statusNum) => {
+
     setCaseStatus(statusNum);
+    console.log(category);
+    console.log("Uid:", category.uID, "caseID", category.caseID, "statusNum", statusNum);
     firestore().collection('Cases').doc(category.uID).collection("Case").doc(category.caseID).update({
       caseStatus: statusNum
     });
@@ -149,7 +156,7 @@ const Components = (props) => {
   const navbar = () => {
     return (
       <Block row style={styles.navbar} center>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity style={styles.touchableArea} onPress={() => navigation.goBack()}>
           <Icon
             name="arrow-left"
             family="font-awesome"
@@ -160,8 +167,8 @@ const Components = (props) => {
         </TouchableOpacity>
         <Text
           color="white"
-          style={{ paddingLeft: theme.SIZES.BASE }}
-          size={17}
+          style={{ paddingLeft: theme.SIZES.BASE * 0.5 }}
+          size={16}
           bold
         >
           Case Detail
@@ -169,6 +176,42 @@ const Components = (props) => {
       </Block>
     );
   };
+
+  const doctorCard = () => {
+    if (caseStatus > 2) {
+      return (
+        <Block>
+          <Text bold size={18} style={{ paddingLeft: width * 0.05 }}>
+            Doctor
+          </Text>
+          <Block row center style={styles.patientHeading}>
+            <Block>
+              <Image
+                source={require("../assets/images/grayscale-photo-of-man2.png")}
+                style={{ width: 60, height: 60 }}
+              />
+            </Block>
+            <Block column style={{ paddingLeft: 10, width: width * 0.55 }}>
+              <Text size={16}>
+                {category.pcDoctorInfo.name}
+              </Text>
+              <Text
+                color={"#909CA1"}
+                style={{ paddingTop: theme.SIZES.BASE * 0.5 }}
+              >
+                {category.pcDoctorInfo.phone}
+              </Text>
+            </Block>
+          </Block>
+        </Block>
+      )
+    }
+    else {
+      return (
+        <Block></Block>
+      )
+    }
+  }
   return (
     <Block flex style={styles.agentCaseDetail}>
       {navbar()}
@@ -180,11 +223,10 @@ const Components = (props) => {
           Patient
         </Text>
         <Block row center style={styles.patientHeading}>
-          {/* <Image
-            source={require("../assets/images/patient1.png")}
-            style={{ width: 60, height: 60 }}
-          /> */}
-          <Image source={{ uri: (category && category.patientInfo.avatar) }} style={styles.avatar} />
+          <Image
+            source={category && category.patientInfo.avatar ? { uri: (category && category.patientInfo.avatar) } : require("../assets/images/userDefault.png")}
+            style={styles.avatar}
+          />
           <Block column style={{ paddingLeft: 10, width: width * 0.55 }}>
             <Text size={16}>
               {category.patientInfo.patientName}
@@ -197,28 +239,7 @@ const Components = (props) => {
             </Text>
           </Block>
         </Block>
-        <Text bold size={18} style={{ paddingLeft: width * 0.05 }}>
-          Doctor
-        </Text>
-        <Block row center style={styles.patientHeading}>
-          <Block>
-            <Image
-              source={require("../assets/images/grayscale-photo-of-man2.png")}
-              style={{ width: 60, height: 60 }}
-            />
-          </Block>
-          <Block column style={{ paddingLeft: 10, width: width * 0.55 }}>
-            <Text size={16}>
-              {category.pcDoctorInfo.name}
-            </Text>
-            <Text
-              color={"#909CA1"}
-              style={{ paddingTop: theme.SIZES.BASE * 0.5 }}
-            >
-              {category.pcDoctorInfo.phone}
-            </Text>
-          </Block>
-        </Block>
+        {doctorCard()}
         <Block style={styles.interval}>
           <Text bold size={18} style={{ paddingLeft: width * 0.05 }}>
             Status
@@ -286,71 +307,79 @@ const Components = (props) => {
             </Block>
           </Block>
         </Block>
-        <Block style={styles.interval}>
-          <Text bold size={18} style={{ paddingLeft: width * 0.05 }}>
-            Date of Injury
-          </Text>
-          <Text size={16} style={styles.startTime}>
-
-            {category.dateOfInjury.toDate().toDateString()}
-          </Text>
+        <Block row style={styles.interval}>
+          <Block flex={6}>
+            <Text bold size={18} style={{ paddingLeft: width * 0.05 }}>
+              Date of Injury
+            </Text>
+          </Block>
+          <Block flex={5}>
+            <Text size={16}>
+              {category.dateOfInjury.toDate().toDateString()}
+            </Text>
+          </Block>
         </Block>
         <Block row style={styles.interval}>
-          <Text
-            bold
-            size={18}
-            color={"black"}
-            style={{ paddingLeft: width * 0.05 }}
-          >
-            Attorney Info
-          </Text>
-          <TouchableOpacity onPress={() => navigation.navigate("AddAttorney", { info: category.attorneyInfo })}>
+          <Block flex={6}>
             <Text
-              size={16}
-              color={"#6E78F7"}
-              style={
-                (styles.startTimeDetail, { marginLeft: theme.SIZES.BASE * 5 })
-              }
+              bold
+              size={18}
+              color={"black"}
+              style={{ paddingLeft: width * 0.05 }}
             >
-              Detail
+              Attorney Info
             </Text>
-          </TouchableOpacity>
+          </Block>
+          <Block flex={5}>
+            <TouchableOpacity onPress={() => navigation.navigate("AddAttorney", { info: category.attorneyInfo })}>
+              <Text
+                size={16}
+                color={"#6E78F7"}
+              >
+                Detail
+              </Text>
+            </TouchableOpacity>
+          </Block>
         </Block>
         <Block row style={styles.interval}>
-          <Text
-            bold
-            size={18}
-            color={"black"}
-            style={{ paddingLeft: width * 0.05 }}
-          >
-            Insurance Info
-          </Text>
-          <TouchableOpacity onPress={() => navigation.navigate("AddInsurance", {info: category.InsuranceInfo})}>
+          <Block flex={6}>
             <Text
-              size={16}
-              color={"#6E78F7"}
-              style={
-                (styles.startTimeDetail, { marginLeft: theme.SIZES.BASE * 4.4 })
-              }
+              bold
+              size={18}
+              color={"black"}
+              style={{ paddingLeft: width * 0.05 }}
             >
-              Detail
+              Insurance Info
             </Text>
-          </TouchableOpacity>
+          </Block>
+          <Block flex={5}>
+            <TouchableOpacity onPress={() => navigation.navigate("AddInsurance", { info: category.InsuranceInfo })}>
+              <Text
+                size={16}
+                color={"#6E78F7"}
+              >
+                Detail
+              </Text>
+            </TouchableOpacity>
+          </Block>
         </Block>
-        <Block style={styles.interval}>
-          <Text bold size={18} style={{ paddingLeft: width * 0.05 }}>
-            Schedule
-          </Text>
-        </Block>
+        {caseStatus > 2 ?
+          <Block style={styles.interval}>
+            <Text bold size={18} style={{ paddingLeft: width * 0.05 }}>
+              Schedule
+            </Text>
+          </Block> : <Block></Block>}
         {weekBar()}
-        <Block center row style={{ marginBottom: 10 }}>
-          <Text style={{ marginRight: width * 0.3 }}>9.00-11.00</Text>
-          <Text>Dr.Ronald</Text>
-        </Block>
+        {caseStatus > 2 ?
+          <Block center row style={{ marginBottom: 10 }}>
+            <Text style={{ marginRight: width * 0.3 }}>9.00-11.00</Text>
+            <Text>Dr.Ronald</Text>
+          </Block> : <Block />}
+
         <Block row center>
           <TouchableOpacity
             style={styles.save}
-            onPress={() => navigation.navigate("PatientCaseFile")}
+            onPress={() => navigation.navigate("PatientCaseFile", {category})}
           >
             <Text color={"white"} size={16}>
               Case file
@@ -511,6 +540,7 @@ const styles = StyleSheet.create({
   weekScrollView: {
     marginVertical: theme.SIZES.BASE,
     padding: theme.SIZES.BASE,
+    marginRight: theme.SIZES.BASE,
     paddingTop: 0,
   },
   dateActive: {
@@ -559,6 +589,12 @@ const styles = StyleSheet.create({
     textDecorationLine: "underline",
     marginHorizontal: 10,
   },
+  touchableArea: {
+    width: 30,
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
   navbar: {
     backgroundColor: "#6E78F7",
     borderBottomRightRadius: 24,
@@ -566,7 +602,7 @@ const styles = StyleSheet.create({
     width: width,
     height: height * 0.1,
     paddingTop: theme.SIZES.BASE,
-    paddingLeft: theme.SIZES.BASE,
+    paddingLeft: theme.SIZES.BASE * 0.5,
   },
   textCenter: {
     justifyContent: "center",

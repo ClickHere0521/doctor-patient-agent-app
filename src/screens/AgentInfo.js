@@ -6,51 +6,137 @@ import {
   Image,
   TouchableOpacity,
   Alert,
+  PermissionsAndroid,
+  ActivityIndicator,
 } from "react-native";
 import { Button, Block, Text, theme, Icon } from "galio-framework";
-
+import { Modal } from 'react-native-paper';
 import { materialTheme } from "../constants";
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import { IMLocalized } from "../localization/IMLocalization";
-import * as ImagePicker from "expo-image-picker";
 import { isValid } from '../utils/helpers';
 import Input from '../components/InputType2';
 import firestore from '@react-native-firebase/firestore';
+import auth from '@react-native-firebase/auth';
+import storage from '@react-native-firebase/storage';
+import PhoneInput from 'react-phone-number-input/react-native-input'
+import { isValidPhoneNumber } from 'react-phone-number-input'
 
 const { width, height } = Dimensions.get("screen");
 const thumbMeasure = (width - 48 - 32) / 3;
 
 const AgentInfo = (props) => {
   const { navigation } = props;
-  const [imageUri, setImageUri] = useState("https://firebasestorage.googleapis.com/v0/b/amgwf-70a28.appspot.com/o/avatar%2Fvlcsnap-00002%20(2).jpg?alt=media&token=328edbad-458b-4a6a-a4ac-963e38928619");
-  const [editFlg, setEditFlg] = useState(false);
+  const [imageUri, setImageUri] = useState("");
   const [fullname, setFullname] = useState("");
   const [email, setEmail] = useState("");
   const [tel, setTel] = useState("");
-  const [role, setRole] = useState("");
-  const [requested, setRequested] = useState(false);
-  const validName = isValid('fullname', fullname);
-  const validEmail = isValid('email', email);
-  const validTel = isValid('tel', tel);
-  const validAddress = isValid('address', role);
+  const [visible, setVisible] = useState(false);
+  const [isAvatarEdited, setIsAvatarEdited] = useState(false);
+  const [spinner, setSpinner] = useState(false);
+  const [isSave, setIsSave] = useState(true);
 
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [3, 3],
-      quality: 1,
-    });
+  const hideModal = () => setVisible(false);
+  const showModal = () => setVisible(true);
+  const hideSpinner = () => setSpinner(false);
+  const showSpinner = () => setSpinner(true);
 
-    if (!result.cancelled) {
-      setImageUri(result.uri);
+  useEffect(() => {
+    requestCameraPermission();
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const agentUid = auth().currentUser.uid;
+      try {
+        firestore().collection('Agents').doc('6hQ6yTAGNXNihOuFfQku05BK1SJ2').collection('BusinessAgent').doc(agentUid).get()
+          .then((doc) => {
+            setFullname(doc.data().Name);
+            setEmail(doc.data().email);
+            setTel(doc.data().Phone);
+            setImageUri(doc.data().avatar);
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      } catch (e) {
+        console.log(e);
+      }
     }
+    fetchData();    
+  }, []);
+
+  useEffect(() => {
+    if (isValid('username', fullname) && phoneValidation(tel) ) 
+      setIsSave(true);
+    else 
+      setIsSave(false);
+  }, [fullname, tel]);
+
+  const requestCameraPermission = async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+        {
+          title: 'App Camera Permission',
+          message: 'App needs access to your camera ',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        },
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        console.log('Camera permission given');
+      } else {
+        console.log('Camera permission denied');
+      }
+    } catch (err) {
+      console.warn(err);
+    }
+  };
+
+  const openCamera = () => {
+    launchCamera(
+      {
+        mediaType: 'photo',
+        includeBase64: false,
+        maxHeight: 200,
+        maxWidth: 200,
+        saveToPhotos: true,
+      },
+      response => {
+        hideModal();
+        if (response.uri) {
+          setIsAvatarEdited(true);
+          setImageUri(response.uri);
+        }
+      },
+    );
+  };
+
+  const openLibrary = () => {
+    launchImageLibrary(
+      {
+        mediaType: 'photo',
+        includeBase64: false,
+        maxHeight: 200,
+        maxWidth: 200,
+      },
+      response => {
+        hideModal();
+        if (response.uri) {
+          setIsAvatarEdited(true);
+          setImageUri(response.uri);
+        }
+      },
+    );
   };
 
   const navbar = () => {
     return (
       <Block>
         <Block row style={styles.navbar} center>
-          <TouchableOpacity onPress={() => navigation.openDrawer()}>
+          <TouchableOpacity style={styles.touchableArea} onPress={() => navigation.openDrawer()}>
             <Icon
               name="align-justify"
               family="font-awesome"
@@ -61,7 +147,7 @@ const AgentInfo = (props) => {
           </TouchableOpacity>
           <Text
             color="black"
-            style={{ paddingLeft: theme.SIZES.BASE }}
+            style={{ paddingLeft: theme.SIZES.BASE * 0.5 }}
             size={16}
             fontWeight="semiBold"
           >
@@ -74,86 +160,40 @@ const AgentInfo = (props) => {
     );
   };
 
+  const phoneValidation = (phonenumber) => {
+    console.log(tel ? (isValidPhoneNumber(tel) ? true : false) : false);
+    return tel ? (isValidPhoneNumber(tel) ? true : false) : false;
+  }
+
   const handleSave = async () => {
-    const agentUid = '6hQ6yTAGNXNihOuFfQku05BK1SJ2';
+    const agentUid = auth().currentUser.uid;
+    var url;
+    showSpinner();
 
-    if (editFlg == true) {
-      if (validName && validEmail && validTel && validAddress) {
-        let businessAgentId;
-        try {
-          await firestore().collection('Agents').doc(agentUid).collection('BusinessAgent').get().then((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-              businessAgentId = doc.id;
-            });
-          });
-        } catch(e) {
-          console.log(e);
-        }
-        let newRef = firestore().collection('Agents').doc(agentUid).collection('BusinessAgent').doc(businessAgentId);
-        newRef.update({
-          email, name: fullname, phone: tel, role: role,
-        })
-        .then( async () => {
-          const pngRef = storage.ref(`logo/${agentUid}.png`);
-          await pngRef.put(imageUri);
-          const url = await pngRef.getDownloadURL();
-          console.log("FDFD",url);
-
-          Alert.alert(
-            "Success",
-            "You have successfully edited the agent info",
-            [
-              {
-                text: 'OK',
-                onPress: () => {}
-              }
-            ]
-          );        
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-          setEditFlg(false)
-          setRequested(false);
-        }
-      else {
-        setRequested(true);
-      }
+    //----------- Avatar Upload ------------//
+    if (isAvatarEdited) {
+      const pngRef = storage().ref(`avatar/${agentUid}.png`);
+      await pngRef.putFile(imageUri);
+      url = await storage()
+        .ref(`avatar/${agentUid}.png`)
+        .getDownloadURL();
+    } else {
+      url = imageUri;
     }
+
+    //----------- Firestore Update -----------//
+    firestore().collection('Agents').doc('6hQ6yTAGNXNihOuFfQku05BK1SJ2').collection('BusinessAgent').doc(agentUid)
+      .update({
+        email, Name: fullname, Phone: tel, avatar: url,
+      })
+      .then(() => {
+        hideSpinner();
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    setIsSave(false);
   };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      // const agentUid = auth.currentUser.uid;
-      const agentUid = '6hQ6yTAGNXNihOuFfQku05BK1SJ2';
-      try {
-        let businessAgentId;
-        try {
-          await firestore().collection('Agents').doc(agentUid).collection('BusinessAgent').get().then((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-              businessAgentId = doc.id;
-            });
-          });
-        } catch(e) {
-          console.log(e);
-        }
-        firestore().collection('Agents').doc(agentUid).collection('BusinessAgent').doc(businessAgentId).get()
-          .then((doc) => {
-            setFullname(doc.data().Name); console.log(doc.data().name);
-            setEmail(doc.data().email);
-            setTel(doc.data().phone);
-            setRole(doc.data().role);
-            // console.log(`agent data ${doc.data()}`);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      } catch (e) {
-        console.log(e);
-      }
-    }
-    fetchData();    
-  }, []);
 
   return (
     <Block center flex style={styles.profile}>
@@ -161,122 +201,85 @@ const AgentInfo = (props) => {
       <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
         <Block center row style={{ marginTop: theme.SIZES.BASE }}>
           <Block middle>
-            <TouchableOpacity
-              onPress={() => pickImage()}
-            >
-              {imageUri ? (
-                <Image
-                  source={{ uri: imageUri }}
-                  style={{ width: 80, height: 80, borderRadius: 50, borderWidth: 3, borderColor: "white" }}
+            <TouchableOpacity onPress={() => showModal()}>
+              <Image
+                source={imageUri ? { uri: imageUri } : require("../assets/images/userDefault.png")}
+                style={styles.photo}
+              />
+              <Block style={styles.photoPick}>
+                <Icon
+                  name="camera"
+                  family="font-awesome"
+                  color="#555"
+                  size={16}
                 />
-              ) : (
-                <Image
-                  source={require("../assets/images/userDefault.png")}
-                  style={{ width: 80, height: 80, borderRadius: 50, borderWidth: 3, borderColor: "white" }}
-                />
-              )}
+              </Block>
             </TouchableOpacity>
-            <Icon
-              name="camera"
-              family="font-awesome"
-              color="#555"
-              size={20}
-              style={{position: 'absolute', bottom: 4, right: 4}}
-            />
           </Block>
         </Block>
         <Block style={styles.userInfo}>
-
           <Text style={styles.label}>
             Full Name <Text color={"red"}>*</Text>
           </Text>
-          <Block flex flexDirection="column">
-            <Block flex={1}>
-              <Input
-                label="FULLNAME"
-                value={fullname}
-                onChangeText={setFullname}
-                editable={editFlg}
-                placeholder={fullname}
-                leftIcon=""
-                rightIcon=""
-                validate
-                requested={requested}
-                style={styles.valiInput}
-                underlineColorAndroid="black"
-              />
-            </Block>
-          </Block>
+          <Input
+            label="FULLNAME"
+            value={fullname}
+            onChangeText={setFullname}
+            placeholder="Mark Veronich"
+            leftIcon=""
+            rightIcon=""
+            validate
+            style={styles.valiInput}
+            underlineColorAndroid="black"
+          />
           <Text style={styles.label}>
             Email <Text color={"red"}>*</Text>
           </Text>
-
           <Input
             label="Email"
             value={email}
-            onChangeText={setEmail}
-            placeholder={email}
-            editable={editFlg}
+            placeholder={"workforceAgent@gmail.com"}
+            editable={false}
             keyboardType="email-address"
             leftIcon=""
             rightIcon=""
             validate
-            requested={requested}
             style={styles.valiInput}
             underlineColorAndroid="black"
           />
           <Text style={styles.label}>
             Tel <Text color={"red"}>*</Text>
           </Text>
-          <Block style={{ width: '100%' }}>
-            <Input
-              label="Tel"
-              value={tel}
-              onChangeText={setTel}
-              placeholder={tel}
-              editable={editFlg}
-              leftIcon=""
-              rightIcon=""
-              validate
-              requested={requested}
-              style={styles.valiInput}
-              underlineColorAndroid="black"
-            />
-          </Block>
-          <Text style={{ paddingTop: 10, alignSelf: "flex-start" }}>
-            Role <Text color={"red"}>*</Text>
-          </Text>
-
-          <Input
-            label="Address"
-            value={role}
-            onChangeText={setRole}
-            editable={editFlg}
-            placeholder={role}
+          {/* <Input
+            label="Tel"
+            value={tel}
+            onChangeText={setTel}
+            placeholder={"1234567890"}
             leftIcon=""
             rightIcon=""
             validate
-            requested={requested}
             style={styles.valiInput}
             underlineColorAndroid="black"
-          />
-          <Block row style={{ alignSelf: "flex-end" }}>
+          /> */}
+          <PhoneInput
+                placeholder="+1234567890"
+                value={tel}
+                maxLength={16}
+                onChange={setTel}
+                underlineColorAndroid="black"
+                />
+          <Block>
+            <Text color="red">
+            {
+              tel ? (isValidPhoneNumber(tel) ? undefined : 'Invalid phone number') : ''
+            }</Text>
+          </Block>
+          <Block row center>
             <Button
               center
               shadowless
-              color="#6E78F7"
-              textStyle={styles.optionsButtonText}
-              style={styles.optionsButton}
-              onPress={() => {
-                setEditFlg(true);
-              }}
-            >
-              EDIT
-            </Button>
-            <Button
-              center
-              shadowless
-              color="#6E78F7"
+              disabled={!isSave}
+              color={isSave ? "#6E78F7" : "#666"}
               textStyle={styles.optionsButtonText}
               style={styles.optionsButton}
               onPress={() => handleSave()}
@@ -286,6 +289,27 @@ const AgentInfo = (props) => {
           </Block>
         </Block>
       </ScrollView>
+      <Modal
+        visible={visible}
+        onDismiss={hideModal}
+        contentContainerStyle={styles.modal}>
+        <TouchableOpacity style={styles.cameraButton} onPress={openCamera}>
+          <Text style={{color: '#FFF'}}>Open Camera</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.cameraButton} onPress={openLibrary}>
+          <Text style={{color: '#FFF'}}>Open Library</Text>
+        </TouchableOpacity>
+      </Modal>
+      <Modal
+        visible={spinner}
+        onDismiss={hideSpinner}
+        contentContainerStyle={styles.modal}
+        dismissable={false}>
+        <Text size={18} color="black">
+          Saving ...
+        </Text>
+        <ActivityIndicator size={50} color="#6E78F7" />
+      </Modal>
     </Block>
   );
 };
@@ -293,22 +317,27 @@ const AgentInfo = (props) => {
 const styles = StyleSheet.create({
   profile: {},
   optionsButtonText: {
-    fontSize: theme.SIZES.BASE * 0.75,
+    fontSize: 14,
     color: "white",
     fontWeight: "normal",
     fontStyle: "normal",
     letterSpacing: -0.29,
   },
   optionsButton: {
-    width: "auto",
-    height: 34,
-    paddingHorizontal: theme.SIZES.BASE,
-    paddingVertical: 10,
-    borderRadius: 3,
+    width: 100,
+    height: 30,  
+    borderRadius: 20,
     shadowColor: "rgba(0, 0, 0, 0.1)",
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
     shadowOpacity: 1,
+    marginBottom: 20,
+  },
+  touchableArea: {
+    width: 30, 
+    height: 30, 
+    justifyContent: 'center', 
+    alignItems: 'center'
   },
   uploadPicture: {
     paddingHorizontal: 14,
@@ -326,7 +355,7 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   userInfo: {
-    paddingHorizontal: width * 0.03,
+    paddingHorizontal: width * 0.05,
     marginTop: height * 0.04,
     marginBottom: height * 0.05,
     marginHorizontal: width * 0.01,
@@ -418,7 +447,7 @@ const styles = StyleSheet.create({
     marginRight: -26,
   },
   label: {
-    paddingTop: 10,
+    paddingTop: 30,
     alignSelf: "flex-start",
   },
   navbar: {
@@ -426,19 +455,55 @@ const styles = StyleSheet.create({
     width: width,
     height: height * 0.1,
     paddingTop: theme.SIZES.BASE * 2,
-    paddingLeft: theme.SIZES.BASE,
+    paddingLeft: theme.SIZES.BASE * 0.5,
     borderBottomWidth: 1,
     borderColor: "rgba(112, 112, 112, 0.1)",
   },
   valiInput: {
-    textTransform: 'capitalize',
     width: '100%',
     borderRadius: 9,
     backgroundColor: 'white',
     fontSize: 14,
     height: 40,
     padding: 10,
-  }
+  },
+  modal: {
+    backgroundColor: 'white',
+    padding: 40,
+    borderRadius: 20,
+    alignSelf: 'center',
+    width: width * 0.7,
+    height: height * 0.3,
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    zIndex: 1000,
+  },
+  cameraButton: {
+    width: width * 0.5,
+    height: height * 0.07,
+    backgroundColor: '#6E78F7',
+    borderRadius: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  photoPick: {
+    alignItems: 'center', 
+    justifyContent: 'center', 
+    position: 'absolute', 
+    bottom: 0, 
+    right: 0, 
+    backgroundColor: '#eee', 
+    borderRadius: 30, 
+    width: 24, 
+    height: 24
+  },
+  photo: { 
+    width: 80, 
+    height: 80, 
+    borderRadius: 50, 
+    borderColor: '#eee', 
+    borderWidth: 2 
+  },
 });
 
 export default AgentInfo;

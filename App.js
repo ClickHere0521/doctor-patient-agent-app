@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Platform, StatusBar, Image, LogBox, Text, View} from 'react-native';
 import AppLoading from 'expo-app-loading';
-import {Asset} from 'expo-asset';
+// import {Asset} from 'expo-asset';
 import {Block, GalioProvider} from 'galio-framework';
 import {NavigationContainer} from '@react-navigation/native';
 import {PersistGate} from 'redux-persist/integration/react';
@@ -18,37 +18,36 @@ import Screens from './src/navigation/Screens';
 import {Images, materialTheme} from './src/constants/';
 
 LogBox.ignoreAllLogs();
-const assetImages = [
-  Images.Profile,
-  Images.Avatar,
-  Images.Onboarding,
-  Images.Products.Auto,
-  Images.Products.Motocycle,
-  Images.Products.Watches,
-  Images.Products.Makeup,
-  Images.Products.Accessories,
-  Images.Products.Fragrance,
-  Images.Products.BMW,
-  Images.Products.Mustang,
-  Images.Products['Harley-Davidson'],
-];
+// const assetImages = [
+//   Images.Profile,
+//   Images.Avatar,
+//   Images.Onboarding,
+//   Images.Products.Auto,
+//   Images.Products.Motocycle,
+//   Images.Products.Watches,
+//   Images.Products.Makeup,
+//   Images.Products.Accessories,
+//   Images.Products.Fragrance,
+//   Images.Products.BMW,
+//   Images.Products.Mustang,
+//   Images.Products['Harley-Davidson'],
+// ];
 
-const cacheImages = images => {
-  return images.map(image => {
-    if (typeof image === 'string') {
-      return Image.prefetch(image);
-    } else {
-      return Asset.fromModule(image).downloadAsync();
-    }
-  });
-};
+// const cacheImages = images => {
+//   return images.map(image => {
+//     if (typeof image === 'string') {
+//       return Image.prefetch(image);
+//     } else {
+//       return Asset.fromModule(image).downloadAsync();
+//     }
+//   });
+// };
 
 const App = props => {
   const [isLoadingComplete, setIsLoadingComplete] = useState(false);
-
-  const _loadResourcesAsync = async () => {
-    return Promise.all([...cacheImages(assetImages)]);
-  };
+  // const _loadResourcesAsync = async () => {
+  //   return Promise.all([...cacheImages(assetImages)]);
+  // };
 
   const _handleLoadingError = error => {
     // In this case, you might want to report the error to your error

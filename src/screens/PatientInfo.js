@@ -40,7 +40,7 @@ const PatientInfo = (props) => {
           <Text
             color="black"
             style={{ paddingLeft: theme.SIZES.BASE }}
-            size={22}
+            size={16}
             fontWeight="semiBold"
           >
             {IMLocalized("profileInfo")}
@@ -59,12 +59,12 @@ const PatientInfo = (props) => {
             source={require("../assets/images/doctor1.png")}
             style={styles.imageStyle}
           ></Image>
-          {/* <SvgUri
+          <Image
             width="20"
             height="20"
-            source={require("../assets/icons/dot.svg")}
-            style={{ position: "absolute", right: -10, top: -5 }}
-          /> */}
+            source={require("../assets/images/ok.png")}
+            style={{ position: "absolute", right: -5, top: 0 }}
+          />
         </Block>
         <TouchableWithoutFeedback style={{ marginLeft: theme.SIZES.BASE * 2 }}>
           <Text
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
   navbar: {
     backgroundColor: "white",
     width: width,
-    height: height * 0.16,
+    height: height * 0.1,
     paddingTop: theme.SIZES.BASE * 2,
     paddingLeft: theme.SIZES.BASE,
     borderBottomWidth: 1,

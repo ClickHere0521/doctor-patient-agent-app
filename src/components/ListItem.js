@@ -11,7 +11,6 @@ import Icon from "./Icon";
 import Button from "./Button";
 import { useSelector } from "react-redux";
 import { IMLocalized } from "../localization/IMLocalization";
-// import { set } from "react-native-reanimated";
 import { CheckBox } from "react-native-elements";
 
 const { width } = Dimensions.get("screen");
@@ -30,14 +29,16 @@ const ListItem = (props) => {
     unReaden,
     weekday,
     role,
+    index,
+    handleCheck
   } = props;
   const imageStyles = [
     styles.image,
     full ? styles.fullImage : styles.horizontalImage,
     imageStyle,
   ];
-  const userRole = useSelector((state) => state.user.role);
-
+  const userRole = useSelector((state) => state.user.role);  
+  
   const showCheck = (role) => {
     switch (role) {
       case "agentPatient":
@@ -99,7 +100,6 @@ const ListItem = (props) => {
         return;
     }
   };
-
   const renderButtons = (role) => {
     switch (role) {
       case "agentPatient":
@@ -113,7 +113,7 @@ const ListItem = (props) => {
               onPress={() => {
                 switch (userRole) {
                   case "agent": {
-                    navigation.navigate("CreateCase");
+                    navigation.navigate("CreateCase", {selectedPatient: category});
                     break;
                   }
                   case "doctor": {
@@ -147,7 +147,7 @@ const ListItem = (props) => {
               onPress={() => {
                 switch (userRole) {
                   case "agent": {
-                    navigation.navigate("AgentCaseDetail", { category });
+                    navigation.navigate("AddPatient", { editPatient: true, addPermission: false, fromCreateCase: false, category});
                     break;
                   }
                   case "doctor": {
@@ -179,18 +179,16 @@ const ListItem = (props) => {
               color={"#06D81E"}
               style={[styles.createBtn, styles.shadow]}
               size={12}
-              onPress={() => navigation.navigate("PatientCaseFile")}
+              onPress={() => navigation.navigate("PatientCaseFile", {category})}
             >
               <Text
                 size={12}
                 center
-                bold
                 style={{ justifyContent: "center", alignItems: "center" }}
                 color={"#FFF"}
                 fontWeight={"semiBold"}
               >
-                {/* {IMLocalized("Upload")} */}
-                Upload
+                {IMLocalized("upload")}
               </Text>
             </Button>
             <Button
@@ -198,27 +196,27 @@ const ListItem = (props) => {
               color={"#06D81E"}
               style={[styles.button, styles.shadow]}
               size={11}
-              onPress={() => navigation.navigate("DoctorCaseDetail")}
+              onPress={() => navigation.navigate("DoctorCaseDetail", {category})}
             >
               <Text
-                size={11}
+                size={12}
                 center
                 style={{ justifyContent: "center", alignItems: "center" }}
                 color={"#FFF"}
               >
-                {/* {IMLocalized("Detail")} */}
-                Detail
+                {IMLocalized("detail")}
               </Text>
             </Button>
           </>
         );
       case "schedulePatientList":
         return (
-          <CheckBox
-            checked={true}
-            // containerStyle={{ borderWidth: 0 }}
-            onPress={() => console.log("pressed")}
-          />
+          <Block style={{top: 12, right: -30}}>
+            <CheckBox
+              checked={category && category.booking.isChecked}
+              onPress={() => handleCheck(index)}
+            />
+          </Block>
         );
       default:
         return (
@@ -272,6 +270,49 @@ const ListItem = (props) => {
         return "Discharged";
     }
   }
+  const pAvatar = () => {
+    {
+      if (role == "agentPatient") {
+        return <Image source={{ uri: (category && category.avatar) || 'https://firebasestorage.googleapis.com/v0/b/amgwf-70a28.appspot.com/o/avatar%2FuserDefault.png?alt=media&token=b58fe00e-cffd-4a50-b7f4-67a07f89c90e' }} style={imageStyles} />;
+      } else if (role == "schedulePatientList") {
+          return <Image source={{ uri: (category && category.booking.patientAvatar) || 'https://firebasestorage.googleapis.com/v0/b/amgwf-70a28.appspot.com/o/avatar%2FuserDefault.png?alt=media&token=b58fe00e-cffd-4a50-b7f4-67a07f89c90e' }} style={imageStyles} />;
+        } else {
+            return <Image source={{ uri: (category && category.patientInfo.avatar) || 'https://firebasestorage.googleapis.com/v0/b/amgwf-70a28.appspot.com/o/avatar%2FuserDefault.png?alt=media&token=b58fe00e-cffd-4a50-b7f4-67a07f89c90e' }} style={imageStyles} />;
+        }
+    }
+  }
+  const pName = () => {
+    if (role == "agentPatient") {
+      return category && category.name;
+    } else if (role == "schedulePatientList") {
+        return category && category.booking.patientName;
+      } else {
+          return category && category.patientInfo.patientName;
+      }
+  }
+  const pDate = () => {
+    if (role == "agentPatient") {
+      return (
+        <Text size={11} style={styles.times} color={"#06D81E"}>
+          {category.DOB.toDate().toDateString()}
+        </Text>
+      )
+    } else if (role == "schedulePatientList") {
+        return null;
+      } else {
+          return (
+            <Text size={11} style={styles.times} color={"#06D81E"}>
+              {category.caseCreateTime.toDate().toDateString()}
+            </Text>
+          )
+        }
+  }
+  const pStatus = () => {
+    if (role != "schedulePatientList" && role != "agentPatient" && category)
+      return getStatusText(category.caseStatus);
+    if (role == "schedulePatientList")  
+      return category && category.booking && category.booking.bookingTime.toDate().toDateString();
+  }
   return (
     <Block
       row={horizontal}
@@ -280,16 +321,15 @@ const ListItem = (props) => {
       style={[styles.product, styles.shadow, style]}
     >
       <TouchableWithoutFeedback
-        onPress={() => ("Product", { product: product })}
       >
         <Block style={[styles.imageContainer, styles.shadow]}>
-          <Image source={{ uri: (category && category.patientInfo.avatar) || 'https://firebasestorage.googleapis.com/v0/b/amgwf-70a28.appspot.com/o/avatar%2Fvlcsnap-00002%20(2).jpg?alt=media&token=328edbad-458b-4a6a-a4ac-963e38928619' }} style={imageStyles} />
+          {pAvatar()}
         </Block>
       </TouchableWithoutFeedback>
       <TouchableWithoutFeedback onPress={() => console.log("Patient Pressed")}>
         <Block flex={2}>
           <Text size={15} style={styles.userName}>
-            {category && category.patientInfo.patientName}
+            {pName()}
           </Text>
           <Text
             size={12}
@@ -297,15 +337,13 @@ const ListItem = (props) => {
             color={priceColor}
             style={styles.content}
           >
-            {role != "schedulePatientList" && role != "agentPatient" && category && getStatusText(category.caseStatus)}
+            {pStatus()}
           </Text>
         </Block>
       </TouchableWithoutFeedback>
       <TouchableWithoutFeedback onPress={() => console.log("Patient Pressed")}>
         <Block flex={1}>
-          <Text size={11} style={styles.times} color={"#06D81E"}>
-            {category && category.caseCreateTime.toDate().toDateString()}
-          </Text>
+          {pDate()}
           {renderButtons(role)}
         </Block>
       </TouchableWithoutFeedback>

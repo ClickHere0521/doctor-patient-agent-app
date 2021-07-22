@@ -9,12 +9,13 @@ import {
 } from "react-native";
 import { Block, Text, theme, Input, Icon } from "galio-framework";
 import { CheckBox } from "react-native-elements";
-// import { set } from "react-native-reanimated";
+import { useSelector } from "react-redux";
 import { IMLocalized, init } from "../localization/IMLocalization";
 
 const { width, height } = Dimensions.get("screen");
 
 const AgentReview = (props) => {
+  const userRole = useSelector((state) => state.user.role);
   const { navigation } = props;
   const [reviews, setReviews] = useState([
     {
@@ -81,13 +82,13 @@ const AgentReview = (props) => {
             Case Final Review
             {/* {IMLocalized("Case Final Review")} */}
           </Text>
-          <TouchableOpacity>
+          {/* <TouchableOpacity>
             <Image
               source={require("../assets/icons/editHeaderBlack.png")}
               alt=""
               style={{ marginLeft: width * 0.4 }}
             />
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </Block>
         <Block style={{ borderTopWidth: 1, borderColor: "white" }}></Block>
       </Block>
@@ -104,6 +105,7 @@ const AgentReview = (props) => {
               <Block key={index} style={styles.content}>
                 <CheckBox
                   title={value.title}
+                  disabled={userRole == 'agent' ? false : true}
                   checked={value.checked}
                   containerStyle={{ backgroundColor: "white", borderWidth: 0 }}
                   onPress={() => handleCheck(index)}

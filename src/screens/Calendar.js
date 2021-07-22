@@ -14,17 +14,25 @@ const { width, height } = Dimensions.get("screen");
 
 const Calendar = (props) => {
   const { navigation } = props;
-  const { childDay, schedule }= props.route.params;
+  const { childDay, scheduleCalendar }= props.route.params;
   const [time, setTime] = useState("");
   const [meetings, setMeetings] = useState([]);  
 
   const onChangeDate = async (date) => {
-    let tempMeetings = [];
-    
-    await schedule && schedule.map((val) => {   
-      if (val.year == date.substring(0,4) && (val.month+1) == date.substring(5,7) && val.day == date.substring(8,10))
+    let tempMeetings = [];    
+    await scheduleCalendar && scheduleCalendar.map((val) => {  
+      const { scheduleTime } = val;
+      const time = new Date(scheduleTime.seconds * 1000 + scheduleTime.nanoseconds/1000000);
+      const changedTime = `${time.getFullYear()}-${(time.getMonth()+1)<10 ? 0 : ''}${time.getMonth()+1}-${time.getDate()<10 ? 0 : ''}${time.getDate()}`;
+      
+      if (changedTime == date)
       {
-        tempMeetings.push(val);
+        tempMeetings.push({
+          day: `${time.getDate()<10 ? 0 : ''}${time.getDate()}`,
+          month: time.getMonth(),
+          patientName: val.patientName,
+          time: scheduleTime.toDate().toDateString(),
+        });
       }
     });
     setMeetings(tempMeetings);
@@ -52,11 +60,29 @@ const Calendar = (props) => {
     );
   };
 
+  const convertMonth = (mon) => {
+    switch (mon) {
+      case 0: return 'Jan';
+      case 1: return 'Feb';
+      case 2: return 'Mar';
+      case 3: return 'Apr';
+      case 4: return 'May';
+      case 5: return 'Jun';
+      case 6: return 'Jul';
+      case 7: return 'Aug';
+      case 8: return 'Sep';
+      case 9: return 'Oct';
+      case 10: return 'Nov';
+      case 11: return 'Dec';
+      default: return null;
+    }
+  };
+
   return (
     <Block style={{backgroundColor: "white"}}>
       <Block style={styles.roundBlock}>
         <Block row style={styles.heading}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity style={styles.touchableArea} onPress={() => navigation.goBack()}>
             <Icon
               size={16}
               name="chevron-left"
@@ -95,7 +121,7 @@ const Calendar = (props) => {
                   <Block key={index} flexDirection="row" style={{marginVertical: 10}}>
                     <Block flex={1} center flexDirection="column" style={{borderRightWidth: 1, borderColor: "blue", padding: theme.SIZES.BASE / 2,}}>
                       <Text size={16}>{val.day}</Text>
-                      <Text size={16}>{val.month}</Text>
+                      <Text size={16}>{convertMonth(val.month)}</Text>
                     </Block>
                     <Block flex={6} flexDirection="column" style={{padding: theme.SIZES.BASE / 2, paddingLeft: theme.SIZES.BASE}}>
                       <Text size={16}>{val.patientName}</Text>
@@ -115,6 +141,12 @@ const styles = StyleSheet.create({
   backIcon: {
     position: "absolute",
     marginLeft: theme.SIZES.BASE * 2,
+  },
+  touchableArea: {
+    width: 30, 
+    height: 30, 
+    justifyContent: 'center', 
+    alignItems: 'center'
   },
   roundBlock: {
     backgroundColor: "white",

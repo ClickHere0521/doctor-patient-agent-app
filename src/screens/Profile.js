@@ -44,15 +44,15 @@ const Profile = (props) => {
           <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
             <Block row space="between" style={{ padding: theme.SIZES.BASE, }}>
               <Block middle>
-                <Text bold size={12} style={{marginBottom: 8}}>Doctors</Text>
+                <Text bold size={12} style={{ marginBottom: 8 }}>Doctors</Text>
                 <Text muted size={12}>50</Text>
               </Block>
               <Block middle>
-                <Text bold size={12} style={{marginBottom: 8}}>Tel</Text>
+                <Text bold size={12} style={{ marginBottom: 8 }}>Tel</Text>
                 <Text muted size={12}>098-90-9088</Text>
               </Block>
               <Block middle>
-                <Text bold size={12} style={{marginBottom: 8}}>Email</Text>
+                <Text bold size={12} style={{ marginBottom: 8 }}>Email</Text>
                 <Text muted size={12}>Anth.gmail@com</Text>
               </Block>
             </Block>

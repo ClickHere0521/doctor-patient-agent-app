@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   ScrollView,
   StyleSheet,
@@ -15,104 +15,98 @@ import {
 } from "../components/";
 import Accordion from "react-native-collapsible/Accordion";
 import firestore from '@react-native-firebase/firestore';
+import { useIsFocused } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get("screen");
 
 const ScheduleView = (props) => {
+  const isFocused = useIsFocused();
+  const scrollRef = useRef();
   const { navigation } = props;
   const [activeSections, setActiveSections] = useState([0]);
   const [schedule, setSchedule] = useState([]);
-  let doctorId;
-
-  const [weekState, setWeekState] = useState([
-    {
-      date: "MON",
-      status: true,
-    },
-    {
-      date: "TUE",
-      status: false,
-    },
-    {
-      date: "WED",
-      status: false,
-    },
-    {
-      date: "THU",
-      status: false,
-    },
-    {
-      date: "FRI",
-      status: false,
-    },
-    {
-      date: "SAT",
-      status: false,
-    },
-    {
-      date: "SUN",
-      status: false,
-    },
-  ]);
+  const [doctors, setDoctors] = useState([]);
+  const [weekState, setWeekState] = useState([]);
 
   useEffect(() => {
-    firestore()
-      .collection("PCDoctors")
-      .get()
-      .then((querySnapshot) => {
-        const doctorArrayPromise = querySnapshot.docs.map((doc) => {
-          return firestore()
-            .collection("PCDoctors")
-            .doc(doc.id)
-            .collection("PCDoctor")
-            .get()
-            .then((querySnapshot) => {
-              doctorId = doc.id;
-              var doctorData = {};
-              querySnapshot.forEach((doctorDoc) => {
-                const { address, city_state, email, name, phone, description } =
-                  doctorDoc.data();
-                doctorData = { ...doctorDoc.data(), doctorId };
-              });
-              return doctorData;
-            });
-        });
-        Promise.all(doctorArrayPromise).then((usersArray) => {
-          setSchedule(usersArray);
-        });
-      });
-  }, []);
-
-  const weekBar = () => {
-    const handleWeekbar = index => {
-      weekState.map((value, indexTemp) => {
-        weekState[indexTemp].status = (index == indexTemp) ? true : false;
-      })        
-      setWeekState([...weekState]);      
+    if (isFocused) {
+      // scrollRef.current.scrollTo({x: 0, y: 100, animated: true})
+      setWeekState([
+        {
+          date: "MON",
+          status: true,
+        },
+        {
+          date: "TUE",
+          status: false,
+        },
+        {
+          date: "WED",
+          status: false,
+        },
+        {
+          date: "THU",
+          status: false,
+        },
+        {
+          date: "FRI",
+          status: false,
+        },
+        {
+          date: "SAT",
+          status: false,
+        },
+        {
+          date: "SUN",
+          status: false,
+        },
+      ]);
     }
-    return (
-      <ScrollView
-        horizontal={true}
-        pagingEnabled={true}
-        decelerationRate={0}
-        scrollEventThrottle={16}
-        snapToAlignment="center"
-        showsHorizontalScrollIndicator={false}
-        snapToInterval={theme.SIZES.BASE * 0.375}
-        style={styles.weekScrollView}
-      >
-        {weekState.map((value, index) => {
-          return (
-            <TouchableOpacity key={index} onPress={() => {handleWeekbar(index)}} style={value.status ? styles.dateActive : styles.dateInActive}>
-              <Text size={16} color={value.status ? "white" : "black"}>
-                {value.date}
-              </Text>
-            </TouchableOpacity>
-          )
-        })}
-      </ScrollView>
-    );
-  };
+  }, [isFocused]);
+
+  firestore()
+  .collection("PCDoctors")
+  .get()
+  .then((querySnapshot) => {
+    var doctorData = [];
+    querySnapshot.docs.map((doc) => {
+      doctorData.push(doc.data());
+    });
+    setDoctors(doctorData);
+  });
+
+  // const weekBar = () => {
+  //   const handleWeekbar = index => {
+  //     scrollRef.current.scrollTo({x: 38*index, y: 100, animated: true});
+  //     weekState.map((value, indexTemp) => {
+  //       weekState[indexTemp].status = (index == indexTemp) ? true : false;
+  //     })        
+  //     setWeekState([...weekState]);      
+  //   }
+  //   return (
+  //     <ScrollView
+  //       ref={scrollRef}
+  //       horizontal={true}
+  //       pagingEnabled={true}
+  //       decelerationRate={0}
+  //       scrollEventThrottle={16}
+  //       snapToAlignment="center"
+  //       showsHorizontalScrollIndicator={false}
+  //       snapToInterval={theme.SIZES.BASE * 0.375}
+  //       style={styles.weekScrollView}
+  //     >
+  //       {weekState.map((value, index) => {
+  //         return (
+  //           <TouchableOpacity key={index} onPress={() => {handleWeekbar(index)}} style={value.status ? styles.dateActive : styles.dateInActive}>
+  //             <Text size={16} color={value.status ? "white" : "black"}>
+  //               {value.date}
+  //             </Text>
+  //           </TouchableOpacity>
+  //         )
+  //       })}
+  //     </ScrollView>
+  //   );
+  // };
 
   const _renderHeader = (section) => {
     return (
@@ -121,7 +115,7 @@ const ScheduleView = (props) => {
           <Block style={[styles.picBox]}>
             <Image
               source={{
-                uri: section.avatar,
+                uri: section && section.avatar,
               }}
               style={[
                 styles.picBox,
@@ -151,7 +145,9 @@ const ScheduleView = (props) => {
         </Block>
         <Block style={{ paddingTop: 10 }}>
           <Text size={16}>
-            {section.address}
+            {IMLocalized("address")}: {section.address}
+            {", "}
+            {IMLocalized("city/state")}: {section.cityState}
           </Text>
         </Block>
       </Block>
@@ -164,7 +160,7 @@ const ScheduleView = (props) => {
         <Block flex style={{ flexDirection: "column" }}>
           <Block flex>
             <Text size={16}>
-              <Text bold>Description:</Text>
+              <Text bold>{IMLocalized("description")}:</Text>
               {section.description}
             </Text>
           </Block>
@@ -176,7 +172,7 @@ const ScheduleView = (props) => {
           onPress={() => navigation.navigate("ScheduleDetail", {section})}
         >
           <Text size={15} color={"white"}>
-            Detail
+            {IMLocalized("detail")}
           </Text>
         </Button>
       </Block>
@@ -192,11 +188,13 @@ const ScheduleView = (props) => {
       <Block style={{ marginBottom: theme.SIZES.BASE * 2 }}>
         <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
           <Block height={theme.SIZES.BASE} flex></Block>
-          {schedule.length == 0 ? (
-            <ActivityIndicator size={50} color="#6E78F7" />
+          {doctors.length == 0 ? (
+            <Block style={{alignSelf: 'center'}}>
+              <ActivityIndicator style={{marginTop: 40}} size={50} color="#6E78F7" />
+            </Block>
           ) : (
             <Accordion
-              sections={schedule}
+              sections={doctors}
               activeSections={activeSections}
               renderHeader={_renderHeader}
               renderContent={_renderContent}
@@ -290,7 +288,7 @@ const ScheduleView = (props) => {
         <Block style={{ margin: theme.SIZES.BASE, marginBottom: 0 }}>
           <Text size={22}>Appointments</Text>
         </Block>
-        {weekBar()}
+        {/* {weekBar()} */}
         {renderPatientsList()}
       </ScrollView>
     </Block>
@@ -301,6 +299,7 @@ const styles = StyleSheet.create({
   weekScrollView: {
     marginVertical: theme.SIZES.BASE,
     padding: theme.SIZES.BASE,
+    marginRight: theme.SIZES.BASE,
     paddingTop: 0,
   },
   container: {
@@ -362,12 +361,10 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   button: {
-    marginBottom: theme.SIZES.BASE,
+    marginBottom: -theme.SIZES.BASE * 0.8,
     width: theme.SIZES.BASE * 8,
     borderRadius: 15,
-    position: "absolute",
-    right: theme.SIZES.BASE * 2,
-    bottom: -theme.SIZES.BASE * 2,
+    alignSelf: 'flex-end',
     height: theme.SIZES.BASE * 2,
   },
   searchBtn: {

@@ -193,6 +193,41 @@ const DashboardAgentStack = (props) => {
           ),
         }}
       />
+      <Stack.Screen
+        name="CreateCase"
+        component={CreateCaseScreen}
+        options={{
+          headerTransparent: true,
+        }}
+      />
+      <Stack.Screen
+        name="AddPatient"
+        component={AddPatientScreen}
+        options={{
+          headerTransparent: true,
+        }}
+      />
+      <Stack.Screen
+        name="AddAttorney"
+        component={AddAttorneyScreen}
+        options={{
+          headerTransparent: true,
+        }}
+      />
+      <Stack.Screen
+        name="AddInsurance"
+        component={AddInsuranceScreen}
+        options={{
+          headerTransparent: true,
+        }}
+      />
+      <Stack.Screen
+        name="AddNotes"
+        component={AddNotesScreen}
+        options={{
+          headerTransparent: true,
+        }}
+      />
     </Stack.Navigator>
   );
 };
@@ -229,6 +264,9 @@ const DoctorCaseHistoryStack = (props) => {
       <Stack.Screen name="DoctorCaseDetailFile" component={DoctorCaseDetailScreen} />
       <Stack.Screen name="DoctorAllNotes" component={DoctorAllNotesScreen} />
       <Stack.Screen name="DoctorAddNotes" component={DoctorAddNotesScreen} />
+      <Stack.Screen name="AgentReview" component={AgentFinalReviewScreen} />
+      <Stack.Screen name="AddAttorney" component={AddAttorneyScreen} />
+      <Stack.Screen name="AddInsurance" component={AddInsuranceScreen} />
     </Stack.Navigator>
   );
 };
@@ -280,7 +318,7 @@ const AppStack = (props) => {
           )}
           drawerStyle={{
             backgroundColor: "white",
-            width: width * 0.8,
+            width: width * 0.7,
           }}
           drawerContentOptions={{
             activeTintColor: "white",
@@ -467,6 +505,15 @@ const AppStack = (props) => {
             component={SchedulePatientListScreen}
             options={{
               headerTransparent: true,
+            }}
+          />
+          <Stack.Screen
+            name="AgentCaseDetail"
+            component={AgentCaseDetailScreen}
+            options={{
+              header: ({ navigation, scene }) => (
+                <Header back title="Case Detail" navigation={props.navigation} />
+              ),
             }}
           />
           <Stack.Screen
@@ -667,7 +714,7 @@ const AppStack = (props) => {
               fontWeight: "normal",
             },
           }}
-          initialRouteName="Doctor Dashboard"
+          initialRouteName="DashboardDoctor"
         >
           <Drawer.Screen
             name="Dashboard"
@@ -877,6 +924,13 @@ const PatientViewStack = (props) => {
           headerTransparent: true,
         }}
       />
+      <Stack.Screen
+        name="AddPatient"
+        component={AddPatientScreen}
+        options={{
+          headerTransparent: true,
+        }}
+      />
     </Stack.Navigator>
   );
 };
@@ -889,6 +943,15 @@ const CaseViewStack = (props) => {
         component={CaseViewScreen}
         options={{
           headerTransparent: true,
+        }}
+      />
+      <Stack.Screen
+        name="AgentCaseDetail"
+        component={AgentCaseDetailScreen}
+        options={{
+          header: ({ navigation, scene }) => (
+            <Header back title="Case Detail" navigation={props.navigation} />
+          ),
         }}
       />
     </Stack.Navigator>
@@ -907,14 +970,6 @@ const DoctorCaseViewStack = (props) => {
           ),
         }}
       />
-    </Stack.Navigator>
-  );
-};
-
-const AgentCaseDetailStack = (props) => {
-  return (
-    <Stack.Navigator mode="card" headerMode="screen">
-      <Stack.Screen name="AgentCaseDetail" component={AgentCaseDetailScreen} />
     </Stack.Navigator>
   );
 };
@@ -993,6 +1048,22 @@ const ScheduleViewStack = (props) => {
         options={{
           header: ({ navigation, scene }) => (
             <Header home title="Schedules" navigation={props.navigation} />
+          ),
+        }}
+      />
+      <Stack.Screen
+        name="DoctorScheduleDetail"
+        component={DoctorScheduleDetailScreen}
+        options={{
+          headerTransparent: true,
+        }}
+      />
+      <Stack.Screen
+        name="AgentCaseDetail"
+        component={AgentCaseDetailScreen}
+        options={{
+          header: ({ navigation, scene }) => (
+            <Header back title="Case Detail" navigation={props.navigation} />
           ),
         }}
       />
@@ -1100,21 +1171,6 @@ const DashboardDoctorStack = (props) => {
           ),
         }}
       />
-    </Stack.Navigator>
-  );
-};
-
-const TimeSlotStack = (props) => {
-  return (
-    <Stack.Navigator mode="card" headerMode="none">
-      <Stack.Screen
-        name="TimeSlot"
-        component={TimeSlotScreen}
-        option={{
-          headerTransparent: true,
-        }}
-      />
-      <Stack.Screen name="App" component={AppStack} />
     </Stack.Navigator>
   );
 };

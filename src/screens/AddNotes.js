@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Dimensions,
@@ -11,6 +11,8 @@ import Input from '../components/InputType2';
 import { isValid } from '../utils/helpers';
 import { useDispatch } from 'react-redux';
 import { noteInfoAction } from '../store/duck/action';
+import DatePicker from 'react-native-datepicker'
+import Textarea from 'react-native-textarea';
 
 const { width, height } = Dimensions.get("screen");
 const thumbMeasure = (width - 48 - 32) / 3;
@@ -18,27 +20,34 @@ const thumbMeasure = (width - 48 - 32) / 3;
 const AddNotes = (props) => {
   const { navigation } = props;
   const [authorName, setAuthorName] = useState("");
-  const [dob, setDob] = useState("");
+  const [dob, setDob] = useState(new Date());
   const [description, setDescription] = useState("");
-  const [editFlg, setEditFlg] = useState(false);
+  const [isSave, setIsSave] = useState(false);
   const [requested, setRequested] = useState(false);
-  const validDob = isValid('date', dob);
-  const validAuthorName = isValid('username', authorName);
-  const validDescription = isValid('description', description);
   const noteInfoDispatch = useDispatch();
   const noteInfo = [];
+
+  useEffect(() => {
+    if (
+        dob && 
+        isValid('username', authorName) && 
+        isValid('description', description) &&
+        authorName != '' &&
+        description != ''
+      ) 
+      setIsSave(true);
+    else 
+      setIsSave(false);
+  }, [dob, authorName, description]);
 
   const renderUserDetail = (detail) => {
     let { heading, content, handleValue, handleName, handleLabel, handlePlaceholder } = { ...detail };
     return (
-      <Block style={styles.detailStyle}>
+      // <Block style={styles.detailStyle}>
         <Input
           label={handleLabel}
           value={handleValue}
-          onChangeText={(res) => {
-            handleName(res)
-            setSaveEnable()
-          }}
+          onChangeText={(res) => handleName(res)}
           placeholder={handlePlaceholder}
           keyboardType="email-address"
           leftIcon=""
@@ -47,18 +56,10 @@ const AddNotes = (props) => {
           requested={requested}
           style={styles.valiInput}
         />
-      </Block>
+      // </Block>
     );
   };
 
-  const setSaveEnable = () => {
-    if (validDob && validAuthorName && validDescription) {
-      setEditFlg(true);
-    }
-    else{
-      setEditFlg(false);
-    }
-  }
   const handleSave = async () => {
     noteInfo.push({
       noteAuthorName: authorName,
@@ -67,14 +68,22 @@ const AddNotes = (props) => {
     });
     console.log("noteInfo->", noteInfo);
     noteInfoDispatch(noteInfoAction(noteInfo));
-    navigation.goBack();
+    resetAndGoBack();
   }
 
+  const resetAndGoBack = () => {
+    setIsSave(false);
+    setDob(new Date());
+    setAuthorName("");
+    setDescription("");
+    navigation.goBack();
+  }
   const navbar = () => {
     return (
       <Block row style={styles.navbar} center>
         <TouchableOpacity
-          onPress={() => navigation.goBack()}
+          style={styles.touchableArea}
+          onPress={() => resetAndGoBack()}
         >
           <Icon
             name="arrow-left"
@@ -86,21 +95,12 @@ const AddNotes = (props) => {
         </TouchableOpacity>
         <Text
           color="white"
-          style={{ paddingLeft: theme.SIZES.BASE }}
+          style={{ paddingLeft: theme.SIZES.BASE * 0.5 }}
           size={17}
           bold
         >
           Add Notes
         </Text>
-        {/* <TouchableOpacity onPress={
-          () => setEditFlg(true)
-        }>
-          <Image
-            source={require("../assets/icons/editHeaderWhite.png")}
-            alt=""
-            style={{ marginLeft: width * 0.55 }}
-          />
-        </TouchableOpacity> */}
       </Block>
     );
   };
@@ -110,13 +110,20 @@ const AddNotes = (props) => {
       {navbar()}
       <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
         <Block style={styles.userDetail}>
-          {renderUserDetail({
-            heading: "General Physician @99",
-            handlePlaceholder: "Fill with note create date",
-            handleName: setDob,
-            handleValue: dob,
-            handleLabel: "Date",
-          })}
+          <DatePicker
+            style={{ width: width * 0.9 }}
+            date={dob}
+            mode="date"
+            placeholder="select date"
+            format="YYYY-MM-DD"
+            minDate="1800-05-01"
+            maxDate="2500-06-01"
+            confirmBtnText="Confirm"
+            cancelBtnText="Cancel"
+            showIcon={false}
+            customStyles={{ dateInput: { borderRadius: 10 } }}
+            onDateChange={(date) => { setDob(date) }}
+          />
           {renderUserDetail({
             heading: "General Physician @99",
             handlePlaceholder: "Fill with author Name",
@@ -124,29 +131,22 @@ const AddNotes = (props) => {
             handleValue: authorName,
             handleLabel: "Username",
           })}
-          <Block style={[styles.detailStyle, { height: theme.SIZES.BASE * 10 }]}>
-            <Input
-              label="Description"
-              value={description}
-              onChangeText={(res) => {
-                setDescription(res)
-                setSaveEnable()
-              }}
-              placeholder="Write descriptions here."
-              leftIcon=""
-              rightIcon=""
-              validate
-              requested={requested}
-              multiline={true}
-              style={styles.valiInput}
+            <Textarea
+              containerStyle={styles.textareaContainer}
+              style={styles.textarea}
+              onChangeText={setDescription}
+              defaultValue={description}
+              maxLength={4000}
+              placeholder={'Fill your note description here.'}
+              placeholderTextColor={'#c7c7c7'}
+              underlineColorAndroid={'transparent'}
             />
-          </Block>
         </Block>
         <Block row style={{ marginTop: 20, alignSelf: 'flex-end' }}>
           <TouchableOpacity
-            style={editFlg ? styles.save : styles.saveDisable}
+            style={isSave ? styles.save : styles.saveDisable}
             onPress={() => handleSave()}
-            disabled={!editFlg}
+            disabled={!isSave}
           >
             <Text color={"#3A58FC"} size={14} style={{ alignSelf: 'center' }}>
               Save
@@ -155,11 +155,7 @@ const AddNotes = (props) => {
           <TouchableOpacity
             style={styles.save}
             onPress={() => {
-              setEditFlg(false);
-              setDob("");
-              setAuthorName("");
-              setDescription("");
-              navigation.goBack();
+              resetAndGoBack();
             }}
           >
             <Text color={"#3A58FC"} size={14} style={{ alignSelf: 'center' }}>
@@ -184,6 +180,12 @@ const styles = StyleSheet.create({
   profile: {
     // marginTop: Platform.OS === "android" ? height * 0.02 : height * 0.02,
     backgroundColor: "white",
+  },
+  touchableArea: {
+    width: 30, 
+    height: 30, 
+    justifyContent: 'center', 
+    alignItems: 'center'
   },
   optionsButtonText: {
     fontSize: theme.SIZES.BASE * 0.75,
@@ -228,6 +230,19 @@ const styles = StyleSheet.create({
     width: width * 1.1,
     height: "auto",
   },
+  textareaContainer: {
+    height: 180,
+    borderRadius: 10,
+    borderColor: 'grey',
+    borderWidth: 1
+  },
+  textarea: {
+    textAlignVertical: 'top',  // hack android
+    padding: theme.SIZES.BASE,
+    height: 170,
+    fontSize: 14,
+    color: '#333',
+  },
   profileContainer: {
     width: width,
     height: "auto",
@@ -269,6 +284,16 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     shadowOpacity: 0.2,
     zIndex: 2,
+  },
+  valiInput: {
+    width: '100%',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: 'grey',
+    backgroundColor: 'white',
+    fontSize: 14,
+    padding: theme.SIZES.BASE,
+    marginTop: theme.SIZES.BASE * 1.5
   },
   thumb: {
     borderRadius: 4,
@@ -341,6 +366,7 @@ const styles = StyleSheet.create({
     paddingVertical: 0,
   },
   saveDisable: {
+    fontSize: 10,
     backgroundColor: "lightgrey",
     borderRadius: 20,
     borderColor: '#C7C7C7',
@@ -352,6 +378,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
   },
   save: {
+    fontSize: 10,
     backgroundColor: "white",
     borderRadius: 20,
     borderColor: '#C7C7C7',
@@ -428,7 +455,7 @@ const styles = StyleSheet.create({
     width: width,
     height: height * 0.1,
     paddingTop: theme.SIZES.BASE,
-    paddingLeft: theme.SIZES.BASE,
+    paddingLeft: theme.SIZES.BASE * 0.5,
   },
 });
 

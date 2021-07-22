@@ -11,8 +11,6 @@ import { IMLocalized, init } from "../localization/IMLocalization";
 import { Icon } from "../components/";
 import { ScrollView } from "react-native-gesture-handler";
 import MapView, { Marker } from "react-native-maps";
-// import Geocoder from "react-native-geocoding";
-import firestore from '@react-native-firebase/firestore';
 
 const { height, width } = Dimensions.get("screen");
 
@@ -20,21 +18,13 @@ const AgentDoctorDetail = (props) => {
   const { navigation, route } = props;
   const { doctor } = route.params;
   const [imageUri, setImageUri] = useState(null);
-  
-  // Geocoder.init("AIzaSyAI7Bmf7Kw_ZXiDuUOFYHpjhJForJNprLo");
-  // Geocoder.from(name)
-  //   .then(json => {
-  //     var location = json.results[0].geometry.location;
-  //     console.log('location', location);
-  //   })
-  //   .catch(error => console.warn(error));      
 
   return (
     <Block flex style={styles.container}>
       <Block>
         <Block flex flexDirection="row" style={styles.roundBlock}>
           <Block flex={1} >
-            <TouchableOpacity onPress={() => navigation.goBack()}>
+            <TouchableOpacity style={styles.touchableArea} onPress={() => navigation.goBack()}>
               <Icon
                 size={16}
                 name="chevron-left"
@@ -47,6 +37,7 @@ const AgentDoctorDetail = (props) => {
           <Block flex={6}></Block>
           <Block flex={1}>
             <TouchableOpacity
+              style={styles.touchableArea}
               onPress={() => navigation.navigate("CreateDoctorAccount", { doctor })}
             >
               <Image
@@ -148,14 +139,14 @@ const AgentDoctorDetail = (props) => {
                     Email
                     <Text color="grey">*</Text>
                   </Text>
-                  <Text color="grey">
+                  <Text color="grey" style={{paddingTop: theme.SIZES.BASE}}>
                     Password
                     <Text color="grey">*</Text>
                   </Text>
                 </Block>
                 <Block flex={3}>
                   <Text color="grey">{doctor && doctor.email}</Text>
-                  <Text color="grey">{doctor && doctor.password}</Text>
+                  <Text color="grey" style={{paddingTop: theme.SIZES.BASE}}>{doctor && doctor.password}</Text>
                 </Block>
               </Block>
             </Block>
@@ -356,6 +347,12 @@ const styles = StyleSheet.create({
     height: 150,
     margin: width * 0.01,
     alignSelf: "center",
+  },
+  touchableArea: {
+    width: 30, 
+    height: 30, 
+    justifyContent: 'center', 
+    alignItems: 'center'
   },
 });
 

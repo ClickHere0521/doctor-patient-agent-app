@@ -1,11 +1,12 @@
 import PropTypes from 'prop-types';
-import React from 'react';
+import React, { useState } from 'react';
 import { View } from 'react-native';
 import { HelperText, TextInput, useTheme } from 'react-native-paper';
 import inputProps from '../constants/inputProps';
 import validators from '../constants/validators';
 import { isValid } from '../utils/helpers';
 import { theme } from "galio-framework";
+import { useSelector } from 'react-redux';
 
 const Input = ({
   onChangeText,
@@ -28,7 +29,8 @@ const Input = ({
   const valid = requested
     ? (isValid(inputProperties?.label.toLowerCase(), value) && value != '')
     : isValid(inputProperties?.label.toLowerCase(), value) || value == '';
-  
+  const [eye, setEye] = useState(false);
+
   if(leftIcon != null && rightIcon != null){
     return (
       <View style={containerStyle}>
@@ -41,6 +43,7 @@ const Input = ({
           {...props}
           label={label}
           value={value}
+          secureTextEntry={!eye}
           style={{
             textTransform: 'capitalize',
             marginBottom: validate ? 0 : 15,
@@ -58,13 +61,21 @@ const Input = ({
               onPress={() => {}}
             />
           }
-          right={
+          right={ rightIcon == "eye" ? (
             <TextInput.Icon
-              name={rightIcon} // where <Icon /> is any component from vector-icons or anything else
+              name={eye ? "eye-off" : rightIcon } // where <Icon /> is any component from vector-icons or anything else
               color="grey"
               size={theme.SIZES.BASE}
-              onPress={() => {}}
+              onPress={() => setEye(!eye)}
             />
+          ) : (
+            <TextInput.Icon
+              name={ rightIcon } // where <Icon /> is any component from vector-icons or anything else
+              color="grey"
+              size={theme.SIZES.BASE}
+              onPress={() => {} }
+            />
+          )
           }
         />
         

@@ -15,7 +15,6 @@ import { useSelector } from "react-redux";
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 
-
 const { width, height } = Dimensions.get("screen");
 
 const CustomDrawerContent = ({
@@ -73,10 +72,27 @@ const CustomDrawerContent = ({
           setCurUser(shot.data());
         });
         break;
+      case 'doctor':
+        firestore().collection('PCDoctors').doc(userId).get().then((shot) => {
+          let curUserTemp = {};
+          shot.docs.forEach((val) => {
+            curUserTemp = val.data();
+          })
+          setCurUser(curUserTemp);
+        });
+        break;
 
       default: break;
     }
   }, []);
+
+  const renderName = () => {
+    if (userRole == 'agent') {
+      return curUser && curUser.Name;
+    } else {
+      return curUser && curUser.name;
+    }
+  }
 
   return (
     <Block
@@ -91,7 +107,7 @@ const CustomDrawerContent = ({
             <Image style={{ width: 50, height: 50, borderRadius: 100 }} source={curUser ? { uri: curUser.avatar } : require('../assets/images/avatar.png')} alt="" />
             <Block middle style={styles.profile}>            
               <Text h5 color={"white"}>
-                {curUser ? curUser.Name : profile.name}                
+                {renderName()}
               </Text>
             </Block>
           </Block>

@@ -14,11 +14,13 @@ import { useSelector } from "react-redux";
 import { Button, Block, Text, theme } from "galio-framework";
 import { Icon } from "../components";
 import { IMLocalized } from "../localization/IMLocalization";
-import firestore from '@react-native-firebase/firestore';
 import LinearGradient from 'react-native-linear-gradient';
-import storage from '@react-native-firebase/storage';
 import { Modal } from 'react-native-paper';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import { useIsFocused } from '@react-navigation/native';
+import firestore from '@react-native-firebase/firestore';
+import storage from '@react-native-firebase/storage';
+import auth from '@react-native-firebase/auth';
 import RNFetchBlob from 'rn-fetch-blob';
 
 const { width, height } = Dimensions.get("screen");
@@ -27,11 +29,7 @@ const cardWidth = theme.SIZES.BASE * 4;
 const PatientCaseFile = (props) => {
   const userRole = useSelector((state) => state.user.role);
   const { navigation } = props;
-  // const { agentID, patientID, caseID } = props.route.params;
-  const agentID = "6hQ6yTAGNXNihOuFfQku05BK1SJ2";
-  const patientID = "fnKnshVLw4gDoISHRcnz1YkTNh62";
-  const caseID = "Ve414BvL9u8ynhnVKavQ";
-  const [activity, setActivity] = useState(false);  
+  const { category } = props.route.params;
   const [caseFiles, setCaseFiles] = useState();
   const [sortDirection, setSortDirection] = useState({
     label: true,
@@ -56,34 +54,33 @@ const PatientCaseFile = (props) => {
   const REMOTE_IMAGE_PATH =
     'https://raw.githubusercontent.com/AboutReact/sampleresource/master/gift.png';
   const [visible, setVisible] = useState(false);
+  const [spinner, setSpinner] = useState(false);
   const [fileUri, setFileUri] = useState('');
   const [fileName, setFileName] = useState('');
-  var tmpCaseFiles;
+  const isFocused = useIsFocused();
 
   const hideModal = () => setVisible(false);
-  const showModal = () => setVisible(true);
-  
+  const showModal = () => setVisible(true);  
+  const hideSpinner = () => setSpinner(false);
+  const showSpinner = () => setSpinner(true);
+
+  useEffect(() => {
+    if (isFocused) {
+      getInitialData();
+    }
+  }, [isFocused]);
   useEffect(() => {
     requestCameraPermission();
-  }, []);
-  
-  firestore()
-    .collection("Cases")
-    .doc(patientID)
-    .collection("Case")
-    .get()
-    .then((querySnapShot) => {
-      querySnapShot.forEach((doc) => {
-        tmpCaseFiles = doc.data().CaseFiles;
-      });
-      setCaseFiles(tmpCaseFiles);
-    });
+  }, []);  
 
+  const getInitialData = ()  => {
+    if (category && category.CaseFiles) setCaseFiles(category.CaseFiles);
+    else setCaseFiles([]);
+  };
   const getExtention = filename => {
     // To get the file extension
     return /[.]/.exec(filename) ? /[^.]+$/.exec(filename) : undefined;
   };  
-
   const checkPermission = async () => {
     if (Platform.OS === 'ios') {
       downloadImage();
@@ -111,7 +108,6 @@ const PatientCaseFile = (props) => {
       }
     }
   };
-
   const downloadImage = () => {
     let date = new Date();
     // Image URL which we want to download
@@ -146,7 +142,6 @@ const PatientCaseFile = (props) => {
         alert('Image Downloaded Successfully.');
       });
   };
-
   const requestCameraPermission = async () => {
     try {
       const granted = await PermissionsAndroid.request(
@@ -168,7 +163,6 @@ const PatientCaseFile = (props) => {
       console.warn(err);
     }
   };
-  
   const openCamera = () => {
     hideModal();
     launchCamera(
@@ -180,26 +174,27 @@ const PatientCaseFile = (props) => {
         saveToPhotos: true,
       },
       response => {
-        setFileUri(response.uri);
-        setFileName(response.fileName);
-        Alert.alert(
-          "Success",
-          `You have successfully scanned \n ${response.fileName}. \n\n Do you want to upload it?`,
-          [
-            {
-              text: "OK",
-              onPress: () => {},
-            },
-            {
-              text: "Cancel",
-              onPress: () => {},
-            }
-          ]
-        );
+        if (response.uri) {
+          setFileUri(response.uri);
+          setFileName(response.fileName);
+          Alert.alert(
+            "Success",
+            `You have successfully scanned \n ${response.fileName}. \n\n Do you want to upload it?`,
+            [
+              {
+                text: "OK",
+                onPress: () => {uploadScannedFile()},
+              },
+              {
+                text: "Cancel",
+                onPress: () => {},
+              }
+            ]
+          );
+        }
       },
     );
   };
-  
   const openLibrary = () => {
     hideModal();
     launchImageLibrary(
@@ -210,12 +205,81 @@ const PatientCaseFile = (props) => {
         maxWidth: 200,
       },
       response => {
-        setFileUri(response.uri);
-        setFileName(response.fileName);
+        if (response.uri) {
+          setFileUri(response.uri);
+          setFileName(response.fileName);
+          Alert.alert(
+            "Success",
+            `You have successfully scanned \n ${response.fileName}. \n\n Do you want to upload it?`,
+            [
+              {
+                text: "OK",
+                onPress: () => {uploadScannedFile()},
+              },
+              {
+                text: "Cancel",
+                onPress: () => {},
+              }
+            ]
+          );          
+        }
       },
     );
   };
+  const uploadScannedFile = async () => {
+    // showSpinner();
+    /* Manual Part */
+    const curSeconds = new Date().getTime() / 1000;;
+    const currentTimeObject = {
+      seconds: curSeconds,
+      nanoseconds: 0
+    }
+    const patientUid = category.patientInfo.patientUid;
+    const label = 'label';
+    const authorUid = auth().currentUser.uid;
+    let authorName;
+    firestore().collection('Agents').doc('6hQ6yTAGNXNihOuFfQku05BK1SJ2').collection('BusinessAgent').doc(authorUid).get().then((snapshot) => {
+      authorName = snapshot.data().Name;
+    }).then(() => {
+      let tempCaseFiles = [...caseFiles, {
+        label: label,
+        author: authorName,
+        UploadTime: currentTimeObject,
+        scanFileUrl: "https://firebasestorage.googleapis.com/v0/b/amgwf-70a28.appspot.com/o/avatar%2F6hQ6yTAGNXNihOuFfQku05BK1SJ2.png?alt=media&token=97f44268-8c34-413e-97d2-25a4522f897c",
+      }];
+      // alert(tempCaseFiles)
+      setCaseFiles(tempCaseFiles);
+    })
+    /* */
+   
+    // uploads file
+    // const currentTime = Date.now();
+    // const label = 'label';
+    // const pngRef = storage().ref(`avatar/${currentTime}.png`);
+    // console.log("pngRef", pngRef);
+    // await pngRef.putFile(fileUri);
+    // const url = await storage()
+    //   .ref(`avatar/${currentTime}.png`)
+    //   .getDownloadURL();
+    // console.log("url", url);
+    // alert(url);
+    // update firestore
+    // let tempCaseFiles = [...caseFiles, {
+    //   label: label,
+    //   author: 'authorName',
+    //   UploadTime: currentTime,
+    //   scanFileUrl: url,
+    // }];
+    // alert(tempCaseFiles)
+    // console.log('tempcasefiles', tempCaseFiles);
 
+    // firestore().collection('Cases').doc(patientUid).collection('Case').update({
+    //   CaseFiles: tempCaseFiles,
+    // }).then(() => {
+    //   hideSpinner();
+    // });
+
+  };
   const navbar = () => {
     return (
       <Block>
@@ -243,7 +307,6 @@ const PatientCaseFile = (props) => {
       </Block>
     );
   };
-
   const roleTitle = () => {
     switch (userRole) {
       case "agent":
@@ -254,7 +317,6 @@ const PatientCaseFile = (props) => {
         return <Text>(Doctor)</Text>;
     }
   };
-
   const renderSort = (item, index) => {
     const sortting = () => {
       switch (item.title) {
@@ -314,7 +376,6 @@ const PatientCaseFile = (props) => {
       </TouchableOpacity>
     );
   };
-
   const scanAndUpload = () => {
     if (userRole != "doctor") {
       return (
@@ -342,7 +403,6 @@ const PatientCaseFile = (props) => {
               </LinearGradient>
             </TouchableOpacity>
             <TouchableOpacity
-
               // onPress={}
             >
               <LinearGradient
@@ -364,7 +424,6 @@ const PatientCaseFile = (props) => {
       );
     }
   };
-
   const renderSorts = () => {
     return (
       <Block
@@ -388,36 +447,48 @@ const PatientCaseFile = (props) => {
       </Block>
     );
   };
-
   const returnButtons = () => {
-    if (userRole == "agent") {
-      return (
-        <Block>
-          <Button
+    switch (userRole) {
+      case 'agent': 
+        return (
+          <Block style={{marginBottom: 10}}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("UploadCaseFiles")}
+            >
+              <Block center style={styles.saveButton}>
+                <Text color="white" size={16}>
+                  {IMLocalized("uploadPatientFiles")}
+                </Text>
+              </Block>
+            </TouchableOpacity>
+            <TouchableOpacity
+
+            >
+              <Block center style={styles.saveButton}>
+                <Text color="white" size={16}>
+                  {IMLocalized("packAndShare")}    
+                </Text>
+              </Block>
+            </TouchableOpacity>
+          </Block>
+        );
+      case 'doctor':
+        return (
+          <Block></Block>
+        );
+      case 'patient':
+        return (
+          <TouchableOpacity
             style={{ borderRadius: 16, width: width * 0.95 }}
             color="#00CE30"
             onPress={() => navigation.navigate("UploadCaseFiles")}
           >
-            {IMLocalized("uploadPatientFiles")}
-          </Button>
-          <Button
-            style={{ borderRadius: 16, width: width * 0.95 }}
-            color="#00CE30"
-          >
-            {IMLocalized("packAndShare")}
-          </Button>
-        </Block>
-      );
-    } else {
-      return (
-        <Button
-          style={{ borderRadius: 16, width: width * 0.95 }}
-          color="#00CE30"
-          onPress={() => navigation.navigate("UploadCaseFiles")}
-        >
-          {IMLocalized("uploadPatientFiles")}
-        </Button>
-      );
+            <Text>
+              {IMLocalized("uploadPatientFiles")}     
+            </Text>            
+          </TouchableOpacity>
+        );
+      default: return null;
     }
   };
 
@@ -490,12 +561,18 @@ const PatientCaseFile = (props) => {
         ) : (
           <ActivityIndicator size={50} color="#6E78F7" />
         )}
-
       </ScrollView>
       {returnButtons()}
-      <Block>
-        
-      </Block>
+      <Modal
+        visible={spinner}
+        onDismiss={hideSpinner}
+        contentContainerStyle={styles.modal}
+        dismissable={false}>
+        <Text size={18} color="black">
+          Saving ...
+        </Text>
+        <ActivityIndicator size={50} color="#6E78F7" />
+      </Modal>      
       <Modal
         visible={visible}
         onDismiss={hideModal}
@@ -516,10 +593,19 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     width: width,
     height: height * 0.1,
-    paddingTop: theme.SIZES.BASE * 2,
+    paddingTop: theme.SIZES.BASE,
     paddingLeft: theme.SIZES.BASE,
     borderBottomWidth: 1,
     borderColor: "rgba(112, 112, 112, 0.1)",
+  },
+  saveButton: { 
+    borderRadius: 16, 
+    width: width * 0.95, 
+    backgroundColor: '#00CE30',
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginVertical: 4,
   },
   sortBox: {
     borderTopWidth: 2,

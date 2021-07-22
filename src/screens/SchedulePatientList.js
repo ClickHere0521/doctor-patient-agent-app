@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
   Dimensions,
+  View,
+  ActivityIndicator,
 } from "react-native";
 import { Block, Text, theme } from "galio-framework";
 import products from "../constants/images/home";
@@ -12,38 +14,82 @@ import {
   ListItem,
 } from "../components/";
 import { IMLocalized } from "../localization/IMLocalization";
+import firestore from '@react-native-firebase/firestore';
+import { set } from "lodash";
 
 const { width, height } = Dimensions.get("screen");
 const cardWidth = theme.SIZES.BASE * 4;
 
 const Components = (props) => {
   const { navigation } = props;
-  const { schedule } = props.route.params;
+  const { doctor } = props.route.params;
+  const [spinner, setSpinner] = useState(false);
+  const [booking, setBooking] = useState([]);
+  const tempBooking = [];
+
+  useEffect(() => {
+    setSpinner(true);
+    firestore().collection('PCDoctors').doc(doctor.uid).collection('Bookings').get().then((querySnapShot) => {
+      querySnapShot.forEach((bookingDoc) => {
+        // bookingDoc.data().caseReference.get().then((caseShot) => {
+        //   caseShot.data();
+        // });
+        tempBooking.push({
+          booking: bookingDoc.data(),
+          // case: caseDoc,
+        });
+      });
+      setBooking(tempBooking);
+
+    }).then((res) => {
+      if (tempBooking.length == 0) {
+        setBooking([]);
+      }
+      setSpinner(false);
+    });
+  }, [doctor]);
+
+  const handleCheck = (index) => {
+    let tempBookingCheck = [...booking];
+    tempBookingCheck[index].booking.isChecked = !tempBookingCheck[index].booking.isChecked;
+    setBooking(tempBookingCheck);
+  };
+
   const renderPatientsList = () => {
     return (
-      <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
-        <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
-          
-          <ListItem product={products[0]} horizontal role="schedulePatientList" />
-          <ListItem product={products[1]} horizontal role="schedulePatientList" />
-          <ListItem product={products[2]} horizontal role="schedulePatientList" />
-          <ListItem product={products[3]} horizontal role="schedulePatientList" />
-          <ListItem product={products[4]} horizontal role="schedulePatientList" />
-          <ListItem product={products[0]} horizontal role="schedulePatientList" />
-          <ListItem product={products[1]} horizontal role="schedulePatientList" />
-          <ListItem product={products[2]} horizontal role="schedulePatientList" />
-          <ListItem product={products[3]} horizontal role="schedulePatientList" />
-          <ListItem product={products[4]} horizontal role="schedulePatientList" />
-        </ScrollView>
-      </Block>
+      spinner ? (
+        <ActivityIndicator style={{marginTop: 40}} size={50} color="#6E78F7" />
+        ) : (
+          <>  
+            {
+              booking && booking.map((val, index) => (
+                  <ListItem key={index} category={val} horizontal role="schedulePatientList" handleCheck={handleCheck} index={index}/>
+                ) 
+              )
+            }            
+          </>
+        )          
     );
   };
 
+  const renderSaveButton = () => {
+    return (
+      <TouchableOpacity onPress={() => navigation.goBack()}>
+        <Block center style={styles.saveButton}>
+          <Text color="white" size={16}>
+            {IMLocalized("save")}
+          </Text>
+        </Block>
+      </TouchableOpacity>
+    );
+  }
+  
   const navbar = () => {
     return (
       <Block>
         <Block row style={styles.navbar} center>
           <TouchableOpacity
+            style={styles.touchableArea}
             onPress={() => navigation.goBack()}
           >
             <Icon
@@ -56,11 +102,11 @@ const Components = (props) => {
           </TouchableOpacity>
           <Text
             color="black"
-            style={{ paddingLeft: theme.SIZES.BASE }}
-            size={22}
+            style={{ paddingLeft: theme.SIZES.BASE * 0.5 }}
+            size={16}
             fontWeight="semiBold"
           >
-            {IMLocalized("Schedule Patient List")}
+            {IMLocalized("Patient List")}
           </Text>
         </Block>
         <Block style={{ borderTopWidth: 1, borderColor: "white" }}></Block>
@@ -77,6 +123,11 @@ const Components = (props) => {
       >
         {renderPatientsList()}
       </ScrollView>
+      {
+        spinner ? (
+          <></>
+        ) : renderSaveButton()
+      }
     </Block>
   );
 };
@@ -84,11 +135,21 @@ const Components = (props) => {
 const styles = StyleSheet.create({
   components: {
     paddingTop: theme.SIZES.BASE,
+    paddingHorizontal: theme.SIZES.BASE,
     backgroundColor: "#F8F8F8",
   },
   title: {
     paddingVertical: theme.SIZES.BASE,
     paddingHorizontal: theme.SIZES.BASE * 2,
+  },
+  saveButton: {
+    width: width * 0.7, 
+    height: 40, 
+    justifyContent: 'center', 
+    alignItems: 'center',
+    backgroundColor: "#6E78F7",
+    borderRadius: 20,    
+    marginBottom: 20,
   },
   group: {
     paddingTop: theme.SIZES.BASE * 3.75,
@@ -202,12 +263,18 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     elevation: 2,
   },
+  touchableArea: {
+    width: 30, 
+    height: 30, 
+    justifyContent: 'center', 
+    alignItems: 'center'
+  },
   navbar: {
     backgroundColor: "white",
     width: width,
-    height: height * 0.16,
+    height: height * 0.1,
     paddingTop: theme.SIZES.BASE * 2,
-    paddingLeft: theme.SIZES.BASE,
+    paddingLeft: theme.SIZES.BASE * 0.5,
     borderBottomWidth: 1,
     borderColor: "rgba(112, 112, 112, 0.1)",
   },

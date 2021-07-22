@@ -18,16 +18,13 @@ import products from "../constants/images/home";
 import { materialTheme } from "../constants";
 import { HeaderHeight } from "../constants/utils";
 import { useDispatch, useSelector } from "react-redux";
+import { patientInfoAction, attorneyInfoAction, insuranceInfoAction, noteInfoAction } from '../store/duck/action';
 import { IMLocalized } from "../localization/IMLocalization";
 import { ScrollView } from "react-native-gesture-handler";
 import { ListItem } from "../components/";
 import firestore from '@react-native-firebase/firestore';
-
 import _ from "lodash";
-
-import {
-  useFocusEffect
-} from '@react-navigation/native';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get("screen");
 const cardWidth = theme.SIZES.BASE * 4;
@@ -44,18 +41,27 @@ const sortCategories = [
   },
 ];
 
-
 const CaseView = (props) => {
-
-  const [cases, setCases] = useState([]);
-
-  let caseLists = [];
   const { navigation } = props;
+  const [cases, setCases] = useState([]);
   const [sortDirection, setSortDirection] = useState({
     patientName: true,
     caseCreateTime: true,
     caseStatus: true,
   });
+
+  const attorneyInfoDispatch = useDispatch();
+  const insuranceInfoDispatch = useDispatch();
+  const patientInfoDispatch = useDispatch();
+  const noteInfoDispatch = useDispatch();
+
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    if (isFocused) {
+      getInitialData();
+    }
+  }, [isFocused]);
 
   useFocusEffect(
     React.useCallback(() => {
@@ -95,7 +101,8 @@ const CaseView = (props) => {
     }, []),
   );
 
-  useEffect(() => {
+  const getInitialData = () => {
+    setCases([]);
     firestore()
       .collection("Cases")
       .get()
@@ -107,43 +114,24 @@ const CaseView = (props) => {
             .collection("Case")
             .get()
             .then((querySnapshot) => {
-              const caseId = doc.id;
-              var caseData = {};
+              var caseData = [];
               querySnapshot.forEach((caseDoc) => {
-                const { patientName, avatar, patientReference, caseStatus, caseCreateTime, caseID, caseWarning, docId } =
-                  caseDoc.data();
-                caseData = { ...caseDoc.data() };
+                caseData.push(caseDoc.data());
               });
               return caseData;
             });
         });
         Promise.all(caseArrayPromise).then((usersArray) => {
-          setCases(usersArray);
+          let temp = [];
+          usersArray.forEach((user_groups) => {
+            user_groups.forEach(user => {
+              temp = [...temp, user];
+            })
+          })
+          setCases(temp);
         });
       });
-  }, []);
-
-  const renderEvents = (events) => {
-    let { eventHeading, eventContent } = { ...events };
-    const userRole = useSelector((state) => state.user.role);
-    return (
-      <Block style={styles.options}>
-        <Block column space="between" style={styles.events} flex flexDirection="row">
-          <Block row center style={{ padding: theme.SIZES.BASE }} >
-            <Text color={"grey"} size={14}>
-              {eventHeading}
-            </Text>
-            <Text color={"red"}> *</Text>
-          </Block>
-          <Block center style={{ paddingRight: theme.SIZES.BASE }}>
-            <Text size={16} color={"black"}>
-              {eventContent}
-            </Text>
-          </Block>
-        </Block>
-      </Block>
-    );
-  };
+  }
 
   const renderSorts = () => {
     return (
@@ -161,7 +149,7 @@ const CaseView = (props) => {
             paddingHorizontal: theme.SIZES.BASE / 4,
           }}
         >
-          <Block flexDirection="row" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
+          <Block flexDirection="row" style={{ paddingBottom: theme.SIZES.BASE * 0.5 }}>
             {sortCategories &&
               sortCategories.map((item, index) => renderSort(item, index))}
           </Block>
@@ -170,13 +158,29 @@ const CaseView = (props) => {
     );
   };
 
+  const resetCreateCase = () => {
+
+    const insuranceInfo = [];
+    const pInfo = [];
+    const attorneyInfo = [];
+    const noteInfo = [];
+
+    attorneyInfoDispatch(attorneyInfoAction(attorneyInfo));
+
+    patientInfoDispatch(patientInfoAction(pInfo));
+
+    insuranceInfoDispatch(insuranceInfoAction(insuranceInfo));
+
+    noteInfoDispatch(noteInfoAction(noteInfo));
+  }
+
   const renderSort = (item, index) => {
     const sortting = () => {
       switch (item.title) {
         case 'Case':
           const sortArray = [...cases].sort((a, b) => {
-            if (a.patientName < b.patientName) return (sortDirection.patientName ? -1 : 1);
-            if (a.patientName > b.patientName) return (sortDirection.patientName ? 1 : -1);
+            if (a.patientInfo.patientName.toUpperCase() < b.patientInfo.patientName.toUpperCase()) return (sortDirection.patientName ? -1 : 1);
+            if (a.patientInfo.patientName.toUpperCase() > b.patientInfo.patientName.toUpperCase()) return (sortDirection.patientName ? 1 : -1);
             return 0;
           });
           setCases(sortArray);
@@ -238,7 +242,7 @@ const CaseView = (props) => {
         <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
 
           {cases.length === 0 ? (
-            <ActivityIndicator size={50} color="#6E78F7" />):
+            <ActivityIndicator style={{ marginTop: 40 }} size={50} color="#6E78F7" />) :
             cases.map((val, index) =>
             (
               <ListItem key={index} category={val} product={products[0]} horizontal role="agentCases" />
@@ -256,6 +260,7 @@ const CaseView = (props) => {
       <Block>
         <Block row style={styles.navbar} center>
           <TouchableOpacity
+            style={styles.touchableArea}
             onPress={() => navigation.openDrawer()}
           >
             <Icon
@@ -268,7 +273,7 @@ const CaseView = (props) => {
           </TouchableOpacity>
           <Text
             color="black"
-            style={{ paddingLeft: theme.SIZES.BASE }}
+            style={{ paddingLeft: theme.SIZES.BASE * 0.5 }}
             size={16}
             fontWeight="semiBold"
           >
@@ -292,13 +297,18 @@ const CaseView = (props) => {
           }}
         >
           <Block>
-            <TouchableOpacity onPress={() => navigation.navigate("CreateCase", { editPatient: false })} style={{ width: 60 }}>
+            <TouchableOpacity
+              onPress={() => {
+                resetCreateCase();
+                navigation.navigate("CreateCase", { selectedPatient: null } )
+              }}
+              style={{ width: 60 }}
+            >
               <Image source={require("../assets/images/createCase.png")} />
             </TouchableOpacity>
             <Text size={10} style={{ left: 26 }}>
               Add
             </Text>
-
           </Block>
         </Block>
         {renderSorts()}
@@ -478,12 +488,18 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     elevation: 2,
   },
+  touchableArea: {
+    width: 30,
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
   navbar: {
     backgroundColor: "white",
     width: width,
     height: height * 0.1,
     paddingTop: theme.SIZES.BASE * 2,
-    paddingLeft: theme.SIZES.BASE,
+    paddingLeft: theme.SIZES.BASE * 0.5,
     borderBottomWidth: 1,
     borderColor: "rgba(112, 112, 112, 0.1)",
   },

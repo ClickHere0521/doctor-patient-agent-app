@@ -17,6 +17,7 @@ import { isValid } from "../utils/helpers";
 import Input from "../components/InputType1";
 import AsyncStorage from '@react-native-community/async-storage';
 import auth from '@react-native-firebase/auth';
+import firestore from "@react-native-firebase/firestore";
 
 const { width, height } = Dimensions.get("window");
 
@@ -105,25 +106,87 @@ const SignIn = (props) => {
     
     auth().signInWithEmailAndPassword(email, password)
       .then(async (res) => {
-        await isSelected && AsyncStorage.setItem(
+        if (isSelected) 
+          await AsyncStorage.setItem(
+              'reminder',
+              JSON.stringify({ reminder: true }),
+              () => {}
+            )
+        else 
+          await AsyncStorage.setItem(
             'reminder',
-            JSON.stringify({ reminder: true }),
+            JSON.stringify({ reminder: false }),
             () => {}
-          )
-        AsyncStorage.getItem(
-          'bio',
-          (err, result) => {
-            tmpBio = JSON.parse(result);
-            if (!tmpBio) 
-              navigation.replace("App");
-            if (tmpBio && tmpBio.bio == 'none') 
-              navigation.replace("App");
-            if (tmpBio && tmpBio.bio == 'touch')
-              navigation.navigate("Biometrics", {bioTypeProp: 'touch'});
-            if (tmpBio && tmpBio.bio == 'face')
-              navigation.navigate("Biometrics", {bioTypeProp: 'face'});
+          )  
+        
+        firestore().collection('Users').doc(res.user.uid).get().then((query) => {
+          if (userRole == query.data().role) {
+            switch (query.data().role) {
+              case 'agent': 
+                AsyncStorage.getItem(
+                  'bio',
+                  (err, result) => {
+                    tmpBio = JSON.parse(result);
+                    if (!tmpBio) 
+                      navigation.replace("App");
+                    if (tmpBio && tmpBio.bio == 'none') 
+                      navigation.replace("App");
+                    if (tmpBio && tmpBio.bio == 'touch')
+                      navigation.navigate("Biometrics", {bioTypeProp: 'touch'});
+                    if (tmpBio && tmpBio.bio == 'face')
+                      navigation.navigate("Biometrics", {bioTypeProp: 'face'});
+                  }
+                ); 
+                break;
+              case 'doctor':
+                AsyncStorage.getItem(
+                  'bio',
+                  (err, result) => {
+                    tmpBio = JSON.parse(result);
+                    if (!tmpBio) 
+                      navigation.replace("App");
+                    if (tmpBio && tmpBio.bio == 'none') 
+                      navigation.replace("App");
+                    if (tmpBio && tmpBio.bio == 'touch')
+                      navigation.navigate("Biometrics", {bioTypeProp: 'touch'});
+                    if (tmpBio && tmpBio.bio == 'face')
+                      navigation.navigate("Biometrics", {bioTypeProp: 'face'});
+                  }
+                );
+                break;
+              case 'patient':
+                AsyncStorage.getItem(
+                  'bio',
+                  (err, result) => {
+                    tmpBio = JSON.parse(result);
+                    if (!tmpBio) 
+                      navigation.replace("App");
+                    if (tmpBio && tmpBio.bio == 'none') 
+                      navigation.replace("App");
+                    if (tmpBio && tmpBio.bio == 'touch')
+                      navigation.navigate("Biometrics", {bioTypeProp: 'touch'});
+                    if (tmpBio && tmpBio.bio == 'face')
+                      navigation.navigate("Biometrics", {bioTypeProp: 'face'});
+                  }
+                );
+                break;
+              default: break;
+            }
+          } else {
+            Alert.alert(
+              "Warning",
+              "Please choose the correct role", 
+              [
+                {
+                  text: "OK",
+                  onPress: () => console.log("OK Pressed"),
+                  style: "OK",
+                },
+              ]
+            );
           }
-        );
+        });
+
       })
       .catch((error) => {
         Alert.alert("Warning", "This email and password is invaild", [
@@ -198,23 +261,29 @@ const SignIn = (props) => {
               </Text>
             </TouchableOpacity>
           </Block>
-          <Block flex flexDirection="row" style={{ width: width * 0.9 }} center>
-            <CheckBox
-              checked={isSelected}
-              containerStyle={{ backgroundColor: "rgba(0,0,0,0)", width: 10 }}
-              onPress={() => {
-                setSelected(!isSelected);
-              }}
-            />
-            <Text style={styles.label}>Remember me</Text>
-            <TouchableOpacity
-              style={{ marginLeft: width / 6 }}
-              onPress={() => navigation.navigate("ForgotPassword")}
-            >
-              <Text style={{ color: "white" }}>
-                {IMLocalized("ForgotPassword")}
-              </Text>
-            </TouchableOpacity>
+          <Block flex flexDirection="row" style={{ width: width * 0.85 }} center>
+            <Block flex={1}>
+              <CheckBox
+                checked={isSelected}
+                center
+                containerStyle={{ backgroundColor: "rgba(0,0,0,0)", width: 10 }}
+                onPress={() => {
+                  setSelected(!isSelected);
+                }}
+              />
+            </Block>
+            <Block flex={6}>
+              <Text style={styles.label}>Remember me</Text>
+            </Block>
+            <Block flex={4}>
+              <TouchableOpacity
+                onPress={() => navigation.navigate("ForgotPassword")}
+              >
+                <Text style={{ color: "white" }}>
+                  {IMLocalized("ForgotPassword")}
+                </Text>
+              </TouchableOpacity>
+            </Block>
           </Block>
           <Block flex>
             <></>
@@ -276,9 +345,7 @@ const styles = StyleSheet.create({
     width: width * 0.8,
     position: "relative",
   },
-  checkboxContainer: {},
   label: {
-    paddingLeft: theme.SIZES.BASE / 2,
     color: "white",
   },
 });

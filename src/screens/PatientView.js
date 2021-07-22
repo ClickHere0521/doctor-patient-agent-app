@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from 'react';
 import {
   StyleSheet,
   Dimensions,
@@ -10,47 +10,40 @@ import {
   Image,
   Alert,
   ActivityIndicator,
-} from "react-native";
-import { Block, Text, theme, Icon } from "galio-framework";
+} from 'react-native';
+import {Block, Text, theme, Icon} from 'galio-framework';
 import LinearGradient from 'react-native-linear-gradient';
 
-import products from "../constants/images/home";
-import { materialTheme } from "../constants";
-import { HeaderHeight } from "../constants/utils";
-import { useDispatch, useSelector } from "react-redux";
-import { IMLocalized } from "../localization/IMLocalization";
-import { ScrollView } from "react-native-gesture-handler";
-import { ListItem } from "../components/";
+import products from '../constants/images/home';
+import {materialTheme} from '../constants';
+import {HeaderHeight} from '../constants/utils';
+import {useDispatch, useSelector} from 'react-redux';
+import {IMLocalized} from '../localization/IMLocalization';
+import {ScrollView} from 'react-native-gesture-handler';
+import {ListItem} from '../components/';
 import firestore from '@react-native-firebase/firestore';
+import _ from 'lodash';
+import {useFocusEffect, useIsFocused} from '@react-navigation/native';
 
-import _ from "lodash";
-
-import {
-  useFocusEffect
-} from '@react-navigation/native';
-
-const { width, height } = Dimensions.get("screen");
+const {width, height} = Dimensions.get('screen');
 const cardWidth = theme.SIZES.BASE * 4;
 
 const sortCategories = [
   {
-    title: "Name",
+    title: 'Name',
   },
   {
-    title: "Date",
+    title: 'Date',
   },
   {
-    title: "Current Status",
+    title: 'Current Status',
   },
 ];
 
-
-const PatientView = (props) => {
-
+const PatientView = props => {
+  const isFocused = useIsFocused();
   const [cases, setCases] = useState([]);
-
-  let caseLists = [];
-  const { navigation } = props;
+  const {navigation} = props;
   const [sortDirection, setSortDirection] = useState({
     patientName: true,
     caseCreateTime: true,
@@ -60,108 +53,93 @@ const PatientView = (props) => {
   useFocusEffect(
     React.useCallback(() => {
       const onBackPress = () => {
-        Alert.alert(
-          'Log out',
-          'Are you sure you want to log out?',
-          [
-            {
-              text: "OK",
-              onPress: () => { navigation.navigate("UserSelectStack") }
+        Alert.alert('Log out', 'Are you sure you want to log out?', [
+          {
+            text: 'OK',
+            onPress: () => {
+              navigation.navigate('UserSelectStack');
             },
-            {
-              text: "Cancel",
-              onPress: () => { }
-            }
-          ]
-        );
+          },
+          {
+            text: 'Cancel',
+            onPress: () => {},
+          },
+        ]);
         // Return true to stop default back navigaton
         // Return false to keep default back navigaton
         return true;
       };
 
       // Add Event Listener for hardwareBackPress
-      BackHandler.addEventListener(
-        'hardwareBackPress',
-        onBackPress
-      );
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
 
       return () => {
         // Once the Screen gets blur Remove Event Listener
-        BackHandler.removeEventListener(
-          'hardwareBackPress',
-          onBackPress
-        );
+        BackHandler.removeEventListener('hardwareBackPress', onBackPress);
       };
     }, []),
   );
 
-  // useEffect(() => {
+  useEffect(() => {
+    if (isFocused) {
+      getInitialData();
+    }
+  }, [isFocused]);
+
+  const getInitialData = () => {
+    setCases([]);
     firestore()
-      .collection("Cases")
+      .collection('Patients')
       .get()
-      .then((querySnapshot) => {
-        const caseArrayPromise = querySnapshot.docs.map((doc) => {
+      .then(querySnapshot => {
+        const caseArrayPromise = querySnapshot.docs.map(doc => {
           return firestore()
-            .collection("Cases")
+            .collection('Patients')
             .doc(doc.id)
-            .collection("Case")
+            .collection('Patient')
             .get()
-            .then((querySnapshot) => {
+            .then(querySnapshot => {
               const caseId = doc.id;
               var caseData = {};
-              querySnapshot.forEach((caseDoc) => {
-                const { patientName, avatar, patientReference, caseStatus, caseCreateTime, caseID, caseWarning, docId } =
-                  caseDoc.data();
-                caseData = { ...caseDoc.data() };
+              querySnapshot.forEach(caseDoc => {
+                const {
+                  patientName,
+                  avatar,
+                  patientReference,
+                  caseStatus,
+                  caseCreateTime,
+                  caseID,
+                  caseWarning,
+                  docId,
+                } = caseDoc.data();
+                caseData = {...caseDoc.data()};
               });
               return caseData;
             });
         });
-        Promise.all(caseArrayPromise).then((usersArray) => {
+        Promise.all(caseArrayPromise).then(usersArray => {
           setCases(usersArray);
         });
       });
-  // }, []);
-
-  const renderEvents = (events) => {
-    let { eventHeading, eventContent } = { ...events };
-    const userRole = useSelector((state) => state.user.role);
-    return (
-      <Block style={styles.options}>
-        <Block column space="between" style={styles.events} flex flexDirection="row">
-          <Block row center style={{ padding: theme.SIZES.BASE }} >
-            <Text color={"grey"} size={14}>
-              {eventHeading}
-            </Text>
-            <Text color={"red"}> *</Text>
-          </Block>
-          <Block center style={{ paddingRight: theme.SIZES.BASE }}>
-            <Text size={16} color={"black"}>
-              {eventContent}
-            </Text>
-          </Block>
-        </Block>
-      </Block>
-    );
   };
 
   const renderSorts = () => {
     return (
-      <Block style={{ marginTop: theme.SIZES.BASE / 2 }}>
+      <Block style={{marginTop: theme.SIZES.BASE / 2}}>
         <ScrollView
           horizontal={true}
           pagingEnabled={true}
           decelerationRate={0}
-          scrollEventThrottle={16} azzz
+          scrollEventThrottle={16}
+          azzz
           snapToAlignment="center"
-          style={{ width: width }}
+          style={{width: width}}
           showsHorizontalScrollIndicator={false}
           snapToInterval={cardWidth + theme.SIZES.BASE * 0.375}
           contentContainerStyle={{
             paddingHorizontal: theme.SIZES.BASE / 4,
-          }}
-        >
-          <Block flexDirection="row" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
+          }}>
+          <Block flexDirection="row" style={{ paddingBottom: theme.SIZES.BASE * 0.5 }}>
             {sortCategories &&
               sortCategories.map((item, index) => renderSort(item, index))}
           </Block>
@@ -173,54 +151,57 @@ const PatientView = (props) => {
   const renderSort = (item, index) => {
     const sortting = () => {
       switch (item.title) {
-        case 'Case':
+        case 'Name':
           const sortArray = [...cases].sort((a, b) => {
-            if (a.patientName < b.patientName) return (sortDirection.patientName ? -1 : 1);
-            if (a.patientName > b.patientName) return (sortDirection.patientName ? 1 : -1);
+            if (a.name.toUpperCase() < b.name.toUpperCase()) return sortDirection.patientName ? -1 : 1;
+            if (a.name.toUpperCase() > b.name.toUpperCase()) return sortDirection.patientName ? 1 : -1;
             return 0;
           });
           setCases(sortArray);
-          let temSort1 = { ...sortDirection };
-          setSortDirection({ ...temSort1, patientName: !temSort1.patientName })
+          let temSort1 = {...sortDirection};
+          setSortDirection({...temSort1, patientName: !temSort1.patientName});
           break;
         case 'Date':
           const sortArray1 = [...cases].sort((a, b) => {
-            if (a.caseCreateTime < b.caseCreateTime) return (sortDirection.caseCreateTime ? -1 : 1);
-            if (a.caseCreateTime > b.caseCreateTime) return (sortDirection.caseCreateTime ? 1 : -1);
+            if (a.DOB < b.DOB) return sortDirection.caseCreateTime ? -1 : 1;
+            if (a.DOB > b.DOB) return sortDirection.caseCreateTime ? 1 : -1;
             return 0;
           });
           setCases(sortArray1);
-          let temSort2 = { ...sortDirection };
-          setSortDirection({ ...temSort2, caseCreateTime: !temSort2.caseCreateTime })
+          let temSort2 = {...sortDirection};
+          setSortDirection({
+            ...temSort2,
+            caseCreateTime: !temSort2.caseCreateTime,
+          });
           break;
         case 'Current Status':
           const sortArray2 = [...cases].sort((a, b) => {
-            if (a.caseStatus < b.caseStatus) return (sortDirection.caseStatus ? -1 : 1);
-            if (a.caseStatus > b.caseStatus) return (sortDirection.caseStatus ? 1 : -1);
+            if (a.caseStatus < b.caseStatus)
+              return sortDirection.caseStatus ? -1 : 1;
+            if (a.caseStatus > b.caseStatus)
+              return sortDirection.caseStatus ? 1 : -1;
             return 0;
           });
           setCases(sortArray2);
-          let temSort3 = { ...sortDirection };
-          setSortDirection({ ...temSort3, caseStatus: !temSort3.caseStatus })
+          let temSort3 = {...sortDirection};
+          setSortDirection({...temSort3, caseStatus: !temSort3.caseStatus});
           break;
       }
-    }
+    };
     return (
       <TouchableOpacity
-        style={{ zIndex: 3, marginHorizontal: theme.SIZES.BASE }}
+        style={{zIndex: 3, marginHorizontal: theme.SIZES.BASE}}
         key={`product-${item.title}`}
         onPress={() => {
-          console.log("sortting");
+          console.log('sortting');
           sortting();
-        }}
-      >
+        }}>
         <LinearGradient
-          start={{ x: 0, y: 0 }}
-          end={{ x: 0.25, y: 1.1 }}
+          start={{x: 0, y: 0}}
+          end={{x: 0.25, y: 1.1}}
           locations={[0.2, 1]}
-          colors={["#EFEFEF", "#FFF"]}
-          style={styles.sortItem}
-        >
+          colors={['#EFEFEF', '#FFF']}
+          style={styles.sortItem}>
           <Block center>
             <Text center size={13} fontWeight="semiBold">
               {item.title}
@@ -233,18 +214,25 @@ const PatientView = (props) => {
 
   const renderPatientsList = () => {
     return (
-      <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
+      <Block style={{paddingHorizontal: theme.SIZES.BASE}}>
         <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
-
           {cases.length === 0 ? (
-            <ActivityIndicator style={{marginTop: 30}} size={50} color="#6E78F7" />) :
-            cases.map((val, index) =>
-            (
-              <ListItem key={index} category={val} product={products[0]} horizontal role="agentPatient" />
-            )
-            )
-          }
-
+            <ActivityIndicator
+              style={{marginTop: 30}}
+              size={50}
+              color="#6E78F7"
+            />
+          ) : (
+            cases.map((val, index) => (
+              <ListItem
+                key={index}
+                category={val}
+                product={products[0]}
+                horizontal
+                role="agentPatient"
+              />
+            ))
+          )}
         </ScrollView>
       </Block>
     );
@@ -254,9 +242,7 @@ const PatientView = (props) => {
     return (
       <Block>
         <Block row style={styles.navbar} center>
-          <TouchableOpacity
-            onPress={() => navigation.openDrawer()}
-          >
+          <TouchableOpacity style={styles.touchableArea} onPress={() => navigation.openDrawer()}>
             <Icon
               name="align-justify"
               family="font-awesome"
@@ -267,14 +253,13 @@ const PatientView = (props) => {
           </TouchableOpacity>
           <Text
             color="black"
-            style={{ paddingLeft: theme.SIZES.BASE }}
+            style={{paddingLeft: theme.SIZES.BASE * 0.5}}
             size={16}
-            fontWeight="semiBold"
-          >
-            {IMLocalized("Patients")}
+            fontWeight="semiBold">
+            {IMLocalized('Patients')}
           </Text>
         </Block>
-        <Block style={{ borderTopWidth: 1, borderColor: "white" }}></Block>
+        <Block style={{borderTopWidth: 1, borderColor: 'white'}}></Block>
       </Block>
     );
   };
@@ -282,21 +267,27 @@ const PatientView = (props) => {
   return (
     <Block flex style={styles.profile}>
       {navbar()}
-      <Block flex={1.3} style={{ backgroundColor: "#F8F8F8" }}>
+      <Block flex={1.3} style={{backgroundColor: '#F8F8F8'}}>
         <Block
           style={{
-            backgroundColor: "white",
+            backgroundColor: 'white',
             paddingVertical: theme.SIZES.BASE * 0.3,
-          }}
-        >
+          }}>
           <Block>
-            <TouchableOpacity onPress={() => navigation.navigate("AddPatient", { editPatient: false, addPermission: true })} style={{ width: 60 }}>
-              <Image source={require("../assets/images/createCase.png")} />
+            <TouchableOpacity
+              onPress={() =>
+                navigation.navigate('AddPatient', {
+                  editPatient: false,
+                  addPermission: true,
+                  category: null,
+                })
+              }
+              style={{width: 60}}>
+              <Image source={require('../assets/images/createCase.png')} />
             </TouchableOpacity>
-            <Text size={10} style={{ left: 26 }}>
+            <Text size={10} style={{left: 26}}>
               Add
-        </Text>
-
+            </Text>
           </Block>
         </Block>
         {renderSorts()}
@@ -310,22 +301,28 @@ const PatientView = (props) => {
 
 const styles = StyleSheet.create({
   profile: {
-    paddingTop: Platform.OS === "android" ? height * 0.02 : height * 0.02,
-    backgroundColor: "white",
+    paddingTop: Platform.OS === 'android' ? height * 0.02 : height * 0.02,
+    backgroundColor: 'white',
     width: width,
   },
   profileImage: {
     width: width * 1.1,
-    height: "auto",
+    height: 'auto',
   },
   profileContainer: {
     width: width,
-    height: "auto",
+    height: 'auto',
     flex: 0.6,
+  },
+  touchableArea: {
+    width: 30, 
+    height: 30, 
+    justifyContent: 'center', 
+    alignItems: 'center'
   },
   profileDetails: {
     paddingTop: theme.SIZES.BASE * 4,
-    justifyContent: "flex-end",
+    justifyContent: 'flex-end',
   },
   profileTexts: {
     paddingHorizontal: theme.SIZES.BASE * 2,
@@ -350,7 +347,7 @@ const styles = StyleSheet.create({
   },
   marginR10: {
     right: theme.SIZES.BASE * 2,
-    position: "absolute",
+    position: 'absolute',
   },
   options: {
     width: width * 0.9,
@@ -360,8 +357,8 @@ const styles = StyleSheet.create({
     marginTop: theme.SIZES.BASE / 1.5,
     borderRadius: 40,
     backgroundColor: theme.COLORS.WHITE,
-    shadowColor: "black",
-    shadowOffset: { width: 0, height: 0 },
+    shadowColor: 'black',
+    shadowOffset: {width: 0, height: 0},
     shadowRadius: 8,
     shadowOpacity: 0.2,
     elevation: 3,
@@ -373,7 +370,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    height: "100%",
+    height: '100%',
   },
   button: {
     marginBottom: theme.SIZES.BASE,
@@ -384,19 +381,19 @@ const styles = StyleSheet.create({
   },
   optionsText: {
     fontSize: theme.SIZES.BASE * 0.75,
-    color: "#4a4a4a",
-    fontWeight: "normal",
-    fontStyle: "normal",
+    color: '#4a4a4a',
+    fontWeight: 'normal',
+    fontStyle: 'normal',
     letterSpacing: -0.29,
   },
   optionsButton: {
-    width: "auto",
+    width: 'auto',
     height: 34,
     paddingHorizontal: theme.SIZES.BASE,
     paddingVertical: 10,
   },
   imageBlock: {
-    overflow: "hidden",
+    overflow: 'hidden',
     borderRadius: 4,
   },
   rows: {
@@ -406,7 +403,7 @@ const styles = StyleSheet.create({
     width: theme.SIZES.BASE * 3.5,
     height: theme.SIZES.BASE * 3.5,
     borderRadius: theme.SIZES.BASE * 1.75,
-    justifyContent: "center",
+    justifyContent: 'center',
   },
   category: {
     backgroundColor: theme.COLORS.WHITE,
@@ -414,20 +411,20 @@ const styles = StyleSheet.create({
     borderWidth: 0,
   },
   categoryTitle: {
-    height: "100%",
+    height: '100%',
     paddingHorizontal: theme.SIZES.BASE,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   sortItem: {
     borderWidth: 2,
     borderRadius: 1000,
-    borderColor: "#EFEFEF",
+    borderColor: '#EFEFEF',
     paddingVertical: 4,
     paddingHorizontal: width * 0.05,
-    shadowColor: "black",
-    shadowOffset: { width: -1, height: -1 },
+    shadowColor: 'black',
+    shadowOffset: {width: -1, height: -1},
     shadowRadius: 2,
     shadowOpacity: 0.2,
     elevation: 1,
@@ -436,18 +433,18 @@ const styles = StyleSheet.create({
   productItem: {
     width: cardWidth - theme.SIZES.BASE * 2,
     marginHorizontal: theme.SIZES.BASE,
-    shadowColor: "black",
-    shadowOffset: { width: 0, height: 7 },
+    shadowColor: 'black',
+    shadowOffset: {width: 0, height: 7},
     shadowRadius: 10,
     shadowOpacity: 0.2,
   },
   productRounded: {
     borderWidth: 2,
     borderRadius: 1000,
-    borderColor: "#fff",
+    borderColor: '#fff',
     padding: 3,
-    shadowColor: "black",
-    shadowOffset: { width: 2, height: 2 },
+    shadowColor: 'black',
+    shadowOffset: {width: 2, height: 2},
     shadowRadius: 4,
     shadowOpacity: 0.2,
   },
@@ -459,31 +456,31 @@ const styles = StyleSheet.create({
     height: cardWidth - theme.SIZES.BASE,
   },
   searchBtn: {
-    position: "absolute",
+    position: 'absolute',
     right: theme.SIZES.BASE,
     borderRadius: 1000,
     borderWidth: 1,
-    borderColor: "#DDD",
-    backgroundColor: "#FFF",
+    borderColor: '#DDD',
+    backgroundColor: '#FFF',
     width: theme.SIZES.BASE * 2,
     height: theme.SIZES.BASE * 2,
     paddingLeft: 5,
   },
   greyGradient: {
-    shadowColor: "black",
-    shadowOffset: { width: 2, height: 2 },
+    shadowColor: 'black',
+    shadowOffset: {width: 2, height: 2},
     shadowRadius: 2,
     shadowOpacity: 0.2,
     elevation: 2,
   },
   navbar: {
-    backgroundColor: "white",
+    backgroundColor: 'white',
     width: width,
     height: height * 0.1,
     paddingTop: theme.SIZES.BASE * 2,
-    paddingLeft: theme.SIZES.BASE,
+    paddingLeft: theme.SIZES.BASE * 0.5,
     borderBottomWidth: 1,
-    borderColor: "rgba(112, 112, 112, 0.1)",
+    borderColor: 'rgba(112, 112, 112, 0.1)',
   },
 });
 

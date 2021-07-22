@@ -66,7 +66,7 @@ const Language = (props) => {
     return (
       <Block>
         <Block row style={styles.navbar} center>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity style={styles.touchableArea} onPress={() => navigation.goBack()}>
             <Icon
               name="arrow-left"
               family="font-awesome"
@@ -77,8 +77,8 @@ const Language = (props) => {
           </TouchableOpacity>
           <Text
             color="black"
-            style={{ paddingLeft: theme.SIZES.BASE }}
-            size={22}
+            style={{ paddingLeft: theme.SIZES.BASE * 0.5 }}
+            size={16}
             fontWeight="semiBold"
           >
             {IMLocalized("language")}
@@ -143,12 +143,18 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 16,
   },
+  touchableArea: {
+    width: 30, 
+    height: 30, 
+    justifyContent: 'center', 
+    alignItems: 'center'
+  },
   navbar: {
     backgroundColor: "white",
     width: width,
     height: height * 0.1,
     paddingTop: theme.SIZES.BASE,
-    paddingLeft: theme.SIZES.BASE,
+    paddingLeft: theme.SIZES.BASE * 0.5,
     borderBottomWidth: 1,
     borderColor: "rgba(112, 112, 112, 0.1)",
   },

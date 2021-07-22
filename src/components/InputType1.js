@@ -26,6 +26,39 @@ const Input = ({
     label.toLowerCase().includes(i.label.toLowerCase()),
   );
 
+  const handleRightIcon = () => {
+    if (rightIcon == 'eye') {
+      if (secure) {
+        return (
+          <TextInput.Icon
+            name={'eye'}
+            color="white"
+            size={theme.SIZES.BASE}
+            onPress={() => {setSecure(!secure)}}
+          />
+        )
+      } else {
+        return (
+          <TextInput.Icon
+            name={'eye-off'}
+            color="white"
+            size={theme.SIZES.BASE}
+            onPress={() => {setSecure(!secure)}}
+          />
+        );
+      }
+    } else {
+      return (
+        <TextInput.Icon
+          name={rightIcon} 
+          color="white"
+          size={theme.SIZES.BASE}
+          onPress={() => {setSecure(!secure)}}
+        />
+      );
+    }
+  };
+
   const valid = requested
     ? (isValid(inputProperties?.label.toLowerCase(), value) && value != '')
     : isValid(inputProperties?.label.toLowerCase(), value) || value == '';
@@ -46,7 +79,7 @@ const Input = ({
             textTransform: 'capitalize',
             marginBottom: validate ? 0 : 15,
             minWidth: '80%',
-            height: 55,
+            height: 50,
             backgroundColor: "transparent"
           }}
           secureTextEntry={secure} 
@@ -57,12 +90,8 @@ const Input = ({
             }
           }}
           right={
-            <TextInput.Icon
-              name={rightIcon} // where <Icon /> is any component from vector-icons or anything else
-              color="white"
-              size={theme.SIZES.BASE}
-              onPress={() => { setSecure(!secure)}}
-            />
+            handleRightIcon()
+
           }
         />
 

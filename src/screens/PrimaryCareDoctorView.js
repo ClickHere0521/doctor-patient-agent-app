@@ -21,32 +21,16 @@ const PrimaryCareDoctorView = (props) => {
   const { navigation } = props;
   const [activeSections, setActiveSections] = useState([0]);
   const [doctors, setDoctors] = useState([]);
-  let doctorId;
-
+  
   firestore()
   .collection("PCDoctors")
   .get()
   .then((querySnapshot) => {
-    const doctorArrayPromise = querySnapshot.docs.map((doc) => {
-      return firestore()
-        .collection("PCDoctors")
-        .doc(doc.id)
-        .collection("PCDoctor")
-        .get()
-        .then((querySnapshot) => {
-          doctorId = doc.id;
-          var doctorData = {};
-          querySnapshot.forEach((doctorDoc) => {
-            const { address, city_state, email, name, phone, description } =
-              doctorDoc.data();
-            doctorData = { ...doctorDoc.data(), doctorId };
-          });
-          return doctorData;
-        });
+    var doctorData = [];
+    querySnapshot.docs.map((doc) => {
+      doctorData.push(doc.data());
     });
-    Promise.all(doctorArrayPromise).then((usersArray) => {
-      setDoctors(usersArray);
-    });
+    setDoctors(doctorData);
   });
 
   const navbarIcons = () => {
@@ -55,9 +39,9 @@ const PrimaryCareDoctorView = (props) => {
         <Block row>
           <TouchableOpacity
             onPress={() =>
-              navigation.navigate("CreateDoctorAccount", { doctorId: null })
+              navigation.navigate("CreateDoctorAccount", { doctor: null })
             }
-            style={{ paddingLeft: width * 0.6, padding: 2 }}
+            style={[styles.touchableArea, {marginLeft: width * 0.6}]}
           >
             <Image source={require("../assets/images/add.png")}/>
           </TouchableOpacity>
@@ -70,7 +54,7 @@ const PrimaryCareDoctorView = (props) => {
     return (
       <Block>
         <Block row style={styles.navbar} center>
-          <TouchableOpacity onPress={() => navigation.openDrawer()}>
+          <TouchableOpacity style={styles.touchableArea} onPress={() => navigation.openDrawer()}>
             <Icon
               name="align-justify"
               family="font-awesome"
@@ -82,8 +66,8 @@ const PrimaryCareDoctorView = (props) => {
 
           <Text
             color="black"
-            style={{ paddingLeft: theme.SIZES.BASE }}
-            size={20}
+            style={{ paddingLeft: theme.SIZES.BASE * 0.5 }}
+            size={16}
             fontWeight="semiBold"
           >
             {IMLocalized("doctors")}
@@ -95,7 +79,8 @@ const PrimaryCareDoctorView = (props) => {
     );
   };
 
-  const _renderHeader = (section) => {
+  const _renderHeader = (section, index, isActive, sections) => {
+    // alert(index)
     return (
       <Block flex style={[styles.container]}>
         <Block flex style={{ flexDirection: "row" }}>
@@ -121,7 +106,7 @@ const PrimaryCareDoctorView = (props) => {
           </Block>
           <Block center>
             <Icon
-              name="chevron-down"
+              name={isActive ? "chevron-up" : "chevron-down"}
               family="font-awesome"
               color={theme.COLORS.MUTED}
               size={theme.SIZES.BASE}
@@ -134,7 +119,7 @@ const PrimaryCareDoctorView = (props) => {
           <Text size={16}>
             {IMLocalized("address")}: {section.address}
             {", "}
-            {IMLocalized("city/state")}: {section.city_state}
+            {IMLocalized("city/state")}: {section.cityState}
           </Text>
         </Block>
       </Block>
@@ -156,8 +141,8 @@ const PrimaryCareDoctorView = (props) => {
           <Button
             shadowless
             color={"#00CE30"}
-            style={[styles.button]}
-            onPress={() =>navigation.navigate("AgentDoctorDetail", { doctor: section })}
+            style={styles.button}
+            onPress={() =>navigation.navigate("AgentDoctorDetail", {doctor: section })}
           >
             <Text size={15} color={"white"}>
               {IMLocalized("detail")}
@@ -224,18 +209,19 @@ const PrimaryCareDoctorView = (props) => {
 
 const styles = StyleSheet.create({
   container: {
+    zIndex: 1,
     shadowColor: "black",
     shadowOffset: { width: 4, height: 4 },
     shadowRadius: 4,
-    shadowOpacity: 0.4,
+    shadowOpacity: 0.2,
     elevation: 4,
     padding: theme.SIZES.BASE * 1.5,
     borderWidth: 1,
     borderColor: "#ddd",
     backgroundColor: "white",
-    borderBottomWidth: 0,
   },
   contentContainer: {
+    zIndex: 100,
     borderBottomLeftRadius: 36,
     borderBottomRightRadius: 36,
     shadowColor: "black",
@@ -283,12 +269,10 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   button: {
-    marginBottom: theme.SIZES.BASE,
+    marginBottom: -theme.SIZES.BASE * 0.8,
     width: theme.SIZES.BASE * 8,
     borderRadius: 15,
-    position: "absolute",
-    right: theme.SIZES.BASE * 2,
-    bottom: -theme.SIZES.BASE * 2,
+    alignSelf: 'flex-end',
     height: theme.SIZES.BASE * 2,
   },
   searchBtn: {
@@ -309,12 +293,18 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     elevation: 2,
   },
+  touchableArea: {
+    width: 30, 
+    height: 30, 
+    justifyContent: 'center', 
+    alignItems: 'center'
+  },
   navbar: {
     backgroundColor: "white",
     width: width,
     height: height * 0.1,
     paddingTop: theme.SIZES.BASE * 2,
-    paddingLeft: theme.SIZES.BASE,
+    paddingLeft: theme.SIZES.BASE * 0.5,
     borderBottomWidth: 1,
     borderColor: "rgba(112, 112, 112, 0.1)",
   },

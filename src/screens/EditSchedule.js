@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   StyleSheet,
   Dimensions,
@@ -6,99 +6,105 @@ import {
   Image,
   View,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 import { Block, Text, theme, Icon } from "galio-framework";
+import { Modal } from 'react-native-paper';
 import { materialTheme } from "../constants";
 import { IMLocalized } from "../localization/IMLocalization";
 import SwitchButton from "switch-button-react-native";
 import firestore from '@react-native-firebase/firestore';
+import { useIsFocused } from '@react-navigation/native';
 
 const { width, height } = Dimensions.get("screen");
 const thumbMeasure = (width - 48 - 32) / 3;
 
 const EditSchedule = (props) => {
+  const isFocused = useIsFocused();
+  const scrollRef = useRef();
   const { navigation } = props;
   const { doctor } = props.route.params;
   const [activeSwitch, setActiveSwitch] = useState(1);
-  const [weekState, setWeekState] = useState([
-    {
-      date: "MON",
-      status: true,
-    },
-    {
-      date: "TUE",
-      status: false,
-    },
-    {
-      date: "WED",
-      status: false,
-    },
-    {
-      date: "THU",
-      status: false,
-    },
-    {
-      date: "FRI",
-      status: false,
-    },
-    {
-      date: "SAT",
-      status: false,
-    },
-    {
-      date: "SUN",
-      status: false,
-    },
-  ]);
+  const [weekState, setWeekState] = useState([]);
   const [currentDay, setCurrentDay] = useState(0);
-  const [timeSlot, setTimeSlot] = useState(null);
-  const [childDay, setChildDay] = useState([]);
+  const [spinner, setSpinner] = useState(false);
   const [schedule, setSchedule] = useState([]);
-  const childDayList = [];
+  const [childDay, setChildDay] = useState([]);
   const tempSchedule = [];
+  const childDayList = [];
 
-  firestore().collection('PCDoctors').doc(doctor.doctorId).collection('PCDoctor').get().then((querySnapShot) => {
-    querySnapShot.forEach((doctorDoc) => {
-      firestore().collection('PCDoctors').doc(doctor.doctorId).collection('PCDoctor').doc(doctorDoc.id).collection('ScheduleInfo').get().then((querySnapShot) => {
-        querySnapShot.forEach((res) => {
-          const { patientName, caseID, caseReference, scheduleTime } = res.data();
-          const time = new Date(scheduleTime.seconds * 1000 + scheduleTime.nanoseconds/1000000);
-          childDayList.push(`${time.getFullYear()}-${time.getMonth()<10 ? 0 : null}${time.getMonth()+1}-${time.getDate()}`);
-          tempSchedule.push({
-            patientName,
-            time: time.toUTCString(),
-            year: time.getFullYear(),
-            month: time.getMonth(),
-            day: time.getDate(),
-            caseID,
-          });
-        })
-        setChildDay(childDayList);
-        setSchedule(tempSchedule);
-      })
-    })
-  })
+  const hideSpinner = () => setSpinner(false);
+  const showSpinner = () => setSpinner(true);
+
+  useEffect(() => {
+    if (isFocused) {
+      scrollRef.current.scrollTo({x: 0, y: 100, animated: true})
+      setWeekState([
+        {
+          date: "MON",
+          status: true,
+        },
+        {
+          date: "TUE",
+          status: false,
+        },
+        {
+          date: "WED",
+          status: false,
+        },
+        {
+          date: "THU",
+          status: false,
+        },
+        {
+          date: "FRI",
+          status: false,
+        },
+        {
+          date: "SAT",
+          status: false,
+        },
+        {
+          date: "SUN",
+          status: false,
+        },
+      ]);
+    }
+  }, [isFocused]);
+
+  useEffect(() => {
+    showSpinner();
+    firestore().collection('PCDoctors').doc(doctor.uid).collection('Schedules').get().then((querySnapShot) => {
+      querySnapShot.forEach((scheduleDoc) => {
+        const { scheduleTime } = scheduleDoc.data();
+        const time = new Date(scheduleTime.seconds * 1000 + scheduleTime.nanoseconds/1000000);
+        childDayList.push(`${time.getFullYear()}-${(time.getMonth()+1)<10 ? 0 : ''}${time.getMonth()+1}-${time.getDate()<10 ? 0 : ''}${time.getDate()}`);
+        tempSchedule.push(scheduleDoc.data());
+      });
+      setSchedule(tempSchedule);
+      setChildDay(childDayList);
+    }).then((res) => {
+      if (tempSchedule.length == 0) {
+        setSchedule([]);
+        setChildDay([]);
+      }
+      hideSpinner();
+    });
+  }, [doctor]);
 
   const weekBar = () => {
     const handleWeekbar = (index) => {
+      scrollRef.current.scrollTo({x: 38*index, y: 100, animated: true});
       weekState.map((value, indexTemp) => {
         weekState[indexTemp].status = index == indexTemp ? true : false;
       });
       setWeekState([...weekState]);
       setCurrentDay(index);
-      // if (dataSourceCords.length > scrollToIndex) {
-      //   ref.scrollTo({
-      //     x: 0,
-      //     y: dataSourceCords[scrollToIndex - 1],
-      //     animated: true,
-      //   });
-      // } else {
-      //   alert('Out of Max Index');
-      // }
     };
 
     return (
       <ScrollView
+        ref={scrollRef}
         horizontal={true}
         pagingEnabled={true}
         decelerationRate={0}
@@ -146,7 +152,8 @@ const EditSchedule = (props) => {
           <Block flex={5}></Block>
           <Block flex={1} style={styles.schedule}>
             <TouchableOpacity
-              // onPress={() => navigation.navigate("SchedulePatientList", {schedule})}
+              style={styles.touchableArea}
+              onPress={() => navigation.navigate("SchedulePatientList", {doctor})}
             >
               <Image source={require("../assets/images/add.png")} style={{width: 16, height: 16}} />
             </TouchableOpacity>
@@ -180,7 +187,7 @@ const EditSchedule = (props) => {
   const navbar = () => {
     return (
       <Block row style={styles.navbar} center>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
+        <TouchableOpacity style={styles.touchableArea} onPress={() => navigation.goBack()}>
           <Icon
             name="arrow-left"
             family="font-awesome"
@@ -191,7 +198,7 @@ const EditSchedule = (props) => {
         </TouchableOpacity>
         <Text
           color="white"
-          style={{ paddingLeft: theme.SIZES.BASE }}
+          style={{ paddingLeft: theme.SIZES.BASE * 0.5 }}
           size={17}
           bold
         >
@@ -199,6 +206,10 @@ const EditSchedule = (props) => {
         </Text>
       </Block>
     );
+  };
+
+  const NavigationToCalendar = () => {
+    navigation.navigate("Calendar", {scheduleCalendar: schedule, childDay});
   };
 
   return (
@@ -235,10 +246,15 @@ const EditSchedule = (props) => {
           </Block>
         </Block>
         <Block row style={styles.Container}>
-          <Text style={styles.schedules}>Schedules</Text>
-          <TouchableOpacity onPress={() => navigation.navigate("Calendar", {childDay, schedule})}>
-            <Text style={styles.calendar}>Calendar</Text>
-          </TouchableOpacity>
+          <Block flex={1}>
+            <Text style={styles.schedules}>Schedules</Text>
+          </Block>
+          <Block flex={3}></Block>
+          <Block flex={1}>
+            <TouchableOpacity onPress={() => NavigationToCalendar()}>
+              <Text style={styles.calendar}>Calendar</Text>
+            </TouchableOpacity>
+          </Block>
         </Block>
         {weekBar()}
         <Block style={styles.renderSchedules}>
@@ -252,14 +268,37 @@ const EditSchedule = (props) => {
           </Block>
         </TouchableOpacity>
       </ScrollView>
+      <Modal
+        visible={spinner}
+        onDismiss={hideSpinner}
+        contentContainerStyle={styles.modal}
+        dismissable={false}>
+        <Text size={18} color="black">
+          Loading ...
+        </Text>
+        <ActivityIndicator size={50} color="#6E78F7" />
+      </Modal>
     </Block>
   );
 };
 
 const styles = StyleSheet.create({
   weekScrollView: {
+    marginVertical: theme.SIZES.BASE,
+    padding: theme.SIZES.BASE,
+    marginRight: theme.SIZES.BASE,
     paddingTop: 0,
-    paddingLeft: 10,
+  },
+  modal: {
+    backgroundColor: 'white',
+    padding: 40,
+    borderRadius: 20,
+    alignSelf: 'center',
+    width: width * 0.7,
+    height: height * 0.3,
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    zIndex: 1000,
   },
   dateActive: {
     backgroundColor: "#00CE30",
@@ -409,7 +448,12 @@ const styles = StyleSheet.create({
   },
   calendar: {
     color: "#06D81E",
-    paddingLeft: width * 0.53,
+  },
+  touchableArea: {
+    width: 30, 
+    height: 30, 
+    justifyContent: 'center', 
+    alignItems: 'center'
   },
   navbar: {
     backgroundColor: "#6E78F7",
@@ -418,7 +462,7 @@ const styles = StyleSheet.create({
     width: width,
     height: height * 0.1,
     paddingTop: theme.SIZES.BASE,
-    paddingLeft: theme.SIZES.BASE,
+    paddingLeft: theme.SIZES.BASE * 0.5,
   },
   time: {
     justifyContent: "center",

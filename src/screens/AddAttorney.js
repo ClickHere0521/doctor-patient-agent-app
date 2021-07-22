@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   StyleSheet,
   Dimensions,
@@ -6,28 +6,29 @@ import {
   Image,
   TouchableOpacity,
   Alert,
+  PermissionsAndroid,
 } from "react-native";
 import { Button, Block, Text, theme, Icon } from "galio-framework";
 import { isValid } from '../utils/helpers';
 import Input from '../components/InputType2';
 import { materialTheme } from "../constants";
-import * as ImagePicker from "expo-image-picker";
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { attorneyInfoAction } from '../store/duck/action';
 import { Modal } from 'react-native-paper';
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-
-
+import PhoneInput from 'react-phone-number-input/react-native-input'
+import { isValidPhoneNumber } from 'react-phone-number-input'
+import { createIconSetFromFontello } from "react-native-vector-icons";
 const { width, height } = Dimensions.get("screen");
 const thumbMeasure = (width - 48 - 32) / 3;
 
 const AddAttorney = (props) => {
-
+  const userRole = useSelector((state) => state.user.role);
   const { navigation } = props;
   const { info } = props.route.params;
   // const { patientUid } = props.route.params;
-  const [imageUri, setImageUri] = useState(null);
-  const [editFlg, setEditFlg] = useState(false);
+  const [imageUri, setImageUri] = useState('');
+  const [isSave, setIsSave] = useState(false);
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [zipcode, setZipcode] = useState("");
@@ -35,30 +36,45 @@ const AddAttorney = (props) => {
   const [tel, setTel] = useState("");
   const [fax, setFax] = useState("");
   const [address, setAddress] = useState("");
-  const [description, setDescription] = useState("");
   const [requested, setRequested] = useState(false);
-
-  const validName = isValid('username', userName);
-  const validEmail = isValid('email', email);
-  const validAddress = isValid('address', address);
-  const validCityState = isValid('citystate', cityState);
-  const validZipcode = isValid('zipcode', zipcode);
-  const validTel = isValid('tel', tel);
-  const validFax = isValid('fax', fax);
-  const validDescription = isValid('description', description);
+  const [permission, setPermission] = useState(true);
+  const [visible, setVisible] = useState(false);
 
   const attorneyInfoDispatch = useDispatch();
-
   const attorneyInfo = [];
-
-  const [visible, setVisible] = useState(false);
 
   const hideModal = () => setVisible(false);
   const showModal = () => setVisible(true);
 
   useEffect(() => {
     requestCameraPermission();
+    if (userRole == 'agent')
+      setPermission(true);
+    else
+      setPermission(false);
   }, []);
+
+  useEffect(() => {
+    if (
+      userName != '' &&
+      email != '' &&
+      address != '' &&
+      cityState != '' &&
+      zipcode != '' &&
+      tel != '' &&
+      fax != '' &&
+      isValid('username', userName) &&
+      isValid('email', email) &&
+      isValid('address', address) &&
+      isValid('citystate', cityState) &&
+      isValid('zipcode', zipcode) &&
+      phoneValidation(tel) &&
+      isValid('fax', fax)
+    )
+      setIsSave(true);
+    else
+      setIsSave(false);
+  }, [userName, email, address, cityState, zipcode, tel, fax, imageUri]);
 
   const requestCameraPermission = async () => {
     try {
@@ -83,7 +99,6 @@ const AddAttorney = (props) => {
   };
 
   const openCamera = () => {
-    hideModal();
     launchCamera(
       {
         mediaType: 'photo',
@@ -93,14 +108,15 @@ const AddAttorney = (props) => {
         saveToPhotos: true,
       },
       response => {
-        console.log('====================', response.uri, response.fileName)
-        setImageUri(response.uri);
+        hideModal();
+        if (response.uri) {
+          setImageUri(response.uri);
+        }
       },
     );
   };
 
   const openLibrary = () => {
-    hideModal();
     launchImageLibrary(
       {
         mediaType: 'photo',
@@ -109,89 +125,118 @@ const AddAttorney = (props) => {
         maxWidth: 200,
       },
       response => {
-        console.log('====================', response.uri, response.fileName)
-        setImageUri(response.uri);
+        hideModal();
+        if (response.uri) {
+          setImageUri(response.uri);
+        }
       },
     );
   };
 
-  const renderUserDetail = (detail) => {
-    let { heading, content, handleName, handleValue, handleLabel, handlePlaceholder, data } = { ...detail };
-    console.log("data:", data);
-    return (
-      <Block style={styles.detail}>
-        <Block row>
-          <Text color={"grey"}>{heading}</Text>
-          <Text color={"red"} style={styles.asteride}>
-            *
-          </Text>
-        </Block>
-        <Block>
-          <Input
-            label={handleLabel}
-            value={data ? data : handleValue}
-            onChangeText={(res) => {
-              handleName(res)
-              setSaveEnable()
-            }}
-            // editable={editFlg}
-            placeholder={handlePlaceholder}
-            keyboardType="email-address"
-            leftIcon=""
-            rightIcon=""
-            validate
-            requested={requested}
-            style={styles.valiInput}
-          />
-        </Block>
-      </Block>
-    );
-  };
+  const phoneValidation = (phonenumber) => {
+    console.log(tel ? (isValidPhoneNumber(tel) ? true : false) : false);
+    return tel ? (isValidPhoneNumber(tel) ? true : false) : false;
+  }
 
-  const setSaveEnable = () => {
-    if (validEmail && validName && validAddress && validCityState && validZipcode && validTel && validFax) {
-      setEditFlg(true);
+  const renderUserDetail = (detail) => {
+    let { heading, handleName, handleValue, handleLabel, handlePlaceholder, data, keyboardType } = { ...detail };
+    if (handleLabel == "Tel") {
+      return (
+        <Block style={styles.detail}>
+          <Block row>
+            <Text color={"grey"}>{heading}</Text>
+            <Text color={"red"} style={styles.asteride}>
+              *
+            </Text>
+          </Block>
+          <Block>
+            {permission ? (
+              <PhoneInput
+                placeholder="+1234567890"
+                value={tel}
+                maxLength={16}
+                onChange={setTel}
+                />
+            ) : (
+              <PhoneInput
+                editable={false}
+                value={tel}
+                maxLength={16}
+                onChange={setTel} />
+            )}
+          </Block>
+          <Block>
+            <Text color="red">
+            {
+              tel ? (isValidPhoneNumber(tel) ? undefined : 'Invalid phone number') : ''
+            }</Text>
+          </Block>
+        </Block>
+      );
     }
     else {
-      setEditFlg(false);
+      return (
+        <Block style={styles.detail}>
+          <Block row>
+            <Text color={"grey"}>{heading}</Text>
+            <Text color={"red"} style={styles.asteride}>
+              *
+            </Text>
+          </Block>
+          <Block>
+            {permission ? (
+              <Input
+                label={handleLabel}
+                value={data ? data : handleValue}
+                onChangeText={(res) => handleName(res)}
+                editable={!info}
+                placeholder={handlePlaceholder}
+                keyboardType={keyboardType}
+                leftIcon=""
+                rightIcon=""
+                validate
+                requested={requested}
+                style={styles.valiInput}
+              />
+            ) : (
+              <Text style={styles.valiInput}>
+                {data}
+              </Text>
+            )}
+          </Block>
+        </Block>
+      );
     }
-  }
+  };
+
 
   const navbar = () => {
     return (
       <Block row style={styles.navbar} center>
         <TouchableOpacity
-          onPress={() => navigation.goBack()}
+          style={styles.touchableArea}
+          onPress={() => resetAndGoBack()}
         >
           <Icon
             name="arrow-left"
             family="font-awesome"
             color="white"
             size={16}
-            style={styles.chevronLeft}
           />
         </TouchableOpacity>
         <Text
           color="white"
-          style={{ paddingLeft: theme.SIZES.BASE }}
+          style={{ paddingLeft: theme.SIZES.BASE * 0.5 }}
           size={17}
           bold
         >
-          Add Attorney Info
+          Attorney Info
         </Text>
-        {/* <TouchableOpacity onPress={() => { setEditFlg(true) }}>
-          <Image
-            source={require("../assets/icons/editHeaderWhite.png")}
-            alt=""
-            style={{ marginLeft: width * 0.4 }}
-          />
-        </TouchableOpacity> */}
       </Block>
     );
   };
 
   const handleSave = async () => {
-
     attorneyInfo.push({
       attorAvatar: imageUri,
       attorName: userName,
@@ -201,84 +246,64 @@ const AddAttorney = (props) => {
       attorTel: tel,
       attorFax: fax,
       attorAddress: address,
-      attorDescription: description
     });
-
-    console.log("attor-PInfo: ", attorneyInfo);
-
     attorneyInfoDispatch(attorneyInfoAction(attorneyInfo));
-
+    // resetAndGoBack();
+    setIsSave(false);
     navigation.goBack();
-    // let caseId, attorneyId;
-    // try {
-    //   await firestore.collection('Cases').doc(patientUid).collection('Case').get().then((querySnapshot) => {
-    //     querySnapshot.forEach((doc) => {
-    //       caseId = doc.id;
-    //     });
-    //   });
-    //   await firestore.collection('Cases').doc(patientUid).collection('Case').doc(caseId).collection('attorneyInfo').get().then((querySnapshot) => {
-    //     querySnapshot.forEach((doc) => {
-    //       attorneyId = doc.id;
-    //     })
-    //   });
-    // } catch(e) {
-    //   console.log(e);
-    // }
-    // let newRef = firestore.collection('Cases').doc(patientUid).collection('Case').doc(caseId).collection('attorneyInfo').doc(attorneyId);
-    // newRef.set({
-    //   address, cityState, email, fax, userName, tel, zipcode, description, reference: newRef
-    // })
-    // .then( async () => {
-    //   const pngRef = storage.ref(`logo/${patientUid}.png`);
-    //   await pngRef.put(imageUri);
-    //   const url = await pngRef.getDownloadURL();
-    //   console.log("FDFD",url);
-    //   Alert.alert(
-    //     "Success",
-    //     "You have successfully created the attorney info",
-    //     [
-    //       {
-    //         text: 'OK',
-    //         onPress: () => navigation.navigate("CreateCase")
-    //       }
-    //     ]
-    //   );        
-    // })
-    // .catch((error) => {
-    //   console.log(error);
-    // });
   }
 
+  const resetAndGoBack = () => {
+    // setIsSave(false);
+    // setImageUri("");
+    // setUserName("");
+    // setEmail("");
+    // setAddress("");
+    // setCityState("");
+    // setZipcode("");
+    // setTel("");
+    // setFax("");
+    navigation.goBack();
+  }
   return (
     <Block center flex style={styles.profile}>
       {navbar()}
       <ScrollView vertical={true} showsVerticalScrollIndicator={false}>
         <Block center row style={{ marginTop: 10, top: 10, marginBottom: 20 }}>
           <Block middle>
-            <TouchableOpacity
-              onPress={() => showModal()}
-            >
-              { info && info.attorneyAvatar ? (
-                <Image
-                  source={{ uri: info.attorneyAvatar }}
-                  style={{ width: 80, height: 80, borderRadius: 50 }}
-                />
-              ) : (
-                <Image
-                  source={imageUri ? { uri: imageUri } : require("../assets/images/userDefault.png")}
-                  // source={require("../assets/images/userDefault.png")}
-                  style={{ width: 80, height: 80, borderRadius: 50 }}
-                />
-              )}
-            </TouchableOpacity>
-
-            <Icon
-              name="camera"
-              family="font-awesome"
-              color="#555"
-              size={20}
-              style={{ position: 'absolute', bottom: 4, right: 4 }}
-            />
+            {permission ? (
+              <Block>
+                <TouchableOpacity
+                  disabled={info}
+                  onPress={() => showModal()}
+                >
+                  {info && info.attorneyAvatar ? (
+                    <Image
+                      source={{ uri: info.attorneyAvatar }}
+                      style={styles.photo}
+                    />
+                  ) : (
+                    <Image
+                      source={imageUri != '' ? { uri: imageUri } : require("../assets/images/userDefault.png")}
+                      style={styles.photo}
+                    />
+                  )}
+                  <Block style={styles.photoPick}>
+                    <Icon
+                      name="camera"
+                      family="font-awesome"
+                      color="#666"
+                      size={16}
+                    />
+                  </Block>
+                </TouchableOpacity>
+              </Block>
+            ) : (
+              <Image
+                source={{ uri: info.attorneyAvatar }}
+                style={{ width: 80, height: 80, borderRadius: 50 }}
+              />
+            )}
           </Block>
         </Block>
 
@@ -289,6 +314,7 @@ const AddAttorney = (props) => {
             handleName: setUserName,
             handleValue: userName,
             handleLabel: "Username",
+            keyboardType: "email-address",
             data: info ? info.attorneyName : null,
           })}
           {renderUserDetail({
@@ -297,6 +323,7 @@ const AddAttorney = (props) => {
             handleName: setEmail,
             handleValue: email,
             handleLabel: "Email",
+            keyboardType: "email-address",
             data: info ? info.attorneyEmail : null,
           })}
           {renderUserDetail({
@@ -305,6 +332,7 @@ const AddAttorney = (props) => {
             handleName: setAddress,
             handleValue: address,
             handleLabel: "Address",
+            keyboardType: "email-address",
             data: info ? info.attorneyAddress : null,
           })}
           {renderUserDetail({
@@ -313,6 +341,7 @@ const AddAttorney = (props) => {
             handleName: setCityState,
             handleValue: cityState,
             handleLabel: "Citystate",
+            keyboardType: "email-address",
             data: info ? info.attorneyCityState : null,
           })}
           {renderUserDetail({
@@ -321,6 +350,7 @@ const AddAttorney = (props) => {
             handleName: setZipcode,
             handleValue: zipcode,
             handleLabel: "Zipcode",
+            keyboardType: "numeric",
             data: info ? info.attorneyZip : null,
           })}
           {renderUserDetail({
@@ -329,6 +359,7 @@ const AddAttorney = (props) => {
             handleName: setTel,
             handleValue: tel,
             handleLabel: "Tel",
+            keyboardType: "number-pad",
             data: info ? info.attorneyPhone : null,
           })}
           {renderUserDetail({
@@ -337,43 +368,45 @@ const AddAttorney = (props) => {
             handleName: setFax,
             handleValue: fax,
             handleLabel: "Fax",
+            keyboardType: "number-pad",
             data: info ? info.attorneyFax : null,
           })}
         </Block>
-        <Block row center>
-          <TouchableOpacity
-            style={[editFlg ? styles.save : styles.saveDisable, info ? styles.noDisplay : styles.display]}
-            disabled={!editFlg}
-            onPress={() => handleSave()}
-          >
-            <Text color={"white"} size={16}>
-              Save
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.save}
-            onPress={() => {
-              setEditFlg(false);
-              navigation.goBack()
-            }}
-          >
-            <Text color={"white"} size={16}>
-              Cancel
-            </Text>
-          </TouchableOpacity>
-        </Block>
+        {permission ? (
+          <Block row center style={{ padding: theme.SIZES.BASE * 0.5 }}>
+            <TouchableOpacity
+              style={[isSave ? styles.save : styles.saveDisable, info ? styles.noDisplay : styles.display]}
+              disabled={!isSave}
+              onPress={() => handleSave()}
+            >
+              <Text color={"white"} size={16}>
+                Save
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.save}
+              onPress={() => resetAndGoBack()}
+            >
+              <Text color={"white"} size={16}>
+                Cancel
+              </Text>
+            </TouchableOpacity>
+          </Block>
+        ) : (
+          <Block></Block>
+        )}
       </ScrollView>
       <Modal
-          visible={visible}
-          onDismiss={hideModal}
-          contentContainerStyle={styles.modal}>
-          <TouchableOpacity style={styles.cameraButton} onPress={openCamera}>
-            <Text style={{color: '#FFF'}}>Open Camera</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.cameraButton} onPress={openLibrary}>
-            <Text style={{color: '#FFF'}}>Open Library</Text>
-          </TouchableOpacity>
-        </Modal>
+        visible={visible}
+        onDismiss={hideModal}
+        contentContainerStyle={styles.modal}>
+        <TouchableOpacity style={styles.cameraButton} onPress={openCamera}>
+          <Text style={{ color: '#FFF' }}>Open Camera</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.cameraButton} onPress={openLibrary}>
+          <Text style={{ color: '#FFF' }}>Open Library</Text>
+        </TouchableOpacity>
+      </Modal>
     </Block>
   );
 };
@@ -406,6 +439,12 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
     shadowOpacity: 1,
+  },
+  touchableArea: {
+    width: 30,
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   uploadPicture: {
     paddingHorizontal: 14,
@@ -579,14 +618,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     marginBottom: 6,
   },
-  description: {
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "grey",
-    padding: 10,
-    width: width * 0.8,
-    margin: 10,
-  },
   userDetail: {
     width: width,
   },
@@ -610,16 +641,16 @@ const styles = StyleSheet.create({
     width: width,
     height: height * 0.1,
     paddingTop: theme.SIZES.BASE,
-    paddingLeft: theme.SIZES.BASE,
+    paddingLeft: theme.SIZES.BASE * 0.5,
   },
   valiInput: {
-    textTransform: 'capitalize',
     width: '100%',
     borderRadius: 9,
     backgroundColor: 'white',
     fontSize: 14,
     height: 40,
     padding: 10,
+    color: '#333'
   },
   cameraButton: {
     width: width * 0.5,
@@ -639,6 +670,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-around',
     zIndex: 1000,
+  },
+  photoPick: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: '#eee',
+    borderRadius: 30,
+    width: 24,
+    height: 24
+  },
+  photo: {
+    width: 80,
+    height: 80,
+    borderRadius: 50,
+    borderColor: '#eee',
+    borderWidth: 2
   },
 });
 
